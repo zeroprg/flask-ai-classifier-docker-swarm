@@ -1,0 +1,57 @@
+
+#Traffic controls cameras:
+#video_file1=http://203.77.210.41:2000/mjpg/video.mjpg
+
+#video_file0=http://107.85.197.18:8080/-wvhttp-01-/GetOneShot?image_size=1920x1080&frame_count=100
+video_file0=http://213.226.254.135:91/mjpg/video.mjpg
+video_file1=http://110.54.126.130:50000/cgi-bin/camera?resolution=1200&amp;quality=1&amp
+
+video_file2=http://14.160.87.118:83/cgi-bin/camera?resolution=1280
+video_file3=http://145.53.212.190:8001/mjpg/video.mjpg
+#Japanees Laundry:
+#video_file3=http://180.13.193.172:8083/-wvhttp-01-/GetOneShot?image_size=640x480&frame_count=1000000000
+
+
+#Parking Lots:
+#video_file0=http://170.249.152.2:8080/cgi-bin/viewer/video.jpg?r=COUNTER
+#video_file1=http://159.255.189.4:8081/mjpg/video.mjpg
+#video_file0=http://213.226.254.135:91/mjpg/video.mjpg
+
+#Jacusi
+#video_file2=http://208.72.70.171:80/mjpg/video.mjpg
+
+#Hotel in Sochi
+#video_file0=http://158.58.130.148/mjpg/video.mjpg
+
+#Park in Moscow
+#video_file0=http://95.215.176.83:8084/mjpg/video.mjpg
+
+#video_file0=picam
+#video_file1=http://192.168.0.100:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367
+#video_file2=http://192.168.0.101:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367
+#video_file0=http://38.101.209.29:8082/mjpg/video.mjpg?COUNTER
+#video_file0=http://192.168.0.100:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367
+ 
+#video_file1=http://192.168.0.101:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367 
+#video_file0=http://192.168.1.100:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367
+#video_file1=http://192.168.1.101:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367
+
+#video_file1=http://38.101.209.29:8082/mjpg/video.mjpg?COUNTER
+
+
+#Commands to move cameras right and left step from 0 to 3
+#cam_right0=curl 'http://z**o:V*st*!@192.168.1.100:81/decoder_control.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&command=6&onestep=2&_=35282579520910.657573406191367'
+#cam_right1=curl 'http://z**o:V*st*!@192.168.1.101:81/decoder_control.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&command=6&onestep=2&_=35282579520910.657573406191367'
+#cam_left0=curl 'http://z**o:V*st*!@192.168.1.100:81/decoder_control.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&command=4&onestep=2&_=35282579520910.657573406191367'
+#cam_left1=curl 'http://z**o:V*st*!@192.168.1.101:81/decoder_control.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&command=4&onestep=2&_=35282579520910.657573406191367'
+
+
+
+#prototxt=yolo-coco/yolov3-tiny.cfg
+prototxt=MobileNetSSD_deploy.prototxt.txt
+#model=yolo-coco/yolov3-tiny.weights
+model=MobileNetSSD_deploy.caffemodel
+confidence=0.10
+
+#Database configuration (Postgres)
+#ipaddress=192.168.0.153
