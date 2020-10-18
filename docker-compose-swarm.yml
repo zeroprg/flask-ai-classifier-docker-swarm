@@ -1,9 +1,9 @@
-version: '3.7'
+version: '3.5'
 
 services:
 
   web:
-    image: mjhea0/flask-docker-swarm_web:latest
+    image: zeroprg/flask-ai-classifier-docker-swarm_web:latest
     deploy:
       replicas: 1
       restart_policy:
@@ -14,7 +14,7 @@ services:
       - 5000
     environment:
       - FLASK_ENV=production
-      - APP_SETTINGS=project.config.ProductionConfig
+     # - APP_SETTINGS=project.config.ProductionConfig
       - DB_USER=postgres
       - DB_PASSWORD=postgres
     secrets:
