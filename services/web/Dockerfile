@@ -3,7 +3,7 @@
 ###########
 
 # Base Image
-FROM python:3.7 as builder
+FROM zeroprg/flask-docker-swarm_cv2:latest as builder
 
 # Lint
 RUN pip install flake8 black
@@ -23,7 +23,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /home/app/wheels -r requireme
 #########
 
 # Base Image
-FROM python:3.7-slim
+FROM zeroprg/flask-docker-swarm_cv2:latest
 
 # ----- NEW ----
 # Install curl
