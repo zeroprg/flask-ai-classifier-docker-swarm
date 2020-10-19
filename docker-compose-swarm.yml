@@ -17,8 +17,8 @@ services:
      # - APP_SETTINGS=project.config.ProductionConfig
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-    secrets:
-      - secret_code
+#    secrets:
+#      - secret_code
     depends_on:
       - db
     networks:
@@ -48,7 +48,7 @@ services:
       - app
 
   nginx:
-    image: mjhea0/flask-docker-swarm_nginx:latest
+    image: zeroprg/flask-docker-swarm_nginx:latest
     deploy:
       replicas: 1
       restart_policy:
@@ -82,6 +82,6 @@ volumes:
   data-volume:
     driver: local
 
-secrets:
-  secret_code:
-    external: true
+#secrets:
+#  secret_code:
+#    external: true

@@ -6,16 +6,16 @@
 FROM zeroprg/flask-docker-swarm_cv2:latest as builder
 
 # Lint
-RUN pip install flake8 black
+#RUN pip install flake8 black
 WORKDIR /home/app
 COPY project ./project
 COPY manage.py .
-RUN flake8 --ignore=E501 .
-RUN black --check .
+#RUN flake8 --ignore=E501 .
+#RUN black --check .
 
 # Install Requirements
 COPY requirements.txt .
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /home/app/wheels -r requirements.txt
+RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /home/app/wheels -r requirements.txt
 
 
 #########
