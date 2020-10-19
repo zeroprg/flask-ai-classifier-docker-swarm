@@ -4,7 +4,7 @@ import os
 import logging
 import argparse
 from flask import Flask, render_template, Response, request, redirect, jsonify, send_from_directory
-from flask_cors import cross_origin, CORS
+
 
 import project.db.api as db
 
