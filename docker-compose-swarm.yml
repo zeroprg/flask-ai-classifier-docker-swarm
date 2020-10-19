@@ -30,7 +30,7 @@ services:
       retries: 5
 
   db:
-    image: mjhea0/flask-docker-swarm_db:latest
+    image: zeroprg/flask-docker-swarm_db:latest
     deploy:
       replicas: 1
       restart_policy:
