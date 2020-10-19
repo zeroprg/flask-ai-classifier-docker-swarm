@@ -9,8 +9,9 @@ import cv2
 from flask import Blueprint, jsonify, request
 from project.api.classifyer import classify_frame
 from project.config import  ProductionConfig as prod
-
+import project.api.tools.config_file
 SECRET_CODE = "secret" #open("/run/secrets/secret_code", "r").read().strip()
+LOG = logging.getLogger("classifier-api.error")
 
 main_blueprint = Blueprint("main", __name__)
 net = None

@@ -2,7 +2,7 @@ import os
 import logging
 import argparse
 
-LOG = logging.getLogger("classifier-api.error")
+
 
 def configure(FILE):
     # construct the argument parse and parse the arguments
@@ -19,8 +19,8 @@ def configure(FILE):
                 # strip() removes white space from the ends of strings
                 args[name.strip()] = value.strip()
     
-    LOG.debug(args)
+
     if("ipaddress" in args.keys() ):
          ipaddress =  args["ipaddress"]
-         LOG.info('DB ip address:' + ipaddress )
+ 
     return args     
