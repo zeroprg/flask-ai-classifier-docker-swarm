@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.5'
 
 services:
 
@@ -33,17 +33,6 @@ services:
     networks:
       - app
 
-  nginx:
-    build:
-      context: ./services/nginx
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - 80:80
-    depends_on:
-      - web
-    networks:
-      - app
 
 networks:
   app:

@@ -63,7 +63,7 @@ services:
       - app
 
   visualizer:
-    image: dockersamples/visualizer:latest
+    image: alexellis2/visualizer-arm:latest
     ports:
       - 8080:8080
     volumes:
