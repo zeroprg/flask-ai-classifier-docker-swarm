@@ -3,7 +3,7 @@ import base64
 import time
 import sqlite3
 
-def create_connection(db_file, ipaddress=None, database="postgress", user="postgress", password="123456"):
+def create_connection(DATABASE_URI=None):
     """ create a database connection to the SQLite database
         specified by the db_file
     :param db_file: database file
@@ -11,13 +11,13 @@ def create_connection(db_file, ipaddress=None, database="postgress", user="postg
     """
     conn = None
     try:
-        if(  ipaddress is None or ipaddress == ''):
+        if(  DATABASE_URI is None or DATABASE_URI == ''):
             conn = sqlite3.connect(db_file)
             conn.execute("PRAGMA journal_mode=WAL")
             
         else:
             import psycopg2
-            conn = psycopg2.connect(host=ipaddress,database=database,user=user,password=password)  
+            conn = psycopg2.connect(psycopg2.connect)  
             P='%s'
 
     except Exception as e:

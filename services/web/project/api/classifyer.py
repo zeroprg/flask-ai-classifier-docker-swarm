@@ -39,12 +39,14 @@ from flask import Blueprint, jsonify, request
 
 #SECRET_CODE = open("/run/secrets/secret_code", "r").read().strip()
 
+# static variable
 
+hashes = {}
 
-
-def classify_frame(self, net, frame, cam):
+def classify_frame( net, frame, cam, confidence):
+    topic_label = ''
     # print(" Classify frame ... --->")
-    conn = db.create_connection(self.sqlite_db , self.db_ipaddress)
+    conn = db.create_connection(prod.DATABASE_URI)
     _frame = cv2.resize(frame, (DIMENSION_X, DIMENSION_Y))
     # _frame = imutils.resize(frame,DIMENSION_X)
     blob = cv2.dnn.blobFromImage(_frame, 0.007843,
@@ -63,7 +65,7 @@ def classify_frame(self, net, frame, cam):
             # with the prediction
             # filter out weak detections by ensuring the `confidence`
             # is greater than the minimum confidence
-            if detections[0, 0, i, 2] < self.confidence:
+            if detections[0, 0, i, 2] < confidence:
                 continue
 
             # otherwise, extract the index of the class label from
@@ -97,27 +99,28 @@ def classify_frame(self, net, frame, cam):
 
             if key not in LOOKED1:
                 continue
-            label1 = "{}: {:.2f}%".format(key, self.confidence * 100)
+            label1 = "{}: {:.2f}%".format(key, confidence * 100)
             # Draw rectangles
             cv2.rectangle(frame, (startX - 25, startY - 25), (endX + 25, endY + 25), (255, 0, 0), 1)
             cv2.putText(frame, label1, (startX - 25, startY - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
-            if self.hashes.get(key, None) is None:
+            camkey = key+' '+str(cam)
+            if hashes.get(camkey, None) is None:
                 # count objects for last sec, last 5 sec and last minute
 
-                self.hashes[key] = ImageHashCodesCountByTimer()
-                if not self.hashes[key].add(hash):
+                hashes[camkey] = ImageHashCodesCountByTimer()
+                if not hashes[camkey].add(hash):
                     continue
 
             else:
                 # if not is_hash_the_same(hash,hashes[key]): hashes[key].add(hash)
-                if not self.hashes[key].add(hash):
+                if not hashes[camkey].add(hash):
                     continue
                 label = ''
-                for key in self.hashes:
-                    if self.hashes[key].getCountedObjects() == 0:
+                for key in hashes:
+                    if hashes[camkey].getCountedObjects() == 0:
                         continue
-                    label += ' ' + key + ':' + str(self.hashes[key].getCountedObjects())
-                self.topic_label = label
+                    label += ' ' + key + ':' + str(hashes[camkey].getCountedObjects())
+                topic_label = label
 
 
             # process further only  if image is really different from other ones
@@ -132,10 +135,10 @@ def classify_frame(self, net, frame, cam):
                 day = "{date:%Y-%m-%d}".format(date=now)
                 db.insert_frame(conn, hash, day, int(time.time()*1000), key, crop_img_data, x_dim, y_dim, cam)
 
-            do_statistic(conn, cam, self.hashes)
+            do_statistic(conn, cam, hashes)
 
         # draw at the top left corner of the screen
-        cv2.putText(frame, self.topic_label, (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+        cv2.putText(frame, topic_label, (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
         conn.commit()
         # print(" Classify frame ... <---")
     return frame
@@ -161,14 +164,14 @@ def get_parameters_json(hashes, cam):
     for key in hashes:
         # logging.debug(images[key])
         trace = Trace()
-        trace.name = key
+        trace.name = key.split()[0]
         trace.cam = cam
         tm = int(time.time()*1000)  # strftime("%H:%M:%S", localtime())
         trace.hashcodes = hashes[key].toString()
         trace.x = tm
         # last = len(hashes[key].counted) -1
         trace.y = hashes[key].getCountedObjects()
-        trace.text = str(trace.y) + ' ' + key + '(s)'
+        # trace.text = str(trace.y) + ' ' + key + '(s)'
         ret.append(trace.__dict__)  # used for proper JSON generation (dictionary)
         # ret.append(trace)
         # logging.debug( trace.__dict__ )

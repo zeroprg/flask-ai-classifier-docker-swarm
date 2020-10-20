@@ -52,7 +52,7 @@ def secret():
     response_object = {
         "status": "success",
         "message": "nay!",
-        "container_id": '????', #os.uname()[1],
+        "container_id": os.uname()[1],
     }
     #if request.get_json().get("secret") == SECRET_CODE:
     #    response_object["message"] = "yay!"
