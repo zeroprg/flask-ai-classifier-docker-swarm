@@ -22,9 +22,9 @@ def seed_db():
     db.session.commit()
 
 @cli.command("ipaddress" )
-def seed_db(arg):
+def seed_db():
     """ Set ipaddress."""
-    print(arg)
+    print("Hited ipaddress")
     #db.session.add(User(username="michael", email="michael@notreal.com"))
     #db.session.commit()
 

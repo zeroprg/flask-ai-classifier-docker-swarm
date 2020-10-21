@@ -10,7 +10,7 @@ if USER is None or USER =='' : USER = "postgres"
 if PASSWORD is None or PASSWORD =='' : PASSWORD =  "postgres"
 # set config
 app_settings = os.getenv("APP_SETTINGS")
-if app_settings is None or app_settings =='' :app_settings = "config.txt"
+if app_settings is None or app_settings =='' :app_settings = "./services/web/config.txt"
 
 
 class ProductionConfig:
