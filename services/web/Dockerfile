@@ -8,6 +8,7 @@ FROM zeroprg/flask-docker-swarm_cv2:latest as builder
 # Lint
 #RUN pip install flake8 black
 WORKDIR /home/app
+
 COPY project ./project
 COPY manage.py .
 #RUN flake8 --ignore=E501 .
@@ -45,6 +46,7 @@ WORKDIR $APP_HOME
 COPY --from=builder /home/app/wheels /wheels
 COPY --from=builder /home/app/requirements.txt .
 RUN pip install --no-cache /wheels/*
+RUN pip install gunicorn
 
 # Copy in the Flask code
 COPY . $APP_HOME
@@ -56,4 +58,4 @@ RUN chown -R app:app $APP_HOME
 USER app
 
 # run server
-CMD gunicorn -w 4 -b 127.0.0.1:4000 manage:app
+CMD gunicorn -w 4 -b 0.0.0.0:4000 manage:app
