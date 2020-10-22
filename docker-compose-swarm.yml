@@ -3,18 +3,18 @@ version: '3.5'
 services:
 
   web:
-    image: zeroprg/flask-ai-classifier-docker-swarm_web:latest
+    image: zeroprg/flask-docker-swarm_web:latest
     deploy:
-      replicas: 1
+      replicas: 3
       restart_policy:
         condition: on-failure
       placement:
         constraints: [node.role == worker]
     expose:
-      - 5000
+      - 4000
     environment:
       - FLASK_ENV=production
-     # - APP_SETTINGS=project.config.ProductionConfig
+      - APP_SETTINGS=/home/app/web/config.txt
       - DB_USER=postgres
       - DB_PASSWORD=postgres
 #    secrets:
@@ -32,7 +32,7 @@ services:
   db:
     image: zeroprg/flask-docker-swarm_db:latest
     deploy:
-      replicas: 1
+      replicas: 2
       restart_policy:
         condition: on-failure
       placement:
@@ -44,6 +44,22 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    networks:
+      - app
+
+
+  nginx:
+    image: zeroprg/flask-docker-swarm_nginx:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == worker]
+    ports:
+      - 80:80
+    depends_on:
+      - web
     networks:
       - app
 

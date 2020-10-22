@@ -6,11 +6,13 @@ services:
     build:
       context: ./services/web
       dockerfile: Dockerfile
+    image: zeroprg/flask-docker-swarm_web
+
     expose:
-      - 5000
+      - 4000
     environment:
       - FLASK_ENV=production
-      - APP_SETTINGS=./services/web/config.txt
+      - APP_SETTINGS=/home/app/web/config.txt
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - SECRET_CODE=myprecious
@@ -23,6 +25,8 @@ services:
     build:
       context: ./services/db
       dockerfile: Dockerfile
+    image: zeroprg/flask-docker-swarm_db
+
     volumes:
       - data-volume:/var/lib/postgresql/data
     expose:
@@ -30,6 +34,20 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    networks:
+      - app
+
+  nginx:
+    build:
+      context: ./services/nginx
+      dockerfile: Dockerfile
+    image: zeroprg/flask-docker-swarm_nginx
+
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - web
     networks:
       - app
 
