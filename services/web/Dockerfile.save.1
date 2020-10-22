@@ -58,4 +58,4 @@ RUN chown -R app:app $APP_HOME
 USER app
 
 # run server
-#CMD gunicorn -w 4 -b 0.0.0.0:4000 manage:app
+CMD gu -w 4 -b localhost:4000 manage:app

@@ -4,14 +4,15 @@ services:
 
   web:
     image: zeroprg/flask-docker-swarm_web:latest
+    command: gunicorn --bind 0.0.0.0:4000 manage:app
     deploy:
       replicas: 3
       restart_policy:
         condition: on-failure
-      placement:
-        constraints: [node.role == worker]
-    expose:
-      - 4000
+#      placement:
+#        constraints: [node.role == worker]
+    ports:
+      - 4000:4000
     environment:
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
@@ -47,15 +48,16 @@ services:
     networks:
       - app
 
-
   nginx:
     image: zeroprg/flask-docker-swarm_nginx:latest
+#    deploy:
+#           mode: global
     deploy:
-      replicas: 4
+      replicas: 1
       restart_policy:
         condition: on-failure
-#      placement:
-#        constraints: [node.role == manager]
+      placement:
+        constraints: [node.role == worker]
     ports:
       - 80:80
     depends_on:

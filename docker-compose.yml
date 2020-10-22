@@ -6,10 +6,10 @@ services:
     build:
       context: ./services/web
       dockerfile: Dockerfile
-    image: zeroprg/flask-docker-swarm_web
+    image: zeroprg/flask-docker-swarm_web:latest
 
-    expose:
-      - 4000
+    ports:
+      - 4000:4000 
     environment:
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
@@ -25,7 +25,7 @@ services:
     build:
       context: ./services/db
       dockerfile: Dockerfile
-    image: zeroprg/flask-docker-swarm_db
+    image: zeroprg/flask-docker-swarm_db:latest
 
     volumes:
       - data-volume:/var/lib/postgresql/data
@@ -41,7 +41,7 @@ services:
     build:
       context: ./services/nginx
       dockerfile: Dockerfile
-    image: zeroprg/flask-docker-swarm_nginx
+    image: zeroprg/flask-docker-swarm_nginx:latest
 
     restart: always
     ports:
