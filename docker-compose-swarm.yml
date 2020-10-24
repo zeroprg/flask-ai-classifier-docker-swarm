@@ -40,8 +40,8 @@ services:
         constraints: [node.role == worker]
     volumes:
       - data-volume:/var/lib/postgresql/data
-    expose:
-      - 5432
+    ports:
+      - 5432:5432
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
