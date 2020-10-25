@@ -1,6 +1,8 @@
 import numpy as np
 from imutils.video import VideoStream
-
+import io
+import zlib
+import requests
 
 import dhash
 from PIL import Image
@@ -10,6 +12,8 @@ import json
 from objCountByTimer import ObjCountByTimer
 from multiprocessing import Process
 from multiprocessing import Queue
+
+CLASSIFIER_SERVER = 'http://192.168.0.167/classify'
 
 # initialize the list of class labels MobileNet SSD was trained to
 # detect, then generate a set of bounding box colors for each class
@@ -30,13 +34,12 @@ piCameraRate = 16
 NUMBER_OF_THREADS = 1
 
 class Detection:
-    def __init__(self, sqlite_db,ipaddress, confidence, prototxt, model, video_url, output_queue, cam):
+    def __init__(self, ipaddress, confidence, prototxt, model, video_url, output_queue, cam):
         self.confidence = confidence
         self.prototxt = prototxt
         self.model = model
         self.video_url = video_url
         self.hashes = {}
-        self.sqlite_db = sqlite_db
         self.db_ipaddress = ipaddress
         self.topic_label = 'no data'
         self.net = self.video_s = None
@@ -58,12 +61,16 @@ class Detection:
                     return
             except:
                 return
-            frame = self.classify_frame(self.net, frame, cam)
-            output_queue.put_nowait(frame)
+            result = call_classifier(frame, cam, self.confidence)
+            logger.info("cam {0} result: {1}".format(cam, result))
+
+            #output_queue.put_nowait(frame)
 
     def init_video_stream(self):
+        #logger.info(self.video_url, ('picam' == self.video_url))
         video_s = VideoStream(self.video_url,usePiCamera=('picam' == self.video_url), resolution=piCameraResolution,
                       framerate=piCameraRate).start()
+        #logger.info(video_s)                      
         time.sleep(2.0)
         return video_s
 
@@ -81,6 +88,32 @@ class Detection:
         return frame
 
 
+def call_classifier(frame,cam, confidence):
+    data, _ , _ = compress_nparr(frame)
+    parameters = {'cam': cam, 'confidence': confidence}
+    data = {'params': parameters, 'array':data}
+    res = requests.post(url=CLASSIFIER_SERVER,
+                        data=data,
+                        headers={'Content-Type': 'text/json'})
 
+    return res
 
+def compress_nparr(nparr):
+    """
+    Returns the given numpy array as compressed bytestring,
+    the uncompressed and the compressed byte size.
+    """
+    bytestream = io.BytesIO()
+    np.save(bytestream, nparr)
+    uncompressed = bytestream.getvalue()
+    compressed = zlib.compress(uncompressed)
+    return compressed, len(uncompressed), len(compressed)
 
+    
+def uncompress_nparr(bytestring):
+    """  Uncompress as bytestring into numpy array  """
+    return np.load(io.BytesIO(zlib.decompress(bytestring)))
+
+    #resp, _, _ = compress_nparr(data10)
+    #return Response(response=resp, status=200,
+    #                mimetype="application/octet_stream")

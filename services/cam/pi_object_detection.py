@@ -10,7 +10,7 @@ import logging
 import mimetypes
 import json
 
-from db.api import db
+import db.api as db
 
 from classifier import Detection
 
@@ -27,6 +27,7 @@ logger.debug('DEBUG mode')
 DELETE_FILES_LATER = 6 * 60 * 60  # sec  (8hours)
 ENCODING = "utf-8"
 IMAGES_BUFFER = 100
+
 
 videos = []
 camleft = []
@@ -119,15 +120,20 @@ vs = None
 
 fps = None
 p_get_frame = None
-ipaddress = None
+ipaddress = os.getenv("IP_ADDRESS")
+if ipaddress is None or ipaddress =='' :ipaddress = "192.168.0.167"
+conn = db.create_connection(ipaddress)
 
+# set config
+app_settings = os.getenv("APP_SETTINGS")
+if app_settings is None or app_settings =='' :app_settings = "./services/web/config.txt"
 
 def configure(args):
     # construct the argument parse and parse the arguments
     # I named config file as  file config.txt and stored it
     # in the same directory as the script
 
-    with open('config.txt') as f:
+    with open(app_settings) as f:
         for line in f:
             if separator in line:
                 # Find the name and value by splitting the string
@@ -164,7 +170,7 @@ def configure(args):
 
 def start_one_stream_processes(cam):
     Detection( ipaddress, float(args["confidence"]), args["prototxt"], args["model"], videos[cam][1],
-              imagesQueue[cam], cam);
+              imagesQueue[cam], cam)
 
     logger.info("p_classifiers for cam:" + str(cam) + " started")
 
@@ -188,7 +194,7 @@ def start():
 
     for cam in range(len(videos)):
         Detection( ipaddress, float(args["confidence"]), args["prototxt"], args["model"], videos[cam][1],
-                  imagesQueue[cam], cam);
+                  imagesQueue[cam], cam)
 
         logger.info("p_classifiers for cam:" + str(cam) + " started")
 
@@ -389,4 +395,4 @@ def params_feed():
 if (__name__ == '__main__'):
     start()
     app.run(host='0.0.0.0', port=3020, threaded=True)  # debug = True ) #
-    conn = db.create_connection(ipaddress)
+    

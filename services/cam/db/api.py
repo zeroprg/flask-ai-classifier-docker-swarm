@@ -3,6 +3,8 @@ import base64
 import time
 import sqlite3
 
+P='%s'
+
 def create_connection(DATABASE_URI=None):
     """ create a database connection to the SQLite database
         specified by the db_file
@@ -14,10 +16,10 @@ def create_connection(DATABASE_URI=None):
         if(  DATABASE_URI is None or DATABASE_URI == ''):
             conn = sqlite3.connect('frame.db')
             conn.execute("PRAGMA journal_mode=WAL")
-            
+            P = '?'
         else:
             import psycopg2
-            conn = psycopg2.connect(psycopg2.connect)  
+            conn = psycopg2.connect("dbname='streamer' user='postgres' host='{0}' password='postgres'".format(DATABASE_URI))  
             P='%s'
 
     except Exception as e:

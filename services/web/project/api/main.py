@@ -1,4 +1,6 @@
 import os
+import io
+import zlib
 import logging
 import json
 import numpy as np
@@ -62,7 +64,12 @@ def secret():
 def classify():
     data = request.json
     params = data['params']
-    array = np.array(data['arr'])
-    LOG.info("Hit /classify route: ", params, array.shape)
-    post_array = classify_frame(net, array, params.cam )
+    bytestring = data['array']
+    frame = uncompress_nparr(bytestring)
+    LOG.info("Hit /classify route: ", params)
+    post_array = classify_frame(net, frame, params.cam, params.confidence)
     return json.dumps(post_array.tolist())
+
+def uncompress_nparr(bytestring):
+    """ Uncompressed the bytestring values """
+    return np.load(io.BytesIO(zlib.decompress(bytestring)))

@@ -127,21 +127,22 @@ def classify_frame( net, frame, cam, confidence):
             if key in subject_of_interes:
                 x_dim = endX - startX
                 y_dim = endY - startY
-                font_scale = min(y_dim, x_dim) / 280
-                if font_scale > 0.15:
+                font_scale = min(y_dim, x_dim) / 280                
+                if font_scale > 0.12:
                     cv2.putText(crop_img_data, str(datetime.datetime.now().strftime('%H:%M %d/%m/%y')), (1, 15),
-                                cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 0, 0), 1)
+                                cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 0), 1)
                 now = datetime.datetime.now()
                 day = "{date:%Y-%m-%d}".format(date=now)
                 db.insert_frame(conn, hash, day, int(time.time()*1000), key, crop_img_data, x_dim, y_dim, cam)
 
-            do_statistic(conn, cam, hashes)
+            params = do_statistic(conn, cam, hashes)
 
         # draw at the top left corner of the screen
         cv2.putText(frame, topic_label, (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
         conn.commit()
         # print(" Classify frame ... <---")
-    return frame
+        # place frame in queue for further processing
+    return params #frame
 
 
 
@@ -157,6 +158,7 @@ def do_statistic(conn, cam, hashes):
     # Do some statistic work here
     params = get_parameters_json(hashes, cam)
     db.insert_statistic(conn, params)
+    return params
 
 
 def get_parameters_json(hashes, cam):

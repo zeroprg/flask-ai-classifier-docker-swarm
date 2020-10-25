@@ -12,12 +12,12 @@ def create_connection(DATABASE_URI=None):
     conn = None
     try:
         if(  DATABASE_URI is None or DATABASE_URI == ''):
-            conn = sqlite3.connect(db_file)
+            conn = sqlite3.connect('frame.db')
             conn.execute("PRAGMA journal_mode=WAL")
             
         else:
             import psycopg2
-            conn = psycopg2.connect(psycopg2.connect)  
+            conn = psycopg2.connect("dbname='streamer' user='postgres' host='{0}' password='postgres'".format(DATABASE_URI))  
             P='%s'
 
     except Exception as e:
