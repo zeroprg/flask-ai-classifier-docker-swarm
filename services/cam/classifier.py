@@ -92,13 +92,13 @@ class Detection:
 
 def call_classifier(frame, cam, confidence):
     data, _ , _ = compress_nparr(frame)    
-    #parameters = {'cam': cam, 'confidence': confidence}
-    #data = {'params': parameters, 'array':data}
+    parameters = {'cam': cam, 'confidence': confidence}
+    data = {'params': parameters, 'array':data}
     jsonResponse = None
     try:
         response = requests.post(url=CLASSIFIER_SERVER,
                             data=data,
-                            headers={'Content-Type': 'application/octet_stream'})
+                            headers={'Content-Type': 'text/json'})
         response.raise_for_status()
         # access JSOn content
         jsonResponse = response.json()
