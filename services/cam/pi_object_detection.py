@@ -122,7 +122,7 @@ fps = None
 p_get_frame = None
 ipaddress = os.getenv("IP_ADDRESS")
 if ipaddress is None or ipaddress =='' :ipaddress = "192.168.0.167"
-conn = db.create_connection(ipaddress)
+
 
 # set config
 app_settings = os.getenv("APP_SETTINGS")
@@ -297,6 +297,7 @@ def moreimgs():
     else:
         hour_back2 = 1  # default value: 60 min back
     print("cam: {}, hour_back1:{}, hour_back2:{}, object_of_interest: {}".format(cam, hour_back1, hour_back2, object_of_interest))
+    conn = db.create_connection(ipaddress)
     rows = db.select_last_frames(conn,cam=cam, time1=hour_back1, time2=hour_back2, obj=object_of_interest)
     return Response(json.dumps(rows), mimetype='text/plain')
 
@@ -313,7 +314,8 @@ def imgs_at_time():
 
 def gen_array_of_imgs(cam, delta=10000, currentime=int(time.time()*1000)):
     time1 = currentime - delta
-    time2 = currentime + delta    
+    time2 = currentime + delta
+    conn = db.create_connection(ipaddress)
     rows = db.select_frame_by_time(conn, cam, time1, time2)
     x = json.dumps(rows)
     return x
@@ -334,7 +336,8 @@ def gen(camera):
 def gen_params(cam=0, time1=0, time2=5*60*60*1000, object_of_interest=[]):
     """Parameters streaming generator function."""
  
-    print("time1: {} time2: {}".format(time1, time2))    
+    print("time1: {} time2: {}".format(time1, time2))
+    conn = db.create_connection(ipaddress)
     ls = db.select_statistic_by_time(conn, cam, time1, time2, object_of_interest)
     ret = json.dumps(ls)  # , indent = 4)
     logger.debug(ret)
