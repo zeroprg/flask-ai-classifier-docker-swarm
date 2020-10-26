@@ -62,12 +62,12 @@ def secret():
 
 @main_blueprint.route('/classify', methods=['POST'])
 def classify():
-    data = request.json
-    params = data['params']
-    bytestring = data['array']
-    frame = uncompress_nparr(bytestring)
-    LOG.info("Hit /classify route: ", params)
-    post_array = classify_frame(net, frame, params.cam, params.confidence)
+    data = request.data
+    #params = data['params']
+    #bytestring = data['array']
+    frame = uncompress_nparr(data)
+    LOG.info("Hit /classify route: ")
+    post_array = classify_frame(net, frame, 0, 0.13) # params.cam, params.confidence)
     return json.dumps(post_array.tolist())
 
 def uncompress_nparr(bytestring):

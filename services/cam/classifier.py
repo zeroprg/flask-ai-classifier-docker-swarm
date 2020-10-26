@@ -3,6 +3,7 @@ from imutils.video import VideoStream
 import io
 import zlib
 import requests
+from requests.exceptions import HTTPError
 
 import dhash
 from PIL import Image
@@ -52,17 +53,18 @@ class Detection:
             time.sleep(0.1 + 0.99/NUMBER_OF_THREADS)
 
     def classify(self, output_queue, cam):
+        print("classify was called")
         if self.video_s is None:
             self.video_s = self.init_video_stream()
         while True:
             try:
-                frame = self.read_video_stream(self.video_s)
-                if frame is None:
-                    return
+                frame = self.video_s.read()                
+                if frame is None: continue
             except:
+                print('Exception during reading stream by URL:{0}'.format(self.video_s))
                 return
             result = call_classifier(frame, cam, self.confidence)
-            logger.info("cam {0} result: {1}".format(cam, result))
+            print("cam {0} result: {1}".format(cam, result))
 
             #output_queue.put_nowait(frame)
 
@@ -88,15 +90,26 @@ class Detection:
         return frame
 
 
-def call_classifier(frame,cam, confidence):
-    data, _ , _ = compress_nparr(frame)
-    parameters = {'cam': cam, 'confidence': confidence}
-    data = {'params': parameters, 'array':data}
-    res = requests.post(url=CLASSIFIER_SERVER,
-                        data=data,
-                        headers={'Content-Type': 'text/json'})
+def call_classifier(frame, cam, confidence):
+    data, _ , _ = compress_nparr(frame)    
+    #parameters = {'cam': cam, 'confidence': confidence}
+    #data = {'params': parameters, 'array':data}
+    jsonResponse = None
+    try:
+        response = requests.post(url=CLASSIFIER_SERVER,
+                            data=data,
+                            headers={'Content-Type': 'application/octet_stream'})
+        response.raise_for_status()
+        # access JSOn content
+        jsonResponse = response.json()
+        print("Entire JSON response")
+        print(jsonResponse)
 
-    return res
+    except HTTPError as http_err:
+        print('HTTP error occurred: {0}'.format(http_err))
+    except Exception as err:
+        print('Other error occurred: {0}'.format(err))
+    return jsonResponse
 
 def compress_nparr(nparr):
     """

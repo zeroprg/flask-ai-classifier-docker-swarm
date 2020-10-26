@@ -109,7 +109,7 @@ def destroy():
     # do a bit of cleanup
     #cv2.destroyAllWindows()
     vs.stop()
-    conn.close()
+    #conn.close()
 
 
 separator = "="
