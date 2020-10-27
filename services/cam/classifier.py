@@ -5,6 +5,8 @@ import zlib
 import requests
 from requests.exceptions import HTTPError
 
+import base64
+
 import dhash
 from PIL import Image
 import time
@@ -14,7 +16,9 @@ from objCountByTimer import ObjCountByTimer
 from multiprocessing import Process
 from multiprocessing import Queue
 
-CLASSIFIER_SERVER = 'http://192.168.0.167/classify'
+import cv2
+
+CLASSIFIER_SERVER = 'http://localhost:5000/classify' # 'http://192.168.0.167/classify'
 
 # initialize the list of class labels MobileNet SSD was trained to
 # detect, then generate a set of bounding box colors for each class
@@ -57,10 +61,10 @@ class Detection:
             self.video_s = self.init_video_stream()
         while True:
             try:
-                frame = self.video_s.read()
-                if frame is None: continue
+                frame = self.read_video_stream(self.video_s)
+                if frame is None: return
             except:
-                print('Exception during reading stream by URL:{0}'.format(self.video_s))
+                print('Exception during reading stream by URL:{0}'.format(self.video_url))
                 return
             result = call_classifier(frame, cam, self.confidence)
             print("cam {0} result: {1}".format(cam, result))
@@ -69,26 +73,38 @@ class Detection:
 
 
     def init_video_stream(self):
-        #logger.info(self.video_url, ('picam' == self.video_url))
-        video_s = VideoStream(self.video_url,usePiCamera=('picam' == self.video_url), resolution=piCameraResolution,
-                      framerate=piCameraRate).start()
-        #logger.info(video)
-        time.sleep(2.0)
+        if 'picam' == self.video_url:
+            video_s = VideoStream(usePiCamera=True, resolution=piCameraResolution, framerate=piCameraRate).start()
+            time.sleep(2.0)
+
+        else:
+            # grab the frame from the threaded video stream
+            video_s = cv2.VideoCapture(self.video_url)
         return video_s
 
-
+    def read_video_stream(self, video_s):
+        # print("Read video stream .. " + self.video_url)
+        if 'picam' == self.video_url:
+            frame = video_s.read()
+        else:
+            flag, frame = video_s.read()
+            if not flag:
+                video_s = cv2.VideoCapture(self.video_url)
+                flag, frame = video_s.read()
+                return frame
+        return frame
 
 
 
 def call_classifier(frame, cam, confidence):
-    data = frame.tolist()  #, _ , _ = compress_nparr(frame)
+    _,data = cv2.imencode('.jpg', frame) # frame.tolist() #  , _ , _ = compress_nparr(frame)
     parameters = {'cam': cam, 'confidence': confidence}
-    data = {'params': parameters, 'array':data}
+    data = {'params': parameters, 'array': base64.b64encode(data).decode('utf-8')}
     jsonResponse = None
     try:
         response = requests.post(url=CLASSIFIER_SERVER,
                             json=data)
-#                            headers={'Content-Type': 'text/json'})
+                            #headers={'Content-Type': 'text/json'})
         response.raise_for_status()
         # access JSOn content
         jsonResponse = response.json()

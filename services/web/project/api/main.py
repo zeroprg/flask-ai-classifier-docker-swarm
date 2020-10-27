@@ -1,6 +1,6 @@
 import os
-#import io
-#import zlib
+import io
+import zlib
 import logging
 import json
 import numpy as np
@@ -17,20 +17,28 @@ SECRET_CODE = "secret" #open("/run/secrets/secret_code", "r").read().strip()
 LOG = logging.getLogger("classifier-api.error")
 
 main_blueprint = Blueprint("main", __name__)
-net = None
 
-@main_blueprint.route("/init", methods=["POST"])
+
+from flask import g
+
+def get_net():
+    if 'net' not in g:
+        g.net = classify_init()
+
+    return g.net
+
 def classify_init():
 # Read configuration parameters
-    classifyer = request.get_json().get("classifyer")
+    net = None
+    classifyer = 'CaffeModel'
     if classifyer == 'CaffeModel':
-        proto = prod.args['prototxt-caffe']
-        model = prod.args['model-caffe']
+        proto = prod.args['prototxt']
+        model = prod.args['model']
         net = cv2.dnn.readNetFromCaffe(proto, model)
         response_object["message"] = "Successefuly changed to Caffe!"
     elif classifyer == 'YOLO':
-            proto = prod.args['prototxt-yolo']
-            model = prod.args['model-yolo']
+            proto = prod.args['prototxt']
+            model = prod.args['model']
             net = cv2.dnn.readNetFromCaffe(proto, model)
             response_object["message"] = "Successefuly changed to YOLO!"
 
@@ -39,6 +47,9 @@ def classify_init():
         net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
     else:
         net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+    return net
+    
+
 
 
 @main_blueprint.route("/ping", methods=["GET"])
@@ -63,6 +74,7 @@ def secret():
 
 @main_blueprint.route('/classify', methods=['POST'])
 def classify():
+    net = get_net()
     data = request.get_json()
     params = data['params']
     print("cam: {0} , confidence: {1} ".format(params['cam'], params['confidence']))
@@ -72,11 +84,14 @@ def classify():
         	{"status": "failed", "message": "np array is NoneType"}
 	    )
     #print(bytestring)
-    frame = np.array(bytestring) #uncompress_nparr(bytestring)
+    #frame =  np.array(bytestring) # uncompress_nparr(bytestring)
+       # convert string of image data to uint8
+    frame = np.fromstring(bytestring, np.uint8)
+    print(frame)
     LOG.info("Hit /classify route: ", params)
     post_array = classify_frame(net, frame, params['cam'], params['confidence'])
     return Response(json.dumps(post_array), mimetype='text/plain')
 
-#def uncompress_nparr(bytestring):
-#    """ Uncompressed the bytestring values """
-#    return np.load(io.BytesIO(zlib.decompress(bytestring)))
+def uncompress_nparr(bytestring):
+    """ Uncompressed the bytestring values """
+    return np.load(io.BytesIO(zlib.decompress(bytestring)))

@@ -120,6 +120,7 @@ vs = None
 
 fps = None
 p_get_frame = None
+#DB IP address
 ipaddress = os.getenv("IP_ADDRESS")
 if ipaddress is None or ipaddress =='' :ipaddress = "192.168.0.167"
 
