@@ -1,6 +1,6 @@
 import os
-import io
-import zlib
+#import io
+#import zlib
 import logging
 import json
 import numpy as np
@@ -73,6 +73,6 @@ def classify():
     post_array = classify_frame(net, frame, params['cam'], params['confidence'])
     return Response(json.dumps(post_array), mimetype='text/plain')
 
-def uncompress_nparr(bytestring):
-    """ Uncompressed the bytestring values """
-    return np.load(io.BytesIO(zlib.decompress(bytestring)))
+#def uncompress_nparr(bytestring):
+#    """ Uncompressed the bytestring values """
+#    return np.load(io.BytesIO(zlib.decompress(bytestring)))
