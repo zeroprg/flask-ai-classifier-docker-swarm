@@ -65,8 +65,12 @@ def secret():
 def classify():
     data = request.get_json()
     params = data['params']
-    print(params)
+    print("cam: {0} , confidence: {1} ".format(params['cam'], params['confidence']))
     bytestring = data['array']
+    if (bytestring is None ):
+	    return jsonify(
+        	{"status": "failed", "message": "np array is NoneType"}
+	    )
     #print(bytestring)
     frame = np.array(bytestring) #uncompress_nparr(bytestring)
     LOG.info("Hit /classify route: ", params)
