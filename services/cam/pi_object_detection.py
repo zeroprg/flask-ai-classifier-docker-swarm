@@ -126,7 +126,7 @@ if ipaddress is None or ipaddress =='' :ipaddress = "192.168.0.167"
 
 # set config
 app_settings = os.getenv("APP_SETTINGS")
-if app_settings is None or app_settings =='' :app_settings = "./services/web/config.txt"
+if app_settings is None or app_settings =='' :app_settings = "./config.txt"
 
 def configure(args):
     # construct the argument parse and parse the arguments

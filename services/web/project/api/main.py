@@ -1,4 +1,4 @@
-import os
+import os
 import io
 import zlib
 import logging
@@ -62,12 +62,14 @@ def secret():
 
 @main_blueprint.route('/classify', methods=['POST'])
 def classify():
-    data = request.data
+    data = request.get_json()
     params = data['params']
+    print(params)
     bytestring = data['array']
-    frame = uncompress_nparr(bytestring)
+    #print(bytestring)
+    frame = np.array(bytestring) #uncompress_nparr(bytestring)
     LOG.info("Hit /classify route: ", params)
-    post_array = classify_frame(net, frame, params.cam, params.confidence)
+    post_array = classify_frame(net, frame, params['cam'], params['confidence'])
     return json.dumps(post_array.tolist())
 
 def uncompress_nparr(bytestring):

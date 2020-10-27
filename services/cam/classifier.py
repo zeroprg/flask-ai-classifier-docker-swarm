@@ -53,12 +53,11 @@ class Detection:
             time.sleep(0.1 + 0.99/NUMBER_OF_THREADS)
 
     def classify(self, output_queue, cam):
-        print("classify was called")
         if self.video_s is None:
             self.video_s = self.init_video_stream()
         while True:
             try:
-                frame = self.video_s.read()                
+                frame = self.video_s.read()
                 if frame is None: continue
             except:
                 print('Exception during reading stream by URL:{0}'.format(self.video_s))
@@ -68,37 +67,28 @@ class Detection:
 
             #output_queue.put_nowait(frame)
 
+
     def init_video_stream(self):
         #logger.info(self.video_url, ('picam' == self.video_url))
         video_s = VideoStream(self.video_url,usePiCamera=('picam' == self.video_url), resolution=piCameraResolution,
                       framerate=piCameraRate).start()
-        #logger.info(video_s)                      
+        #logger.info(video)
         time.sleep(2.0)
         return video_s
 
-    def read_video_stream(self, video_s):
-        # print("Read video stream .. " + self.video_url)
-        if 'picam' == self.video_url:
-            frame = video_s.read()
-        else:
-            flag, frame = video_s.read()
-            if not flag:
-                video_s = VideoStream(self.video_url,usePiCamera=('picam' == self.video_url), resolution=piCameraResolution,
-                      framerate=piCameraRate).start()
-                flag, frame = video_s.read()
-                return frame
-        return frame
+
+
 
 
 def call_classifier(frame, cam, confidence):
-    data, _ , _ = compress_nparr(frame)    
+    data = frame.tolist()  #, _ , _ = compress_nparr(frame)
     parameters = {'cam': cam, 'confidence': confidence}
     data = {'params': parameters, 'array':data}
     jsonResponse = None
     try:
         response = requests.post(url=CLASSIFIER_SERVER,
-                            data=data,
-                            headers={'Content-Type': 'text/json'})
+                            json=data)
+#                            headers={'Content-Type': 'text/json'})
         response.raise_for_status()
         # access JSOn content
         jsonResponse = response.json()
@@ -108,7 +98,7 @@ def call_classifier(frame, cam, confidence):
     except HTTPError as http_err:
         print('HTTP error occurred: {0}'.format(http_err))
     except Exception as err:
-        print('Other error occurred: {0}'.format(err))
+        print('Other error occurred: {0}')#.format(err))
     return jsonResponse
 
 def compress_nparr(nparr):

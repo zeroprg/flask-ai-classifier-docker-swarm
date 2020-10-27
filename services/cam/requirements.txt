@@ -1,3 +1,4 @@
+numpy
 Flask==1.1.1
 #Flask-SQLAlchemy==2.4.1
 #flask-migrate==2.5.2
@@ -7,3 +8,4 @@ dhash
 imutils
 Pillow
 zip
+requests
