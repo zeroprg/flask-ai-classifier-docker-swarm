@@ -40,7 +40,7 @@ RUN set -e; \
     # Clear apt cache
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install numpy
+RUN pip install numpy Pillow
 
 ARG OPENCV_VERSION
 ENV OPENCV_VERSION=$OPENCV_VERSION
