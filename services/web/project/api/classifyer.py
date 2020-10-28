@@ -5,8 +5,7 @@ import logging
 import argparse
 from flask import Flask, render_template, Response, request, redirect, jsonify, send_from_directory
 
-
-import project.db.api as db
+from project.db.api import Sql
 
 import cv2
 import dhash
@@ -43,10 +42,9 @@ from flask import Blueprint, jsonify, request
 
 hashes = {}
 
-def classify_frame( net, frame, cam, confidence):
+def classify_frame( db, net, frame, cam, confidence):
     topic_label = ''
     # print(" Classify frame ... --->")
-    conn = db.create_connection(prod.DATABASE_URI)
     _frame = cv2.resize(frame, (DIMENSION_X, DIMENSION_Y))
     # _frame = imutils.resize(frame,DIMENSION_X)
     blob = cv2.dnn.blobFromImage(_frame, 0.007843,
@@ -134,13 +132,12 @@ def classify_frame( net, frame, cam, confidence):
                                 cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 0), 1)
                 now = datetime.datetime.now()
                 day = "{date:%Y-%m-%d}".format(date=now)
-                db.insert_frame(conn, hash, day, int(time.time()*1000), key, crop_img_data, x_dim, y_dim, cam)
+                db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, x_dim, y_dim, cam)
 
-            params = do_statistic(conn, cam, hashes)
+            params = do_statistic(db, cam, hashes)
 
         # draw at the top left corner of the screen
         cv2.putText(frame, topic_label, (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-        conn.commit()
         # print(" Classify frame ... <---")
         # place frame in queue for further processing
     return params #frame
@@ -155,10 +152,10 @@ class ImageHashCodesCountByTimer(ObjCountByTimer):
         return delta < HASH_DELTA
 
 
-def do_statistic(conn, cam, hashes):
+def do_statistic(db, cam, hashes):
     # Do some statistic work here
     params = get_parameters_json(hashes, cam)
-    db.insert_statistic(conn, params)
+    db.insert_statistic(params)
     return params
 
 

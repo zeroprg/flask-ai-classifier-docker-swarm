@@ -9,24 +9,33 @@ import base64
 from PIL import Image
 
 
-
-
-from flask import Blueprint, Response, jsonify, request
+from flask import Blueprint, Response, jsonify, request, g
 from project.api.classifyer import classify_frame
 from project.config import  ProductionConfig as prod
 import project.api.tools.config_file
+
+from project.db.api import Sql
+
 SECRET_CODE = "secret" #open("/run/secrets/secret_code", "r").read().strip()
 LOG = logging.getLogger("classifier-api.error")
 
 main_blueprint = Blueprint("main", __name__)
 
 
-from flask import g
+def get_db():
+    if 'db' not in g:
+        g.db = Sql(prod.DATABASE_URI)
+    return g.db
+
+@app.teardown_appcontext
+def teardown_db(exception):
+    db = g.pop('db', None)
+    if db is not None:
+        db.getConn().close()
 
 def get_net():
     if 'net' not in g:
         g.net = classify_init()
-
     return g.net
 
 def classify_init():
@@ -84,6 +93,7 @@ def from_base64(base64_data):
 @main_blueprint.route('/classify', methods=['POST'])
 def classify():
     net = get_net()
+    db = get_db()
     data = request.get_json()
     params = data['params']
     print("cam: {0} , confidence: {1} ".format(params['cam'], params['confidence']))
@@ -94,7 +104,7 @@ def classify():
 	    )
     frame =  from_base64(base64_data)
     LOG.info("Hit /classify route: ", params)
-    post_array = classify_frame(net, frame, params['cam'], params['confidence'])
+    post_array = classify_frame(db, net, frame, params['cam'], params['confidence'])
     return Response(json.dumps(post_array), mimetype='text/plain')
 
 def uncompress_nparr(bytestring):
