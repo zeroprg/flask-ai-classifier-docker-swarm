@@ -47,13 +47,14 @@ def classify_frame( net, frame, cam, confidence):
     topic_label = ''
     # print(" Classify frame ... --->")
     conn = db.create_connection(prod.DATABASE_URI)
-    #_frame = cv2.resize(frame, (DIMENSION_X, DIMENSION_Y))
+    _frame = cv2.resize(frame, (DIMENSION_X, DIMENSION_Y))
     # _frame = imutils.resize(frame,DIMENSION_X)
-    blob = cv2.dnn.blobFromImage(frame, 0.007843,
+    blob = cv2.dnn.blobFromImage(_frame, 0.007843,
                                     (DIMENSION_X, DIMENSION_Y), (127.5, 127.5, 127.5), True)
     # set the blob as input to our deep learning object
     # detector and obtain the detections
     net.setInput(blob)
+    params = None
     detections = net.forward()
     # loop over the detections
     (fH, fW) = frame.shape[:2]

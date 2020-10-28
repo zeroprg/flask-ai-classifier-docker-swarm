@@ -1,9 +1,12 @@
+#import sqlite3
 import cv2
 import base64
 import time
 import sqlite3
-P='%s'
-def create_connection(DATABASE_URI=None):
+
+#P ="%s" 
+P ='?' 
+def create_connection(db_file, ipaddress=None, database="postgress", user="postgress", password="123456"):
     """ create a database connection to the SQLite database
         specified by the db_file
     :param db_file: database file
@@ -11,14 +14,13 @@ def create_connection(DATABASE_URI=None):
     """
     conn = None
     try:
-        if(  DATABASE_URI is None or DATABASE_URI == ''):
-            conn = sqlite3.connect('frame.db')
+        if(  ipaddress is None or ipaddress == ''):
+            conn = sqlite3.connect(db_file)
             conn.execute("PRAGMA journal_mode=WAL")
-            P='?'
             
         else:
             import psycopg2
-            conn = psycopg2.connect("dbname='streamer' user='postgres' host='{0}' password='postgres'".format(DATABASE_URI))  
+            conn = psycopg2.connect(host=ipaddress,database=database,user=user,password=password)  
             P='%s'
 
     except Exception as e:
