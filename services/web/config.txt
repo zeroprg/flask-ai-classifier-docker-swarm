@@ -54,4 +54,4 @@ model=MobileNetSSD_deploy.caffemodel
 confidence=0.10
 
 #Database configuration (Postgres)
-#ipaddress=192.168.0.153
+ipaddress=192.168.0.167

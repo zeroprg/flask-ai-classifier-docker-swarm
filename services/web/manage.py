@@ -2,7 +2,7 @@ from flask.cli import FlaskGroup
 import logging
 from project import create_app
 from project.db import api 
-
+from flask import g
 
 app = create_app()
 cli = FlaskGroup(create_app=create_app)
@@ -14,6 +14,12 @@ def recreate_db():
     #db.create_all()
     db.session.commit()
 
+
+@app.teardown_appcontext
+def teardown_db(exception):
+    db = g.pop('db', None)
+    if db is not None:
+        db.getConn().close()
 
 @cli.command("seed_db")
 def seed_db():

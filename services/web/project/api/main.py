@@ -27,12 +27,6 @@ def get_db():
         g.db = Sql(prod.DATABASE_URI)
     return g.db
 
-@app.teardown_appcontext
-def teardown_db(exception):
-    db = g.pop('db', None)
-    if db is not None:
-        db.getConn().close()
-
 def get_net():
     if 'net' not in g:
         g.net = classify_init()
@@ -53,8 +47,8 @@ def classify_init():
     # specify the target device as the Myriad processor on the NCS
     if "DNN_TARGET_MYRIAD" in prod.args:
         net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
-    #else:
-    #    net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+    else:
+        net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
     return net
     
 

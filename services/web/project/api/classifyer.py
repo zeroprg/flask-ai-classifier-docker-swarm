@@ -126,7 +126,7 @@ def classify_frame( db, net, frame, cam, confidence):
             if key in subject_of_interes:
                 x_dim = endX - startX
                 y_dim = endY - startY
-                font_scale = min(y_dim, x_dim) / 280                
+                font_scale = min(y_dim, x_dim) / 300                
                 if font_scale > 0.12:
                     cv2.putText(crop_img_data, str(datetime.datetime.now().strftime('%H:%M %d/%m/%y')), (1, 15),
                                 cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 0), 1)

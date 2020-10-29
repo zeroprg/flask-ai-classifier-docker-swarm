@@ -49,12 +49,13 @@ class Detection:
         self.topic_label = 'no data'
         self.net = self.video_s = None
 
-        for i in range(NUMBER_OF_THREADS):
-            p_get_frame = Process(target=self.classify,
-                                  args=(output_queue, cam))
-            p_get_frame.daemon = True
-            p_get_frame.start()
-            time.sleep(0.1 + 0.99/NUMBER_OF_THREADS)
+        #for i in range(NUMBER_OF_THREADS):
+        #    p_get_frame = Process(target=self.classify,
+        #                          args=(output_queue, cam))
+        #    p_get_frame.daemon = True
+        #    p_get_frame.start()
+        #    time.sleep(0.1 + 0.99/NUMBER_OF_THREADS)
+        self.classify(output_queue, cam)
 
     def classify(self, output_queue, cam):
         if self.video_s is None:
@@ -67,7 +68,8 @@ class Detection:
                 print('Exception during reading stream by URL:{0}'.format(self.video_url))
                 return
             result = call_classifier(frame, cam, self.confidence)
-            print("cam {0} result: {1}".format(cam, result))
+            if(result is  not None ):
+                 print("cam {0} result: {1}".format(cam, result))
 
             #output_queue.put_nowait(frame)
 
@@ -108,8 +110,8 @@ def call_classifier(frame, cam, confidence):
         response.raise_for_status()
         # access JSOn content
         jsonResponse = response.json()
-        print("Entire JSON response")
-        print(jsonResponse)
+        #print("Entire JSON response")
+        #print(jsonResponse)
 
     except HTTPError as http_err:
         print('HTTP error occurred: {0}'.format(http_err))

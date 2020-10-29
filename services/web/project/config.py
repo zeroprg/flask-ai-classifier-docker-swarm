@@ -17,6 +17,6 @@ class ProductionConfig:
     """Production configuration"""
 
     TRACK_MODIFICATIONS = False
-    DATABASE_URI = "192.168.0.165" # "postgres://{0}:{1}@db:5432/streamer".format(USER,PASSWORD)
+    DATABASE_URI = "192.168.0.156" # "postgres://{0}:{1}@db:5432/streamer".format(USER,PASSWORD)
     # read config file from app_settings
     args = configure(app_settings)
