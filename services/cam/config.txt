@@ -53,5 +53,8 @@ prototxt=MobileNetSSD_deploy.prototxt.txt
 model=MobileNetSSD_deploy.caffemodel
 confidence=0.10
 
+#server for object classifications
+CLASSIFIER_SERVER = http://192.168.0.165/classify
+
 #Database configuration (Postgres)
-#ipaddress=192.168.0.153
+DB_IP_ADDRESS=192.168.0.167

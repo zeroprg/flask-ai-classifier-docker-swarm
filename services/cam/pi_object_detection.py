@@ -120,9 +120,11 @@ vs = None
 
 fps = None
 p_get_frame = None
+
 #DB IP address
-ipaddress = os.getenv("IP_ADDRESS")
-if ipaddress is None or ipaddress =='' :ipaddress = "192.168.0.167"
+DB_IP_ADDRESS = os.getenv("DB_IP_ADDRESS")
+#DB IP address
+CLASSIFIER_SERVER = os.getenv("CLASSIFIER_SERVER")
 
 
 # set config
@@ -170,7 +172,8 @@ def configure(args):
     logger.debug(args)
 
 def start_one_stream_processes(cam):
-    Detection( ipaddress, float(args["confidence"]), args["prototxt"], args["model"], videos[cam][1],
+
+    Detection( args["CLASSIFIER_SERVER"], DB_IP_ADDRESS, float(args["confidence"]), args["prototxt"], args["model"], videos[cam][1],
               imagesQueue[cam], cam)
 
     logger.info("p_classifiers for cam:" + str(cam) + " started")
@@ -193,17 +196,9 @@ def start():
 
     initialize_video_streams()
 
+
     for cam in range(len(videos)):
-        Detection( ipaddress, float(args["confidence"]), args["prototxt"], args["model"], videos[cam][1],
-                  imagesQueue[cam], cam)
-
-        logger.info("p_classifiers for cam:" + str(cam) + " started")
-
-        p = Process(target=get_frame, args=(imagesQueue[cam], cam))
-        p.daemon = True
-        p.start()
-        cam += 1
-
+        start_one_stream_processes(cam)
 
 # initialize the video stream, allow the cammera sensor to warmup,
 # and initialize the FPS counter
@@ -298,7 +293,7 @@ def moreimgs():
     else:
         hour_back2 = 1  # default value: 60 min back
     print("cam: {}, hour_back1:{}, hour_back2:{}, object_of_interest: {}".format(cam, hour_back1, hour_back2, object_of_interest))
-    conn = db.create_connection(ipaddress)
+    conn = db.create_connection(DB_IP_ADDRESS)
     rows = db.select_last_frames(conn,cam=cam, time1=hour_back1, time2=hour_back2, obj=object_of_interest)
     return Response(json.dumps(rows), mimetype='text/plain')
 
@@ -316,7 +311,7 @@ def imgs_at_time():
 def gen_array_of_imgs(cam, delta=10000, currentime=int(time.time()*1000)):
     time1 = currentime - delta
     time2 = currentime + delta
-    conn = db.create_connection(ipaddress)
+    conn = db.create_connection(DB_IP_ADDRESS)
     rows = db.select_frame_by_time(conn, cam, time1, time2)
     x = json.dumps(rows)
     return x
@@ -338,7 +333,7 @@ def gen_params(cam=0, time1=0, time2=5*60*60*1000, object_of_interest=[]):
     """Parameters streaming generator function."""
  
     print("time1: {} time2: {}".format(time1, time2))
-    conn = db.create_connection(ipaddress)
+    conn = db.create_connection(DB_IP_ADDRESS)
     ls = db.select_statistic_by_time(conn, cam, time1, time2, object_of_interest)
     ret = json.dumps(ls)  # , indent = 4)
     logger.debug(ret)
@@ -365,9 +360,8 @@ def urls():
     if list_url is not None:
         #data = {url:videos, objectOfInterests: subject_of_interes}
         #for video in videos:
-            
-
         return Response(json.dumps(videos), mimetype='text/plain')
+        
     if delete_url is not None:
         for video in videos:
             if video[0] == delete_url:
@@ -398,6 +392,10 @@ def params_feed():
 
 if (__name__ == '__main__'):
     start()
+    if DB_IP_ADDRESS is None or DB_IP_ADDRESS =='':
+         DB_IP_ADDRESS = args['DB_IP_ADDRESS']
+    if CLASSIFIER_SERVER is None or CLASSIFIER_SERVER =='':
+        CLASSIFIER_SERVER = args['CLASSIFIER_SERVER']
 # gunicorn will start it
-#    app.run(host='0.0.0.0', port=3020, threaded=True)  # debug = True ) #
+    app.run(host='0.0.0.0', port=3020, threaded=True)  # debug = True ) #
     

@@ -1,8 +1,7 @@
-import cv2
 import numpy as np
 from imutils.video import VideoStream
 import io
-#import zlib
+import zlib
 import requests
 from requests.exceptions import HTTPError
 
@@ -17,8 +16,8 @@ from objCountByTimer import ObjCountByTimer
 from multiprocessing import Process
 from multiprocessing import Queue
 
+import cv2
 
-CLASSIFIER_SERVER = 'http://192.168.0.167/classify' # 'http://192.168.0.167/classify'
 
 # initialize the list of class labels MobileNet SSD was trained to
 # detect, then generate a set of bounding box colors for each class
@@ -39,7 +38,7 @@ piCameraRate = 16
 NUMBER_OF_THREADS = 1
 
 class Detection:
-    def __init__(self, ipaddress, confidence, prototxt, model, video_url, output_queue, cam):
+    def __init__(self, classify_server, ipaddress, confidence, prototxt, model, video_url, output_queue, cam):
         self.confidence = confidence
         self.prototxt = prototxt
         self.model = model
@@ -49,15 +48,16 @@ class Detection:
         self.topic_label = 'no data'
         self.net = self.video_s = None
 
-        #for i in range(NUMBER_OF_THREADS):
-        #    p_get_frame = Process(target=self.classify,
-        #                          args=(output_queue, cam))
-        #    p_get_frame.daemon = True
-        #    p_get_frame.start()
-        #    time.sleep(0.1 + 0.99/NUMBER_OF_THREADS)
-        self.classify(output_queue, cam)
+        for i in range(NUMBER_OF_THREADS):
+            p_get_frame = Process(target=self.classify,
+                                  args=(classify_server
+                                  ,output_queue, cam))
+            p_get_frame.daemon = True
+            p_get_frame.start()
+            time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
+        
 
-    def classify(self, output_queue, cam):
+    def classify(self,classify_server, output_queue, cam):
         if self.video_s is None:
             self.video_s = self.init_video_stream()
         while True:
@@ -67,9 +67,8 @@ class Detection:
             except:
                 print('Exception during reading stream by URL:{0}'.format(self.video_url))
                 return
-            result = call_classifier(frame, cam, self.confidence)
-            if(result is  not None ):
-                 print("cam {0} result: {1}".format(cam, result))
+            result = call_classifier(classify_server, frame, cam, self.confidence)
+            if(result is  not None ): print("cam {0} result: {1}".format(cam, result))
 
             #output_queue.put_nowait(frame)
 
@@ -98,13 +97,13 @@ class Detection:
 
 
 
-def call_classifier(frame, cam, confidence):
+def call_classifier(classify_server, frame, cam, confidence):
     _,data = cv2.imencode('.jpg', frame) # frame.tolist() #  , _ , _ = compress_nparr(frame)
     parameters = {'cam': cam, 'confidence': confidence}
     data = {'params': parameters, 'array': base64.b64encode(data).decode('utf-8')}
     jsonResponse = None
     try:
-        response = requests.post(url=CLASSIFIER_SERVER,
+        response = requests.post(url=classify_server,
                             json=data)
                             #headers={'Content-Type': 'text/json'})
         response.raise_for_status()
@@ -119,21 +118,21 @@ def call_classifier(frame, cam, confidence):
         print('Other error occurred: {0}')#.format(err))
     return jsonResponse
 
-#def compress_nparr(nparr):
-#    """
-#    Returns the given numpy array as compressed bytestring,
-#    the uncompressed and the compressed byte size.
-#    """
-#    bytestream = io.BytesIO()
-#    np.save(bytestream, nparr)
-#    uncompressed = bytestream.getvalue()
-#    compressed = zlib.compress(uncompressed)
-#    return compressed, len(uncompressed), len(compressed)
+def compress_nparr(nparr):
+    """
+    Returns the given numpy array as compressed bytestring,
+    the uncompressed and the compressed byte size.
+    """
+    bytestream = io.BytesIO()
+    np.save(bytestream, nparr)
+    uncompressed = bytestream.getvalue()
+    compressed = zlib.compress(uncompressed)
+    return compressed, len(uncompressed), len(compressed)
 
     
-#def uncompress_nparr(bytestring):
-#    """  Uncompress as bytestring into numpy array  """
-#    return np.load(io.BytesIO(zlib.decompress(bytestring)))
+def uncompress_nparr(bytestring):
+    """  Uncompress as bytestring into numpy array  """
+    return np.load(io.BytesIO(zlib.decompress(bytestring)))
 
     #resp, _, _ = compress_nparr(data10)
     #return Response(response=resp, status=200,
