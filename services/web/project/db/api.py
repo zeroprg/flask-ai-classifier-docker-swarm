@@ -11,7 +11,7 @@ class Sql:
         :param db_file: database file
         :return: Connection object or None
         """
-        conn = None
+        self.conn = None
         try:
             if(  DATABASE_URI is None or DATABASE_URI == ''):
                 self.conn = sqlite3.connect('frame.db')

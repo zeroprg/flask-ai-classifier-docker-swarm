@@ -1,5 +1,3 @@
-# import the necessary packages
-
 from multiprocessing import Process
 from multiprocessing import Queue
 import os
@@ -10,7 +8,7 @@ import logging
 import mimetypes
 import json
 
-import db.api as db
+from db.api import Sql
 
 from classifier import Detection
 
@@ -293,8 +291,8 @@ def moreimgs():
     else:
         hour_back2 = 1  # default value: 60 min back
     print("cam: {}, hour_back1:{}, hour_back2:{}, object_of_interest: {}".format(cam, hour_back1, hour_back2, object_of_interest))
-    conn = db.create_connection(DB_IP_ADDRESS)
-    rows = db.select_last_frames(conn,cam=cam, time1=hour_back1, time2=hour_back2, obj=object_of_interest)
+    db = Sql(DB_IP_ADDRESS)
+    rows = db.select_last_frames(cam=cam, time1=hour_back1, time2=hour_back2, obj=object_of_interest)
     return Response(json.dumps(rows), mimetype='text/plain')
 
 
@@ -311,8 +309,8 @@ def imgs_at_time():
 def gen_array_of_imgs(cam, delta=10000, currentime=int(time.time()*1000)):
     time1 = currentime - delta
     time2 = currentime + delta
-    conn = db.create_connection(DB_IP_ADDRESS)
-    rows = db.select_frame_by_time(conn, cam, time1, time2)
+    db = Sql(DB_IP_ADDRESS)
+    rows = db.select_frame_by_time(cam, time1, time2)
     x = json.dumps(rows)
     return x
 
@@ -333,8 +331,8 @@ def gen_params(cam=0, time1=0, time2=5*60*60*1000, object_of_interest=[]):
     """Parameters streaming generator function."""
  
     print("time1: {} time2: {}".format(time1, time2))
-    conn = db.create_connection(DB_IP_ADDRESS)
-    ls = db.select_statistic_by_time(conn, cam, time1, time2, object_of_interest)
+    db = Sql(DB_IP_ADDRESS)
+    ls = db.select_statistic_by_time(cam, time1, time2, object_of_interest)
     ret = json.dumps(ls)  # , indent = 4)
     logger.debug(ret)
     return ret
