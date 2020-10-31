@@ -58,7 +58,7 @@ def classify_init():
 def ping_pong():
     LOG.info('Hitting the "/ping" route')
     return jsonify(
-        {"status": "success", "message": "pong!", "container_id": os.uname()[1]}
+        {"status": "success", "message": "ping-pong!", "container_id": os.uname()[1]}
     )
 
 

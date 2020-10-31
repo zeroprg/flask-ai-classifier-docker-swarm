@@ -398,5 +398,6 @@ def params_feed():
 
 if (__name__ == '__main__'):
     start()
-    app.run(host='0.0.0.0', port=3020, threaded=True)  # debug = True ) #
+# gunicorn will start it
+#    app.run(host='0.0.0.0', port=3020, threaded=True)  # debug = True ) #
     

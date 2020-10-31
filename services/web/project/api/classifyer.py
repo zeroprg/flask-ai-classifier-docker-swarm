@@ -133,8 +133,8 @@ def classify_frame( db, net, frame, cam, confidence):
                 now = datetime.datetime.now()
                 day = "{date:%Y-%m-%d}".format(date=now)
                 db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, x_dim, y_dim, cam)
-
             params = do_statistic(db, cam, hashes)
+            db.getConn().commit()
 
         # draw at the top left corner of the screen
         cv2.putText(frame, topic_label, (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)

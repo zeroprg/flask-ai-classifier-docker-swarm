@@ -1,4 +1,3 @@
-import cv2
 import base64
 import time
 import sqlite3
@@ -21,7 +20,7 @@ class Sql:
             else:
                 import psycopg2
                 self.conn = psycopg2.connect("dbname='streamer' user='postgres' host='{0}' password='postgres'".format(DATABASE_URI))  
-                self.conn.autocommit = True
+                self.conn.autocommit = False
                 self.P='%s'
 
         except Exception as e:

@@ -1,7 +1,8 @@
+import cv2
 import numpy as np
 from imutils.video import VideoStream
 import io
-import zlib
+#import zlib
 import requests
 from requests.exceptions import HTTPError
 
@@ -16,9 +17,8 @@ from objCountByTimer import ObjCountByTimer
 from multiprocessing import Process
 from multiprocessing import Queue
 
-import cv2
 
-CLASSIFIER_SERVER = 'http://localhost:5000/classify' # 'http://192.168.0.167/classify'
+CLASSIFIER_SERVER = 'http://192.168.0.167/classify' # 'http://192.168.0.167/classify'
 
 # initialize the list of class labels MobileNet SSD was trained to
 # detect, then generate a set of bounding box colors for each class
@@ -119,21 +119,21 @@ def call_classifier(frame, cam, confidence):
         print('Other error occurred: {0}')#.format(err))
     return jsonResponse
 
-def compress_nparr(nparr):
-    """
-    Returns the given numpy array as compressed bytestring,
-    the uncompressed and the compressed byte size.
-    """
-    bytestream = io.BytesIO()
-    np.save(bytestream, nparr)
-    uncompressed = bytestream.getvalue()
-    compressed = zlib.compress(uncompressed)
-    return compressed, len(uncompressed), len(compressed)
+#def compress_nparr(nparr):
+#    """
+#    Returns the given numpy array as compressed bytestring,
+#    the uncompressed and the compressed byte size.
+#    """
+#    bytestream = io.BytesIO()
+#    np.save(bytestream, nparr)
+#    uncompressed = bytestream.getvalue()
+#    compressed = zlib.compress(uncompressed)
+#    return compressed, len(uncompressed), len(compressed)
 
     
-def uncompress_nparr(bytestring):
-    """  Uncompress as bytestring into numpy array  """
-    return np.load(io.BytesIO(zlib.decompress(bytestring)))
+#def uncompress_nparr(bytestring):
+#    """  Uncompress as bytestring into numpy array  """
+#    return np.load(io.BytesIO(zlib.decompress(bytestring)))
 
     #resp, _, _ = compress_nparr(data10)
     #return Response(response=resp, status=200,

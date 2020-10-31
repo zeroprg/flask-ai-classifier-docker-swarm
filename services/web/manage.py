@@ -15,11 +15,11 @@ def recreate_db():
     db.session.commit()
 
 
-@app.teardown_appcontext
-def teardown_db(exception):
-    db = g.pop('db', None)
-    if db is not None:
-        db.getConn().close()
+#@app.teardown_appcontext
+#def teardown_db(exception):
+#    db = g.pop('db', None)
+#    if db is not None:
+#        db.getConn().close()
 
 @cli.command("seed_db")
 def seed_db():

@@ -2,6 +2,28 @@ version: '3.5'
 
 services:
 
+  cam:
+    build:
+      context: ./services/cam
+      dockerfile: Dockerfile 
+    image: zeroprg/flask-docker-swarm_cam:latest
+    command: gunicorn --bind 0.0.0.0:3020 pi_object_detection:app
+    ports:
+      - 3020:3020
+    environment:
+      - FLASK_ENV=production
+      - APP_SETTINGS=/home/app/web/config.txt
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+#    secrets:
+#      - secret_code
+    depends_on:
+      - db
+      - web
+    networks:
+      - app
+
+
   web:
     build:
       context: ./services/web
