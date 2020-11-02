@@ -8,11 +8,12 @@ import logging
 import mimetypes
 import json
 
-from db.api import Sql
+#from db.api import Sql
+from project.config import  ProductionConfig as prod
+from project.classifier import Detection
+from project import db
 
-from classifier import Detection
-
-from flask import Flask, render_template, Response, request, redirect, jsonify, send_from_directory
+from flask import Blueprint, Response, request, g, send_from_directory
 from flask_cors import cross_origin, CORS
 
 logger = logging.getLogger('logger')
@@ -22,7 +23,7 @@ logger.addHandler(console)
 logger.debug('DEBUG mode')
 
 
-DELETE_FILES_LATER = 6 * 60 * 60  # sec  (8hours)
+DELETE_FILES_LATER = 8 #   (8hours)
 ENCODING = "utf-8"
 IMAGES_BUFFER = 100
 
@@ -33,6 +34,8 @@ camright = []
 IMG_PAGINATOR = 40
 
 SHOW_VIDEO = False
+
+port=5000
 
 class CameraMove:
     def __init__(self, move_left, move_right, timestep=10):
@@ -61,6 +64,9 @@ class CameraMove:
         self.t1 = threading.Timer(self.timestep, self.cameraLoop)
 
         self.t1.start()
+
+
+main_blueprint = Blueprint("main", __name__)
 
 
 def change_res(camera, width, height):
@@ -119,59 +125,10 @@ vs = None
 fps = None
 p_get_frame = None
 
-#DB IP address
-DB_IP_ADDRESS = os.getenv("DB_IP_ADDRESS")
-#DB IP address
-CLASSIFIER_SERVER = os.getenv("CLASSIFIER_SERVER")
 
-
-# set config
-app_settings = os.getenv("APP_SETTINGS")
-if app_settings is None or app_settings =='' :app_settings = "./config.txt"
-
-def configure(args):
-    # construct the argument parse and parse the arguments
-    # I named config file as  file config.txt and stored it
-    # in the same directory as the script
-
-    with open(app_settings) as f:
-        for line in f:
-            if separator in line:
-                # Find the name and value by splitting the string
-                name, value = line.split(separator, 1)
-                # Assign key value pair to dict
-                # strip() removes white space from the ends of strings
-                args[name.strip()] = value.strip()
-
-    # global scrn_stats
-    # scrn_stats = Screen_statistic(paramsQueue)
-
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-nw", "--not_show_in_window", required=False,
-                    help="video could be shown in window.", action="store_true", default=False)
-    ap.add_argument("-v", "--video_file", required=False,
-                    help="video file , could be access to remote location.")
-    ap.add_argument("-p", "--prototxt", required=False,
-                    help="path to Caffe 'deploy' prototxt file")
-    ap.add_argument("-m", "--model", required=False,
-                    help="path to Caffe pre-trained model")
-    ap.add_argument("-c", "--confidence", type=float, required=False,
-                    help="minimum probability to filter weak detections")
-    more_args = vars(ap.parse_args())
-
-    more_args = {k: v for k, v in more_args.items() if v is not None}
-    # if more_args["confidence"] == 0.0:more_args["confidence"] = args["confidence"]
-
-    args.update(more_args)
-
-    SHOW_VIDEO = not args["not_show_in_window"]
-    logger.info("SHOW_VIDEO=" + str(SHOW_VIDEO))
-
-    logger.debug(args)
 
 def start_one_stream_processes(cam):
-
-    Detection( args["CLASSIFIER_SERVER"], DB_IP_ADDRESS, float(args["confidence"]), args["prototxt"], args["model"], videos[cam][1],
+    Detection(prod.CLASSIFIER_SERVER, float(prod.args["confidence"]), prod.args["prototxt"], prod.args["model"], videos[cam][1],
               imagesQueue[cam], cam)
 
     logger.info("p_classifiers for cam:" + str(cam) + " started")
@@ -182,8 +139,6 @@ def start_one_stream_processes(cam):
 
 
 def start():
-    # load our serialized model from disk
-    configure(args)
     logger.info("[INFO] loading model...")
     # construct a child process *indepedent* from our main process of
     # execution
@@ -191,10 +146,7 @@ def start():
     # initialize the video stream, allow the cammera sensor to warmup,
     # and initialize the FPS counter
     logger.info("[INFO] starting video stream...")
-
     initialize_video_streams()
-
-
     for cam in range(len(videos)):
         start_one_stream_processes(cam)
 
@@ -210,7 +162,7 @@ def initialize_video_streams(url=None):
         i = len(videos)
     #  initialise picam or IPCam
     else:
-        arg = args.get('video_file' + str(i), None)
+        arg = prod.args.get('video_file' + str(i), None)
     while arg is not None:
         if not (i, arg) in videos:
             camright.append(args.get('cam_right' + str(i), None))
@@ -222,32 +174,58 @@ def initialize_video_streams(url=None):
             arg = args.get('video_file' + str(i), None)
 
     # Start process
-    time.sleep(3.0)
+    time.sleep(1.0)
    # fps = FPS().start()
 
 
+
+def detect(cam):
+    """Video streaming generator function."""
+    label = ''
+    try:
+        # logger.debug('imagesQueue:', imagesQueue.empty())
+        while True:
+            while (not imagesQueue[cam].empty()):
+                frame = imagesQueue[cam].get(block=True)
+                iterable = cv2.imencode('.jpg', frame)[1].tobytes()
+                yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + iterable + b'\r\n'
+    except GeneratorExit:
+        pass
+
+
 ###################### Flask API #########################
-app = Flask(__name__, static_url_path='/static')
-app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy   dog'
-app.config['CORS_HEADERS'] = 'Content-Type'
 
-cors = CORS(app, resources={r"/urls": {"origins": "http://localhost:3020"}})
+#main_blueprint.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy   dog'
+#main_blueprint.config['CORS_HEADERS'] = 'Content-Type'
+
+cors = CORS(main_blueprint, resources={r"/urls": {"origins": 'http://localhost:{}'.format(port)}})
 
 
-# api = Api(app)
+
+# api = Api(main_blueprint)
 # api.decorators=[cors.crossdomain(origin='*')]
 
 
-@app.route('/static/<path:filename>')
+@main_blueprint.route('/static/<path:filename>')
+@cross_origin(origin='http://localhost:{}'.format(port))
 def serve_static(filename):
     root_dir = os.path.dirname(os.getcwd())
     return send_from_directory(os.path.join(root_dir, 'static', 'js'), filename)
 
 
 
+@main_blueprint.route('/video_feed', methods=['GET'])
+@cross_origin(origin='http://localhost:{}'.format(port))
+def video_feed():
+    """Video streaming route. Put this in the src attribute of an img tag."""
+    # gen(Camera()),
+    cam = request.args.get('cam', default=0, type=int)
+    return Response(detect(int(cam)),  # mimetype='text/event-stream')
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/moreparams')
-@cross_origin(origin='http://localhost:3020')
+
+@main_blueprint.route('/moreparams')
+@cross_origin(origin='http://localhost:{}'.format(port))
 def moreparams():
     """ Read list of json files or return one specific  for specific time """
     hour_back1 = request.args.get('hour_back1', default=1, type=int)
@@ -271,8 +249,8 @@ def moreparams():
     return Response(params, mimetype='text/plain')
 
 
-@app.route('/moreimgs')
-@cross_origin(origin='http://localhost:3020')
+@main_blueprint.route('/moreimgs')
+@cross_origin(origin='http://localhost:{}'.format(port))
 def moreimgs():
     """ Read list of json files or return one specific  for specific time """
     hour_back1 = request.args.get('hour_back1', default=1, type=int)
@@ -291,13 +269,13 @@ def moreimgs():
     else:
         hour_back2 = 1  # default value: 60 min back
     print("cam: {}, hour_back1:{}, hour_back2:{}, object_of_interest: {}".format(cam, hour_back1, hour_back2, object_of_interest))
-    db = Sql(DB_IP_ADDRESS)
+    #db = Sql(DB_IP_ADDRESS)
     rows = db.select_last_frames(cam=cam, time1=hour_back1, time2=hour_back2, obj=object_of_interest)
     return Response(json.dumps(rows), mimetype='text/plain')
 
 
-@app.route('/imgs_at_time')
-@cross_origin(origin='http://localhost:3020')
+@main_blueprint.route('/imgs_at_time')
+@cross_origin(origin='http://localhost:{}'.format(port))
 def imgs_at_time():
     """ Read list of json files or return one specific  for specific time """
     seconds = request.args.get('time', default=int(time.time()*1000), type=int)
@@ -309,7 +287,7 @@ def imgs_at_time():
 def gen_array_of_imgs(cam, delta=10000, currentime=int(time.time()*1000)):
     time1 = currentime - delta
     time2 = currentime + delta
-    db = Sql(DB_IP_ADDRESS)
+    #db = Sql(DB_IP_ADDRESS)
     rows = db.select_frame_by_time(cam, time1, time2)
     x = json.dumps(rows)
     return x
@@ -331,7 +309,7 @@ def gen_params(cam=0, time1=0, time2=5*60*60*1000, object_of_interest=[]):
     """Parameters streaming generator function."""
  
     print("time1: {} time2: {}".format(time1, time2))
-    db = Sql(DB_IP_ADDRESS)
+    #db = Sql(DB_IP_ADDRESS)
     ls = db.select_statistic_by_time(cam, time1, time2, object_of_interest)
     ret = json.dumps(ls)  # , indent = 4)
     logger.debug(ret)
@@ -341,9 +319,10 @@ def ping_video_url(url):
     if( video =='video/mp4'): return True
     return False
 
-@app.route('/urls', methods=['GET', 'POST'])
-@cross_origin(origin='http://localhost:3020')
+@main_blueprint.route('/urls', methods=['GET', 'POST'])
+@cross_origin(origin='http://localhost:{}'.format(port))
 def urls():
+    print('Hey Im here' )
     """Add/Delete/Update a new video url, list all availabe urls."""
     list_url = request.args.get('list', default=None)
     add_url = request.args.get('add', default=None)
@@ -354,7 +333,8 @@ def urls():
             initialize_video_streams(add_url)
             start_one_stream_processes(cam=len(videos) - 1)
             # return index() #redirect("/")
-            return Response('{"message":"URL added  successfully , video start processing"}', mimetype='text/plain')
+            return Response('{"message":"URL added  successfully , video start processing"}', mimetype='text/plain')            
+    print(json.dumps(videos))            
     if list_url is not None:
         #data = {url:videos, objectOfInterests: subject_of_interes}
         #for video in videos:
@@ -372,7 +352,8 @@ def urls():
             return Response('{"message":"URL updated successfully"}', mimetype='text/plain')
 
 
-@app.route('/params_feed')
+@main_blueprint.route('/params_feed')
+@cross_origin(origin='http://localhost:{}'.format(port))
 def params_feed():
     """Parameters streaming route. Put this in the src attribute of an img tag."""
     hours = request.args.get('hour_back1', default=1)
@@ -382,18 +363,3 @@ def params_feed():
                     mimetype='text/plain')
 
 
-# @app.route('/images_feed')
-# def images_feed():
-#    """Images streaming route. Put this in the src attribute of an img tag."""
-#    return Response( gen_images(),
-#                    mimetype='text/plain')
-
-if (__name__ == '__main__'):
-    start()
-    if DB_IP_ADDRESS is None or DB_IP_ADDRESS =='':
-         DB_IP_ADDRESS = args['DB_IP_ADDRESS']
-    if CLASSIFIER_SERVER is None or CLASSIFIER_SERVER =='':
-        CLASSIFIER_SERVER = args['CLASSIFIER_SERVER']
-# gunicorn will start it
-    app.run(host='0.0.0.0', port=3020, threaded=True)  # debug = True ) #
-    

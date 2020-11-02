@@ -12,7 +12,7 @@ from PIL import Image
 import time
 import datetime
 import json
-from objCountByTimer import ObjCountByTimer
+from project.objCountByTimer import ObjCountByTimer
 from multiprocessing import Process
 from multiprocessing import Queue
 
@@ -38,13 +38,12 @@ piCameraRate = 16
 NUMBER_OF_THREADS = 1
 
 class Detection:
-    def __init__(self, classify_server, ipaddress, confidence, prototxt, model, video_url, output_queue, cam):
+    def __init__(self, classify_server, confidence, prototxt, model, video_url, output_queue, cam):
         self.confidence = confidence
         self.prototxt = prototxt
         self.model = model
         self.video_url = video_url
-        self.hashes = {}
-        self.db_ipaddress = ipaddress
+        self.hashes = {}        
         self.topic_label = 'no data'
         self.net = self.video_s = None
 

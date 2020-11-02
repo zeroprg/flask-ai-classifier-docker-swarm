@@ -2,46 +2,60 @@ import cv2
 import base64
 import time
 import sqlite3
-import sqlalchemy as db
-
+import sqlalchemy as sql
+import psycopg2
 
 class Sql:
-    def __init__ (self, USER_NAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
-
+    def __init__ (self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
         """ create a database connection to the SQLite database
             specified by the db_file
         :param db_file: database file
         :return: Connection object or None
         """
-        self.conn = None
-        try:
-            if(  DATABASE_URI is None or DATABASE_URI == ''):
-                self.conn = sqlite3.connect('frame.db')
-                self.conn.execute("PRAGMA journal_mode=WAL")
-                self.P='?'
-                self.engine = db.create_engine('sqlite://frame.db')
+        
+        self.engine = None
+        metadata = sql.MetaData()
+        
+        if(  DATABASE_URI is None or DATABASE_URI == ''):
+            self.engine = sql.create_engine('sqlite://frame.db')
+            conn = engine.connect()
+            conn.execute("PRAGMA journal_mode=WAL")
+            
+        else:
+            self.engine = sql.create_engine('postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME))
 
-                
-            else:
-                import psycopg2
-                self.engine = db.create_engine('postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(USER_NAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME))
-                self.P='%s'
+        self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
+        self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
+        ##self.getConn().autocommit = False
 
-            self.conn = engine.connect()
-            metadata = db.MetaData()
-            self.objects = db.Table('objects', metadata, autoload=True, autoload_with=self.engine)
-            self.statistic = db.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
-            ##self.conn.autocommit = False
+    def __init__ (self, SQLALCHEMY_DATABASE_URI):
+        """ create a database connection to the SQLite database
+            specified by the db_file
+        :param db_file: database file
+        :return: Connection object or None
+        """
+        self.engine = None
+        metadata = sql.MetaData()
+
+        if(  SQLALCHEMY_DATABASE_URI is None or SQLALCHEMY_DATABASE_URI == ''):
+            self.engine = sql.create_engine('sqlite://frame.db')
+            conn = engine.connect()
+            conn.execute("PRAGMA journal_mode=WAL")
+            
+        else:
+            
+            self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI)
+
+        self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
+        self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
 
 
-        except Exception as e:
-            print(e)
-
+        #conn = self.engine.connect()
+        ##self.getConn().autocommit = False
     
     def getConn(self):
-        return self.conn
-    def setConn(self,conn):
-        self.conn = conn
+        return self.engine.connect()
+
  
     def select_all_objects(self):
         """
@@ -51,15 +65,14 @@ class Sql:
         """
         #cur = conn.cursor()
         #cur.execute("SELECT hashcode, currentdate, currentime, type, x_dim, y_dim FROM objects  ORDER BY currentime DESC ")
-        query = self.db.select([self.objects]).limit(50).all()
-        ResultProxy = self.conn.execute(query)
+        query = sql.select([self.objects]).limit(50).all()
+        ResultProxy = self.getConn().execute(query)
         rows = ResultProxy.fetchall()
         #for row in rows:
         #    print(row)
         return rows
 
     def insert_statistic(self, params):
-        cur = self.conn.cursor()
         for param in params:
             hashcodes = ''
             length = len(param['hashcodes'])
@@ -70,8 +83,8 @@ class Sql:
             #cur.execute("INSERT INTO statistic(type,currentime,y,text,hashcodes,cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")",
             #     (param['name'], param['x'],  param['text'], hashcodes, param['cam']))
             values = {'name': param['name'], 'y': param['y'], 'hashcodes': hashcodes, 'cam':param['cam'] }     
-            query = self.db.insert(self.statistic)
-            ResultProxy = self.execute(query, values)
+            query = sql.insert(self.statistic)
+            ResultProxy = self.getConn().execute(query, values)
             print(" insert_statistic was {0} with params: {1}".format(ResultProxy.is_insert ,params))    
         except Exception as e:
             print(" e: {}".format( e))
@@ -93,23 +106,19 @@ class Sql:
             time1=a
 
         print(time2,time1, obj)
-        cur = self.conn.cursor()
-        # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        
-        #str =  "('" + obj.replace(",","','") + "')"
         tuple_ =  obj.split(',')
         #print(str)
         #cur.execute("SELECT type, currentime as x0, currentime + 30000 as x, y as y FROM statistic WHERE type IN" +str+ " AND cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY type,currentime ASC", #DeSC
         #    (cam, time2, time1 ))
 
-        query = self.db.select([self.statistic]).where(db.and_(self.statistic.columns.cam == cam, 
+        query = sql.select([self.statistic]).where(sql.and_(self.statistic.columns.cam == cam, 
                                                               self.statistic.columns.type.in_(tuple_),
                                                               self.statistic.columns.currentime.between(time2, time1)
                                                              )
                                                       .order_by(self.statistic.columns.type, self.statistic.columns.currentime.asc())
                                                       )
                                      
-        ResultProxy = self.conn.execute(query)
+        ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()    
 
         # convert row object to the dictionary
@@ -127,7 +136,7 @@ class Sql:
 
 
     def insert_frame(self, hashcode, date, time, type, numpy_array, x_dim, y_dim, cam):
-        cur = self.conn.cursor()
+        
         if y_dim == 0 or x_dim == 0 or  x_dim/y_dim > 5 or y_dim/x_dim > 5: return
         #cur.execute("UPDATE objects SET currentime="+self.P+" WHERE hashcode="+self.P, (time, str(hashcode)))
         print("cam= {}, x_dim={}, y_dim={}".format(cam, x_dim, y_dim))
@@ -137,8 +146,8 @@ class Sql:
             #cur.execute("INSERT INTO objects (hashcode, currentdate, currentime, type, frame, x_dim, y_dim, cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")", 
             #(str(hashcode), date, time, type, str(jpg_as_base64), int(x_dim), int(y_dim), int(cam)))
             values = {'hashcode': hashcode, 'date': date, 'time': time, 'type': type, 'frame':str(jpg_as_base64), 'x_dim': int(x_dim), 'y_dim': int(y_dim), 'cam':int(cam) }     
-            query = self.db.insert(self.objects)
-            ResultProxy = self.execute(query, values)
+            query = sql.insert(self.objects)
+            ResultProxy = self.getConn().execute(query, values)
             print(" insert_frame was {0} with params: {1}".format(ResultProxy.is_insert ,values))
         except Exception as e: print(" e: {}".format( e))
 
@@ -150,16 +159,15 @@ class Sql:
         :param cam, time1, time2 in epoch seconds
         :return:
         """    
-        #cur = self.conn.cursor()
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects WHERE cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
         
-        query = self.db.select([self.objects]).where(db.and_(self.statistic.columns.cam == cam, 
+        query = sql.select([self.objects]).where(sql.and_(self.statistic.columns.cam == cam, 
                                                               self.statistic.columns.currentime.between(time1, time2)
                                                              )
                                                       .order_by(self.statistic.columns.type, self.statistic.columns.currentime.desc())
                                                       )
                                 
-        ResultProxy = self.conn.execute(query)
+        ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()    
         rows = [dict(r) for r in cursor.fetchall()] 
 
@@ -182,18 +190,18 @@ class Sql:
         #str =  "('" + obj.replace(",","','") + "')"    
         print(time2,time1, obj)
         tuple_ =  obj.split(',')
-        #cur = self.conn.cursor()
+        
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects where cam="+self.P+" AND  type IN " +str+ " AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC LIMIT "+self.P+" OFFSET "+self.P+"", 
         #    (cam, time2, time1,n_rows,offset,))
         #fetched_rows = cur.fetchall()
-        query = self.db.select([self.objects]).where(db.and_(self.statistic.columns.cam == cam, 
+        query = sql.select([self.objects]).where(sql.and_(self.statistic.columns.cam == cam, 
                                                               self.statistic.columns.type.in_(tuple_),
                                                               self.statistic.columns.currentime.between(time2, time1)
                                                              )
                                                       .order_by(self.statistic.columns.type, self.statistic.columns.currentime.desc())
                                                       ).limit(n_rows).offset(offset)
                                      
-        ResultProxy = self.conn.execute(query)
+        ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()
         rows = [ {'cam':v[0] , 'hashcode':v[1],  'currentdate':v[2], 'currentime':v[3], 'type': v[4], 'frame': v[5]} for v in cursor ]
         #print(rows[0])
@@ -210,8 +218,8 @@ class Sql:
 
         millis_back = int(round(time.time() * 1000)) - hours*60*60*1000
         try:
-            query = self.db.delete(self.objects).where( self.objects.currentime < millis_back )
-            ResultProxy = self.execute(query)
+            query = sql.delete(self.objects).where( self.objects.currentime < millis_back )
+            ResultProxy = self.getConn().execute(query)
             print(" delete_frames_later_then was {0} with params: {1}".format(ResultProxy.is_insert ,hours))
         except Exception as e: print(" e: {}".format( e))
     

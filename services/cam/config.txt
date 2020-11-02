@@ -57,4 +57,4 @@ confidence=0.10
 CLASSIFIER_SERVER = http://192.168.0.167/classify
 
 #Database configuration (Postgres)
-DB_IP_ADDRESS=192.168.0.156
+DATABASE_URI=192.168.0.156
