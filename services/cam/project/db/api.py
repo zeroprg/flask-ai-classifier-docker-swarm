@@ -3,6 +3,7 @@ import base64
 import time
 import sqlite3
 import sqlalchemy as sql
+from sqlalchemy import text
 import psycopg2
 
 class Sql:
@@ -115,9 +116,7 @@ class Sql:
                                                               self.statistic.columns.type.in_(tuple_),
                                                               self.statistic.columns.currentime.between(time2, time1)
                                                              )
-                                                      .order_by(self.statistic.columns.type, self.statistic.columns.currentime.asc())
-                                                      )
-                                     
+                                                    ).order_by(text("currentime asc"))                                                                                         
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()    
 
@@ -161,12 +160,11 @@ class Sql:
         """    
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects WHERE cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
         
-        query = sql.select([self.objects]).where(sql.and_(self.statistic.columns.cam == cam, 
-                                                              self.statistic.columns.currentime.between(time1, time2)
+        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam, 
+                                                              self.objects.columns.currentime.between(time1, time2)
                                                              )
-                                                      .order_by(self.statistic.columns.type, self.statistic.columns.currentime.desc())
-                                                      )
-                                
+                                                ).order_by(text("currentime desc")
+                                                                                    
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()    
         rows = [dict(r) for r in cursor.fetchall()] 
@@ -194,12 +192,11 @@ class Sql:
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects where cam="+self.P+" AND  type IN " +str+ " AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC LIMIT "+self.P+" OFFSET "+self.P+"", 
         #    (cam, time2, time1,n_rows,offset,))
         #fetched_rows = cur.fetchall()
-        query = sql.select([self.objects]).where(sql.and_(self.statistic.columns.cam == cam, 
-                                                              self.statistic.columns.type.in_(tuple_),
-                                                              self.statistic.columns.currentime.between(time2, time1)
-                                                             )
-                                                      .order_by(self.statistic.columns.type, self.statistic.columns.currentime.desc())
-                                                      ).limit(n_rows).offset(offset)
+        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam, 
+                                                              self.objects.columns.type.in_(tuple_),
+                                                              self.objects.columns.currentime.between(time2, time1)
+                                                         )
+                                                ).order_by(text("currentime desc")).limit(n_rows).offset(offset)
                                      
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()

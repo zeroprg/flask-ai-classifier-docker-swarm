@@ -271,7 +271,7 @@ def moreimgs():
     print("cam: {}, hour_back1:{}, hour_back2:{}, object_of_interest: {}".format(cam, hour_back1, hour_back2, object_of_interest))
     #db = Sql(DB_IP_ADDRESS)
     rows = db.select_last_frames(cam=cam, time1=hour_back1, time2=hour_back2, obj=object_of_interest)
-    return Response(json.dumps(rows), mimetype='text/plain')
+    return Response(json.dumps(rows, indent=4, sort_keys=True, default=str), mimetype='text/plain')
 
 
 @main_blueprint.route('/imgs_at_time')
