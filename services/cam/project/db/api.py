@@ -163,7 +163,7 @@ class Sql:
         query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam, 
                                                               self.objects.columns.currentime.between(time1, time2)
                                                              )
-                                                ).order_by(text("currentime desc")
+                                                ).order_by(text("currentime desc"))
                                                                                     
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()    

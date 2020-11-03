@@ -1,38 +1,31 @@
 from flask.cli import FlaskGroup
 import logging
-from project import create_app
-from project.db import api 
-from flask import g
+from project import create_app, db
+
+import sqlalchemy as sql
+from sqlalchemy import text
 
 app = create_app()
 cli = FlaskGroup(create_app=create_app)
 
 
-@cli.command("recreate_db")
-def recreate_db():
-    #db.drop_all()
-    #db.create_all()
-    db.session.commit()
-
-
-#@app.teardown_appcontext
-#def teardown_db(exception):
-#    db = g.pop('db', None)
-#    if db is not None:
-#        db.getConn().close()
-
-@cli.command("seed_db")
+@cli.command("health")
 def seed_db():
-    """Seeds the database."""
-    #db.session.add(User(username="michael", email="michael@notreal.com"))
-    db.session.commit()
+    """ Check connectivity."""
+    print("Check connection health:")
+    logging.basicConfig()
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
+    
+    with db.engine.connect() as conn:
+        conn.execute(text("select 'Hi everything fine, don.t worry'"))
+        print("Total objects : {}".format(conn.execute("SELECT count(*) FROM OBJECTS" ).fetchall()))
+        print("Total statistic : {}".format(conn.execute("SELECT count(*) FROM STATISTIC" ).fetchall()))
+        metadata = sql.MetaData()
+        objects = sql.Table('objects', metadata, autoload=True, autoload_with=db.engine)
 
-@cli.command("ipaddress" )
-def seed_db():
-    """ Set ipaddress."""
-    print("Hited ipaddress")
-    #db.session.add(User(username="michael", email="michael@notreal.com"))
-    #db.session.commit()
+    print("Database connection health was fine !!!")
+    
+
 
 
 if __name__ == "__main__":

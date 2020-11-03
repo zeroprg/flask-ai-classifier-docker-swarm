@@ -271,7 +271,7 @@ def moreimgs():
     print("cam: {}, hour_back1:{}, hour_back2:{}, object_of_interest: {}".format(cam, hour_back1, hour_back2, object_of_interest))
     #db = Sql(DB_IP_ADDRESS)
     rows = db.select_last_frames(cam=cam, time1=hour_back1, time2=hour_back2, obj=object_of_interest)
-    return Response(json.dumps(rows, indent=4, sort_keys=True, default=str), mimetype='text/plain')
+    return Response(json.dumps(rows,default=str), mimetype='text/plain')
 
 
 @main_blueprint.route('/imgs_at_time')
@@ -289,7 +289,7 @@ def gen_array_of_imgs(cam, delta=10000, currentime=int(time.time()*1000)):
     time2 = currentime + delta
     #db = Sql(DB_IP_ADDRESS)
     rows = db.select_frame_by_time(cam, time1, time2)
-    x = json.dumps(rows)
+    x = json.dumps(rows, default=str)
     return x
 
 
@@ -311,7 +311,7 @@ def gen_params(cam=0, time1=0, time2=5*60*60*1000, object_of_interest=[]):
     print("time1: {} time2: {}".format(time1, time2))
     #db = Sql(DB_IP_ADDRESS)
     ls = db.select_statistic_by_time(cam, time1, time2, object_of_interest)
-    ret = json.dumps(ls)  # , indent = 4)
+    ret = json.dumps(ls, default=str)  # , indent = 4)
     logger.debug(ret)
     return ret
 def ping_video_url(url):
@@ -334,7 +334,7 @@ def urls():
             start_one_stream_processes(cam=len(videos) - 1)
             # return index() #redirect("/")
             return Response('{"message":"URL added  successfully , video start processing"}', mimetype='text/plain')            
-    print(json.dumps(videos))            
+    #print(json.dumps(videos))            
     if list_url is not None:
         #data = {url:videos, objectOfInterests: subject_of_interes}
         #for video in videos:

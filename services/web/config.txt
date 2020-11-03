@@ -51,7 +51,11 @@ video_file3=http://145.53.212.190:8001/mjpg/video.mjpg
 prototxt=MobileNetSSD_deploy.prototxt.txt
 #model=yolo-coco/yolov3-tiny.weights
 model=MobileNetSSD_deploy.caffemodel
-confidence=0.10
+
+confidence=0.15
+
+#server for object classifications
+CLASSIFIER_SERVER = http://192.168.0.167/classify
 
 #Database configuration (Postgres)
 ipaddress=192.168.0.167

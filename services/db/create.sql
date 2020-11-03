@@ -8,7 +8,6 @@ CREATE INDEX index_currentime ON objects(currentime Desc);
 CREATE INDEX index_type ON objects(type);
 CREATE INDEX index_cam ON objects(cam Asc);
 CREATE INDEX index_cam_hashcode ON objects(cam Asc, hashcode);
-
 CREATE INDEX index_currentime_stat ON statistic(currentime Desc);
 
 
