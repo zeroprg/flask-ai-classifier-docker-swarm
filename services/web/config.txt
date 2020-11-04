@@ -39,8 +39,7 @@ video_file3=http://145.53.212.190:8001/mjpg/video.mjpg
 #video_file1=http://38.101.209.29:8082/mjpg/video.mjpg?COUNTER
 
 
-#Commands to move cameras right and left step from 0 to 3
-#cam_right0=curl 'http://z**o:V*st*!@192.168.1.100:81/decoder_control.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&command=6&onestep=2&_=35282579520910.657573406191367'
+#Commands to move cameras right and left step from 0 to 3#cam_right0=curl 'http://z**o:V*st*!@192.168.1.100:81/decoder_control.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&command=6&onestep=2&_=35282579520910.657573406191367'
 #cam_right1=curl 'http://z**o:V*st*!@192.168.1.101:81/decoder_control.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&command=6&onestep=2&_=35282579520910.657573406191367'
 #cam_left0=curl 'http://z**o:V*st*!@192.168.1.100:81/decoder_control.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&command=4&onestep=2&_=35282579520910.657573406191367'
 #cam_left1=curl 'http://z**o:V*st*!@192.168.1.101:81/decoder_control.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&command=4&onestep=2&_=35282579520910.657573406191367'
@@ -58,4 +57,4 @@ confidence=0.15
 CLASSIFIER_SERVER = http://192.168.0.167/classify
 
 #Database configuration (Postgres)
-ipaddress=192.168.0.167
+DB_IP_ADDRESS=192.168.0.167

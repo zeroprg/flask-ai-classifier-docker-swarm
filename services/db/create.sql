@@ -1,4 +1,4 @@
---CREATE DATABASE streamer;
+CREATE DATABASE streamer;
 --drop  table objects;
 CREATE TABLE objects(hashcode bigint PRIMARY KEY, currentdate DATE, currentime bigint, lastdate DATE, lasttime bigint, type TEXT, frame TEXT, x_dim int, y_dim int, cam int);
 --drop  table statistic;
