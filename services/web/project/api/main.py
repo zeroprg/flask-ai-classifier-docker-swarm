@@ -91,8 +91,8 @@ def classify():
 	    )
     frame =  from_base64(base64_data)
     LOG.info("Hit /classify route: ", params)
-    post_array = db.classify_frame(net, frame, params['cam'], params['confidence'])
-    return Response(json.dumps(post_array), mimetype='text/plain')
+    post_array = classify_frame(net, frame, params['cam'], params['confidence'])
+    return Response(json.dumps(post_array, default=str), mimetype='text/plain')
 
 def uncompress_nparr(bytestring):
     """ Uncompressed the bytestring values """

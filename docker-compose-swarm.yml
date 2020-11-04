@@ -3,29 +3,29 @@ version: '3.5'
 services:
 
 
-#  cam:
-#    image: zeroprg/flask-docker-swarm_cam:latest
-#    command: gunicorn --bind 0.0.0.0:3020 pi_object_detection:app
-#    deploy:
-#      replicas: 1
-#      restart_policy:
-#        condition: on-failure
-#      placement:
-#        constraints: [node.role == manager]
-#    ports:
-#      - 3020:3020
-#    environment:
-#      - FLASK_ENV=production
-#      - APP_SETTINGS=/home/app/web/config.txt
-#      - DB_USER=postgres
-#      - DB_PASSWORD=postgres
+  cam:
+    image: zeroprg/flask-docker-swarm_cam:latest
+    command: gunicorn --bind 0.0.0.0:3020 manage:app
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+    ports:
+      - 3020:3020
+    environment:
+      - FLASK_ENV=production
+      - APP_SETTINGS=/home/app/web/config.txt
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
 #    secrets:
 #      - secret_code
-#    depends_on:
-#      - db
-#      - web
-#    networks:
-#      - app
+    depends_on:
+      - db
+      - web
+    networks:
+      - app
 
 
   web:

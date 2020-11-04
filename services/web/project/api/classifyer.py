@@ -6,6 +6,7 @@ import argparse
 from flask import Flask, render_template, Response, request, redirect, jsonify, send_from_directory
 
 from project.db.api import Sql
+from project import db
 
 import cv2
 import dhash
@@ -42,7 +43,7 @@ from flask import Blueprint, jsonify, request
 
 hashes = {}
 
-def classify_frame( db, net, frame, cam, confidence):
+def classify_frame(net, frame, cam, confidence):
     topic_label = ''
     rectangles = []
     # print(" Classify frame ... --->")
@@ -105,8 +106,8 @@ def classify_frame( db, net, frame, cam, confidence):
             #cv2.rectangle(frame, (startX - 25, startY - 25), (endX + 25, endY + 25), (255, 0, 0), 1)
             #cv2.putText(frame, label1, (startX - 25, startY - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
             camkey = key+' '+str(cam)
-            rectangle = {"startX": startX, "endX": endX, "startY": startY, "endY": endY, "text": label1}  
-            rectangles.add(rectangle)
+            rectangle = {"startX": startX, "endX": endX, "startY": startY, "endY": endY, "text": label1}
+            rectangles.append(rectangle)
             if hashes.get(camkey, None) is None:
                 # count objects for last sec, last 5 sec and last minute
 
@@ -138,7 +139,7 @@ def classify_frame( db, net, frame, cam, confidence):
                 now = datetime.datetime.now()                
                 day = "{date:%Y-%m-%d}".format(date=now)                
                 db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, x_dim, y_dim, cam)
-            params = do_statistic(db, cam, hashes)
+            params = do_statistic(cam, hashes)
             #db.getConn().commit()
 
         # draw at the top left corner of the screen
@@ -158,7 +159,7 @@ class ImageHashCodesCountByTimer(ObjCountByTimer):
         return delta < HASH_DELTA
 
 
-def do_statistic(db, cam, hashes):
+def do_statistic(cam, hashes):
     # Do some statistic work here
     params = get_parameters_json(hashes, cam)
     db.insert_statistic(params)

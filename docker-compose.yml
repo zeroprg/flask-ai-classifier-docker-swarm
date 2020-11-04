@@ -7,7 +7,7 @@ services:
       context: ./services/cam
       dockerfile: Dockerfile 
     image: zeroprg/flask-docker-swarm_cam:latest
-    command: gunicorn --bind 0.0.0.0:3020 pi_object_detection:app
+    command: gunicorn --bind 0.0.0.0:3020 manage:app
     ports:
       - 3020:3020
     environment:
