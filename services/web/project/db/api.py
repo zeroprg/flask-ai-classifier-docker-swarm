@@ -1,4 +1,4 @@
-import cv2
+import cv2
 import base64
 import time
 import sqlite3
@@ -21,10 +21,9 @@ class Sql:
             self.engine = sql.create_engine('sqlite://frame.db')
             conn = engine.connect()
             conn.execute("PRAGMA journal_mode=WAL")
-            
         else:
             self.engine = sql.create_engine('postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME))
-
+        self.engine.connect().autocommit = True
         self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
         self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
         ##self.getConn().autocommit = False
@@ -42,11 +41,9 @@ class Sql:
             self.engine = sql.create_engine('sqlite://frame.db')
             conn = engine.connect()
             conn.execute("PRAGMA journal_mode=WAL")
-            
         else:
-            
             self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI)
-
+        self.engine.connect().autocommit = True
         self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
         self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
 
@@ -83,10 +80,10 @@ class Sql:
         try:
             #cur.execute("INSERT INTO statistic(type,currentime,y,text,hashcodes,cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")",
             #     (param['name'], param['x'],  param['text'], hashcodes, param['cam']))
-            values = {'name': param['name'], 'y': param['y'], 'hashcodes': hashcodes, 'cam':param['cam'] }     
+            values = {'type':param['name'], 'currentime':param['x'], 'y': param['y'], 'hashcodes': hashcodes, 'cam':param['cam'] }
             query = sql.insert(self.statistic)
             ResultProxy = self.getConn().execute(query, values)
-            print(" insert_statistic was {0} with params: {1}".format(ResultProxy.is_insert ,params))    
+            print(" insert_statistic was {0} with params: {1}".format(ResultProxy.is_insert ,params))
         except Exception as e:
             print(" e: {}".format( e))
         
@@ -144,7 +141,7 @@ class Sql:
         try:
             #cur.execute("INSERT INTO objects (hashcode, currentdate, currentime, type, frame, x_dim, y_dim, cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")", 
             #(str(hashcode), date, time, type, str(jpg_as_base64), int(x_dim), int(y_dim), int(cam)))
-            values = {'hashcode': hashcode, 'date': date, 'time': time, 'type': type, 'frame':str(jpg_as_base64), 'x_dim': int(x_dim), 'y_dim': int(y_dim), 'cam':int(cam) }     
+            values = {'hashcode': hashcode, 'currentdate': date, 'currentime': time, 'type': type, 'frame':str(jpg_as_base64), 'x_dim': int(x_dim), 'y_dim': int(y_dim), 'cam':int(cam) }     
             query = sql.insert(self.objects)
             ResultProxy = self.getConn().execute(query, values)
             print(" insert_frame was {0} with params: {1}".format(ResultProxy.is_insert ,values))

@@ -24,26 +24,26 @@ services:
 #      - app
 
 
-#  web:
-#    build:
-#      context: ./services/web
-#      dockerfile: Dockerfile
-#    image: zeroprg/flask-docker-swarm_web:latest
-#    command: gunicorn --bind 0.0.0.0:4000 manage:app
+  web:
+    build:
+      context: ./services/web
+      dockerfile: Dockerfile
+    image: zeroprg/flask-docker-swarm_web:latest
+    command: gunicorn --bind 0.0.0.0:4000 manage:app
 
-#    ports:
-#      - 4000:4000 
-#    environment:
-#      - FLASK_ENV=production
-#      - APP_SETTINGS=/home/app/web/config.txt
-#      - DB_USER=postgres
-#      - DB_IP_ADDRESS=192.168.0.167
-#      - DB_PASSWORD=postgres
-#      - SECRET_CODE=myprecious
-#    depends_on:
-#      - db
-#    networks:
-#      - app
+    ports:
+      - 4000:4000 
+    environment:
+      - FLASK_ENV=production
+      - APP_SETTINGS=/home/app/web/config.txt
+      - DB_USER=postgres
+      - DB_IP_ADDRESS=192.168.0.167
+      - DB_PASSWORD=postgres
+      - SECRET_CODE=myprecious
+    depends_on:
+      - db
+    networks:
+      - app
 
   db:
     build:
@@ -64,19 +64,19 @@ services:
 
 
 
-#  nginx:
-#    build:
-#      context: ./services/nginx
-#      dockerfile: Dockerfile
-#    image: zeroprg/flask-docker-swarm_nginx:latest
+  nginx:
+    build:
+      context: ./services/nginx
+      dockerfile: Dockerfile
+    image: zeroprg/flask-docker-swarm_nginx:latest
 
-#    restart: always
-#    ports:
-#      - 80:80
-#    depends_on:
-#      - web
-#    networks:
-#      - app
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - web
+    networks:
+      - app
 
 
 networks:
