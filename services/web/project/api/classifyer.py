@@ -209,7 +209,7 @@ def dhash(image_data, hashSize=8):
 
     # resize the input image, adding a single column (width) so we
     # can compute the horizontal gradient
-    resized = cv2.resize(image, (hashSize + 1, hashSize), interpolation=cv2.INTER_LINEAR)
+    resized = cv2.resize(image, (hashSize, hashSize), interpolation=cv2.INTER_LINEAR)
     diff = resized[:, 1:] > resized[:, :-1]
     # convert the difference image to a hash
     return sum([2 ** i for (i, v) in enumerate(diff.flatten()) if v])

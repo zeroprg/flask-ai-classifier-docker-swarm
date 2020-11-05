@@ -1,4 +1,4 @@
-import cv2
+import cv2
 import base64
 import time
 import sqlite3
