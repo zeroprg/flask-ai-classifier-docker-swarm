@@ -30,7 +30,7 @@ class ProductionConfig:
     if DB_PORT is None or DB_PORT =='' : DB_PORT =  (  args["DB_PORT"] if ("DB_PORT" in args.keys())  else "5432")
     if DB_NAME is None or DB_NAME =='' : DB_NAME =  (  args["DB_NAME"] if ("DB_NAME" in args.keys())  else "streamer")
     if SQLALCHEMY_DATABASE_URI is None or SQLALCHEMY_DATABASE_URI=='':
-        if DB_IP_ADDRESS is not None: 
+        if DB_IP_ADDRESS is not None or args["DB_IP_ADDRESS"] is not None: 
             DB_IP_ADDRESS =  args["DB_IP_ADDRESS"] if ("DB_IP_ADDRESS" in  args.keys()) else "192.168.0.167"
             SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DB_IP_ADDRESS, DB_PORT, DB_NAME)
         else:

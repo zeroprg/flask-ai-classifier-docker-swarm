@@ -27,7 +27,7 @@ class Sql:
 
         self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
         self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
-        ##self.getConn().autocommit = False
+        self.engine.connect().autocommit = True
 
     def __init__ (self, SQLALCHEMY_DATABASE_URI):
         """ create a database connection to the SQLite database
