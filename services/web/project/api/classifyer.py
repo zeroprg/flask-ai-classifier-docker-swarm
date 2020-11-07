@@ -122,7 +122,7 @@ def classify_frame(net, frame, cam, confidence):
                 for key in hashes:
                     if hashes[key].getCountedObjects() == 0:
                         continue
-                    label += ' ' + key + ':' + str(hashes[camkey].getCountedObjects())
+                    label += ' ' + key + ':' + str(hashes[key].getCountedObjects())
                 topic_label = label
 
 
