@@ -35,7 +35,7 @@ IMG_PAGINATOR = 40
 
 SHOW_VIDEO = False
 
-port=5000
+port = '3020' #prod.PORT
 
 class CameraMove:
     def __init__(self, move_left, move_right, timestep=10):
@@ -334,7 +334,7 @@ def urls():
             start_one_stream_processes(cam=len(videos) - 1)
             # return index() #redirect("/")
             return Response('{"message":"URL added  successfully , video start processing"}', mimetype='text/plain')            
-    #print(json.dumps(videos))            
+    print(json.dumps(videos))            
     if list_url is not None:
         #data = {url:videos, objectOfInterests: subject_of_interes}
         #for video in videos:

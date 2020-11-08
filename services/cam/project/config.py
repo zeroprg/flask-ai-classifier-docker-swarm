@@ -12,6 +12,8 @@ if app_settings is None or app_settings =='' :app_settings = "./config.txt"
 
 class ProductionConfig:
     """Production configuration"""
+    PORT = os.environ.get("PORT")
+
     DB_USERNAME = os.environ.get("DB_USERNAME")
     DB_PASSWORD = os.environ.get("DB_PASSWORD")
     DB_PORT = os.environ.get("DB_PORT")
