@@ -21,9 +21,10 @@ class Sql:
             self.engine = sql.create_engine('sqlite://frame.db')
             conn = engine.connect()
             conn.execute("PRAGMA journal_mode=WAL")
+            
         else:
             self.engine = sql.create_engine('postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME))
-        self.engine.connect().autocommit = True
+
         self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
         self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
         ##self.getConn().autocommit = False
@@ -41,9 +42,11 @@ class Sql:
             self.engine = sql.create_engine('sqlite://frame.db')
             conn = engine.connect()
             conn.execute("PRAGMA journal_mode=WAL")
+            
         else:
+            
             self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI)
-        self.engine.connect().autocommit = True
+
         self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
         self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
 
@@ -80,10 +83,10 @@ class Sql:
         try:
             #cur.execute("INSERT INTO statistic(type,currentime,y,text,hashcodes,cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")",
             #     (param['name'], param['x'],  param['text'], hashcodes, param['cam']))
-            values = {'type':param['name'], 'currentime':param['x'], 'y': param['y'], 'hashcodes': hashcodes, 'cam':param['cam'] }
+            values = {'name': param['name'], 'y': param['y'], 'hashcodes': hashcodes, 'cam':param['cam'] }     
             query = sql.insert(self.statistic)
             ResultProxy = self.getConn().execute(query, values)
-            print(" insert_statistic was {0} with params: {1}".format(ResultProxy.is_insert ,params))
+            print(" insert_statistic was {0} with params: {1}".format(ResultProxy.is_insert ,params))    
         except Exception as e:
             print(" e: {}".format( e))
         
@@ -133,15 +136,18 @@ class Sql:
 
     def insert_frame(self, hashcode, date, time, type, numpy_array, x_dim, y_dim, cam):
         
-        if y_dim == 0 or x_dim == 0 or  x_dim/y_dim > 5 or y_dim/x_dim > 5: return
+        if y_dim == 0 or x_dim == 0 or x_dim/y_dim > 5 or y_dim/x_dim > 5: return
         #cur.execute("UPDATE objects SET currentime="+self.P+" WHERE hashcode="+self.P, (time, str(hashcode)))
         print("cam= {}, x_dim={}, y_dim={}".format(cam, x_dim, y_dim))
         buffer = cv2.imencode('.jpg', numpy_array)[1]
         jpg_as_base64='data:image/jpeg;base64,'+ base64.b64encode(buffer).decode('utf-8')
+
+
+        
         try:
             #cur.execute("INSERT INTO objects (hashcode, currentdate, currentime, type, frame, x_dim, y_dim, cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")", 
             #(str(hashcode), date, time, type, str(jpg_as_base64), int(x_dim), int(y_dim), int(cam)))
-            values = {'hashcode': hashcode, 'currentdate': date, 'currentime': time, 'type': type, 'frame':str(jpg_as_base64), 'x_dim': int(x_dim), 'y_dim': int(y_dim), 'cam':int(cam) }     
+            values = {'hashcode': hashcode, 'date': date, 'time': time, 'type': type, 'frame':str(jpg_as_base64), 'x_dim': int(x_dim), 'y_dim': int(y_dim), 'cam':int(cam) }     
             query = sql.insert(self.objects)
             ResultProxy = self.getConn().execute(query, values)
             print(" insert_frame was {0} with params: {1}".format(ResultProxy.is_insert ,values))
@@ -163,8 +169,9 @@ class Sql:
                                                 ).order_by(text("currentime desc"))
                                                                                     
         ResultProxy = self.getConn().execute(query)
-        cursor = ResultProxy.fetchall()    
-        rows = [dict(r) for r in cursor.fetchall()] 
+#        rows = [dict(r) for r in cursor] 
+        cursor = ResultProxy.fetchall()
+        rows = [ {'cam':v['çam'] , 'hashcode':v['hashcode'],  'currentdate':v['currentdate'], 'currentime':v['currentime'], 'type': v['type'], 'frame': v['frame'], 'lastdate': v['lastdate'], 'lasttime': v['lasttime']  } for v in cursor ]
 
         return rows
 
@@ -197,7 +204,7 @@ class Sql:
                                      
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()
-        rows = [ {'cam':v[0] , 'hashcode':v[1],  'currentdate':v[2], 'currentime':v[3], 'type': v[4], 'frame': v[5]} for v in cursor ]
+        rows = [ {'cam':v['çam'] , 'hashcode':v['hashcode'],  'currentdate':v['currentdate'], 'currentime':v['currentime'], 'type': v['type'], 'frame': v['frame'], 'lastdate': v['lastdate'], 'lasttime': v['lasttime']  } for v in cursor ]
         #print(rows[0])
         return rows
 

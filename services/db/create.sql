@@ -1,6 +1,6 @@
 CREATE DATABASE streamer;
 drop  table objects;
-CREATE TABLE objects(hashcode int8 PRIMARY KEY, currentdate TEXT, currentime int8, lastdate DATE, lasttime int8, type TEXT, frame TEXT, x_dim int, y_dim int, cam int);
+CREATE TABLE objects(hashcode int8 PRIMARY KEY, currentdate TEXT, currentime int8, lastdate TEXT, lasttime int8, type TEXT, frame TEXT, x_dim int, y_dim int, cam int);
 drop  table statistic;
 CREATE TABLE statistic(type TEXT, currentime int8, y int2,  cam int2, hashcodes TEXT);
 
