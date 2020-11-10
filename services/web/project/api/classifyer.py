@@ -105,24 +105,25 @@ def classify_frame(net, frame, cam, confidence):
 
             #cv2.rectangle(frame, (startX - 25, startY - 25), (endX + 25, endY + 25), (255, 0, 0), 1)
             #cv2.putText(frame, label1, (startX - 25, startY - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
+            camkey = key+' '+str(cam)
             rectangle = {"startX": startX, "endX": endX, "startY": startY, "endY": endY, "text": label1}
             rectangles.append(rectangle)
-            if hashes.get(key, None) is None:
+            if hashes.get(camkey, None) is None:
                 # count objects for last sec, last 5 sec and last minute
 
-                hashes[key] = ImageHashCodesCountByTimer()
-                if not hashes[key].add(hash):
+                hashes[camkey] = ImageHashCodesCountByTimer()
+                if not hashes[camkey].add(hash):
                     continue
 
             else:
                 # if not is_hash_the_same(hash,hashes[key]): hashes[key].add(hash)
-                if not hashes[key].add(hash):
+                if not hashes[camkey].add(hash):
                     continue
                 label = ''
                 for key in hashes:
-                    if hashes[key].getCountedObjects() == 0:
+                    if hashes[camkey].getCountedObjects() == 0:
                         continue
-                    label += ' ' + key + ':' + str(hashes[key].getCountedObjects())
+                    label += ' ' + key + ':' + str(hashes[camkey].getCountedObjects())
                 topic_label = label
 
 
@@ -199,7 +200,7 @@ class Trace(dict):
                           sort_keys=True, indent=4)
 
 
-def dhash(image_data, hashSize=8):
+def dhash(image_data, hashSize=7):
     image_out = np.array(image_data).astype(np.uint8)
 
     # convert the image to grayscale and compute the hash
