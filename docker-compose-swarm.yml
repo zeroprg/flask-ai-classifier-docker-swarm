@@ -1,38 +1,37 @@
+
 version: '3.5'
 
 services:
 
-
-#  cam:
-#    image: zeroprg/flask-docker-swarm_cam:latest
+  cam:
+    image: zeroprg/flask-docker-swarm_cam:latest
 #    command: gunicorn --bind 0.0.0.0:3020 manage:app
-#    deploy:
-#      replicas: 1
-#      restart_policy:
-#        condition: on-failure
-#      placement:
-#        constraints: [node.role == manager]
-#    ports:
-#      - 3020:3020
-#    environment:
-#      - FLASK_ENV=production
-#      - APP_SETTINGS=/home/app/web/config.txt
-#      - DB_USER=postgres
-#      - DB_PASSWORD=postgres
-#    secrets:
-#      - secret_code
-#    depends_on:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+    ports:
+      - 4010:4010
+    environment:
+      - FLASK_ENV=production
+      - APP_SETTINGS=/home/app/web/config.txt
+      - DB_IP_ADDRESS=192.168.0.167
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
 #      - db
-#      - web
-#    networks:
-#      - app
+      - web
+    networks:
+      - app
 
 
   web:
     image: zeroprg/flask-docker-swarm_web:latest
-    command: gunicorn --bind 0.0.0.0:4000 manage:app
+#   command: gunicorn --bind 0.0.0.0:4000 manage:app
     deploy:
-      replicas: 4
+      replicas: 5
       restart_policy:
         condition: on-failure
 #      placement:
@@ -60,7 +59,7 @@ services:
  # db:
  #   image: zeroprg/flask-docker-swarm_db:latest
  #   deploy:
- #     replicas: 1
+ #     replicas: 5
  #     restart_policy:
  #       condition: on-failure
  #     placement:
@@ -80,11 +79,11 @@ services:
 #    deploy:
 #           mode: global
     deploy:
-      replicas: 1
+      replicas: 5
       restart_policy:
         condition: on-failure
       placement:
-        constraints: [node.role == manager]
+        constraints: [node.role == worker]
     ports:
       - 80:80
     depends_on:
@@ -101,17 +100,17 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
     deploy:
       placement:
-        constraints: [node.role == manager]
+        constraints: [node.role == worker]
     networks:
       - app
 
 networks:
   app:
     driver: overlay
-#    ipam:
-#       driver: default
-#       config:
-#           - subnet: 192.168.0.0/16 
+    ipam:
+       driver: default
+       config:
+           - subnet: 192.168.0.0/16 
 volumes:
   data-volume:
     driver: local

@@ -57,4 +57,5 @@ RUN chown -R app:app $APP_HOME
 USER app
 
 # run server
-#CMD gunicorn -w 4 -b 0.0.0.0:3020 pi_object_detection:app
+#CMD gunicorn  -b 0.0.0.0:3020 manage:app
+CMD python3 manage.py run -h 0.0.0.0 -p 3020

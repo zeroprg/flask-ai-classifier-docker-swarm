@@ -169,9 +169,9 @@ class Sql:
                                                 ).order_by(text("currentime desc"))
                                                                                     
         ResultProxy = self.getConn().execute(query)
-#        rows = [dict(r) for r in cursor] 
         cursor = ResultProxy.fetchall()
-        rows = [ {'cam':v['çam'] , 'hashcode':v['hashcode'],  'currentdate':v['currentdate'], 'currentime':v['currentime'], 'type': v['type'], 'frame': v['frame'], 'lastdate': v['lastdate'], 'lasttime': v['lasttime']  } for v in cursor ]
+        rows = [dict(r) for r in cursor] 
+#        rows = [ {'cam':v['çam'] , 'hashcode':v['hashcode'],  'currentdate':v['currentdate'], 'currentime':v['currentime'], 'type': v['type'], 'frame': v['frame'], 'lastdate': v['lastdate'], 'lasttime': v['lasttime']  } for v in ResultProxy ]
 
         return rows
 
@@ -204,7 +204,10 @@ class Sql:
                                      
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()
-        rows = [ {'cam':v['çam'] , 'hashcode':v['hashcode'],  'currentdate':v['currentdate'], 'currentime':v['currentime'], 'type': v['type'], 'frame': v['frame'], 'lastdate': v['lastdate'], 'lasttime': v['lasttime']  } for v in cursor ]
+        rows = [dict(r) for r in cursor] 
+
+        #cursor = ResultProxy.fetchall()
+        #rows = [ {'cam':v['çam'] , 'hashcode':v['hashcode'],  'currentdate':v['currentdate'], 'currentime':v['currentime'], 'type': v['type'], 'frame': v['frame'], 'lastdate': v['lastdate'], 'lasttime': v['lasttime']  } for v in cursor ]
         #print(rows[0])
         return rows
 
