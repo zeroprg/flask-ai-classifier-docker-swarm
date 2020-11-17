@@ -147,7 +147,7 @@ class Sql:
         try:
             #cur.execute("INSERT INTO objects (hashcode, currentdate, currentime, type, frame, x_dim, y_dim, cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")", 
             #(str(hashcode), date, time, type, str(jpg_as_base64), int(x_dim), int(y_dim), int(cam)))
-            values = {'hashcode': hashcode, 'date': date, 'time': time, 'type': type, 'frame':str(jpg_as_base64), 'x_dim': int(x_dim), 'y_dim': int(y_dim), 'cam':int(cam) }     
+            values = {'hashcode': hashcode, 'currentdate': date, 'currenttime': time, 'type': type, 'frame':str(jpg_as_base64), 'x_dim': int(x_dim), 'y_dim': int(y_dim), 'cam':int(cam) }     
             query = sql.insert(self.objects)
             ResultProxy = self.getConn().execute(query, values)
             print(" insert_frame was {0} with params: {1}".format(ResultProxy.is_insert ,values))
