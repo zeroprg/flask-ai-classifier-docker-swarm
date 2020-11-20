@@ -68,7 +68,12 @@ class Detection:
                 return
             result = call_classifier(classify_server, frame, cam, self.confidence)
             if(result is  not None ): print("cam {0} result: {1}".format(cam, result))
-
+        # Draw rectangles
+            for rec in result.rectangles: 
+                cv2.rectangle(frame, (rec.startX - 25, rec.startY - 25), (rec.endX + 25, rec.endY + 25), (255, 0, 0), 1)
+                cv2.putText(frame, rec.label1, (rec.startX - 25, rec.startY - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
+            cv2.putText(frame, result.topic_label, (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+            output_queue.append(frame)
             #output_queue.put_nowait(frame)
 
 

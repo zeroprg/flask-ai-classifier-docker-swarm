@@ -136,7 +136,8 @@ class Sql:
 
     def insert_frame(self, hashcode, date, time, type, numpy_array, x_dim, y_dim, cam):
         
-        if y_dim == 0 or x_dim == 0 or x_dim/y_dim > 5 or y_dim/x_dim > 5: return
+         if y_dim <25 or x_dim <25 or x_dim/y_dim > 4.7 or y_dim/x_dim > 4.7: return
+
         #cur.execute("UPDATE objects SET currentime="+self.P+" WHERE hashcode="+self.P, (time, str(hashcode)))
         print("cam= {}, x_dim={}, y_dim={}".format(cam, x_dim, y_dim))
         buffer = cv2.imencode('.jpg', numpy_array)[1]
