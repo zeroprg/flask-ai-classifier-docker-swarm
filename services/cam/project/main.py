@@ -7,6 +7,7 @@ import time
 import logging
 import mimetypes
 import json
+import cv2
 
 #from db.api import Sql
 from project.config import  ProductionConfig as prod
