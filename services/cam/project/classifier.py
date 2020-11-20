@@ -74,7 +74,7 @@ class Detection:
                     for rec in result['rectangles']: 
                         cv2.rectangle(frame, (rec.get('startX') - 25, rec.get('startY') - 25), (rec.get('endX') + 25, rec.get('endY') + 25), (255, 0, 0), 1)
                         cv2.putText(frame, rec.get('label1') , (rec.get('startX') - 25, rec.get('startY') - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
-                    if cv2.putText(frame, result.get('topic_label', 'None')  , (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+                cv2.putText(frame, result.get('topic_label', 'None')  , (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
                 output_queue.append(frame)
                 #output_queue.put_nowait(frame)
 
