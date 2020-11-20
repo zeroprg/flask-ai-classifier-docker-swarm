@@ -136,10 +136,9 @@ class Sql:
 
     def insert_frame(self, hashcode, date, time, type, numpy_array, x_dim, y_dim, cam):
         
-         if y_dim <25 or x_dim <25 or x_dim/y_dim > 4.7 or y_dim/x_dim > 4.7: return
-
+        if y_dim <25 or x_dim <25 or x_dim/y_dim > 4.7 or y_dim/x_dim > 4.7: return
         #cur.execute("UPDATE objects SET currentime="+self.P+" WHERE hashcode="+self.P, (time, str(hashcode)))
-        print("cam= {}, x_dim={}, y_dim={}".format(cam, x_dim, y_dim))
+        #print("cam= {}, x_dim={}, y_dim={}".format(cam, x_dim, y_dim))
         buffer = cv2.imencode('.jpg', numpy_array)[1]
         jpg_as_base64='data:image/jpeg;base64,'+ base64.b64encode(buffer).decode('utf-8')
 
@@ -151,7 +150,7 @@ class Sql:
             values = {'hashcode': hashcode, 'currentdate': date, 'currentime': time, 'type': type, 'frame':str(jpg_as_base64), 'x_dim': int(x_dim), 'y_dim': int(y_dim), 'cam':int(cam) }     
             query = sql.insert(self.objects)
             ResultProxy = self.getConn().execute(query, values)
-            print(" insert_frame was {0} with params: {1}".format(ResultProxy.is_insert ,values))
+            #print(" insert_frame was {0} with params: {1}".format(ResultProxy.is_insert ,values))
         except Exception as e: print(" e: {}".format( e))
 
 
