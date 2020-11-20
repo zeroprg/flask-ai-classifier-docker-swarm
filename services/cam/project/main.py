@@ -334,7 +334,7 @@ def urls():
             initialize_video_streams(add_url)
             start_one_stream_processes(cam=len(videos) - 1)
             # return index() #redirect("/")
-            return Response('{"message":"URL added  successfully , video start processing"}', mimetype='text/plain')            
+            return Response(json.dumps(videos), mimetype='text/plain') #Response('{"message":"URL added  successfully , video start processing"}', mimetype='text/plain')            
     print(json.dumps(videos))            
     if list_url is not None:
         #data = {url:videos, objectOfInterests: subject_of_interes}
