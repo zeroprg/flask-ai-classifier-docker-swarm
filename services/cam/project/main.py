@@ -139,6 +139,8 @@ def start_one_stream_processes(cam):
     p.start()
 
 
+
+
 def start():
     logger.info("[INFO] loading model...")
     # construct a child process *indepedent* from our main process of
@@ -150,6 +152,8 @@ def start():
     initialize_video_streams()
     for cam in range(len(videos)):
         start_one_stream_processes(cam)
+
+
 
 # initialize the video stream, allow the cammera sensor to warmup,
 # and initialize the FPS counter
@@ -163,7 +167,7 @@ def initialize_video_streams(url=None):
         i = len(videos)
     #  initialise picam or IPCam
     else:
-        arg = prod.args.get('video_file' + str(i), None)
+        arg = prod.get('video_file' + str(i), None)
     while arg is not None:
         if not (i, arg) in videos:
             camright.append(args.get('cam_right' + str(i), None))
@@ -175,10 +179,8 @@ def initialize_video_streams(url=None):
             arg = args.get('video_file' + str(i), None)
 
     # Start process
-    time.sleep(1.0)
+    time.sleep(2.0)
    # fps = FPS().start()
-
-
 
 def detect(cam):
     """Video streaming generator function."""
@@ -320,10 +322,10 @@ def ping_video_url(url):
     if( video =='video/mp4'): return True
     return False
 
+
 @main_blueprint.route('/urls', methods=['GET', 'POST'])
 @cross_origin(origin='http://localhost:{}'.format(port))
 def urls():
-    print('Hey Im here' )
     """Add/Delete/Update a new video url, list all availabe urls."""
     list_url = request.args.get('list', default=None)
     add_url = request.args.get('add', default=None)
@@ -334,13 +336,11 @@ def urls():
             initialize_video_streams(add_url)
             start_one_stream_processes(cam=len(videos) - 1)
             # return index() #redirect("/")
-            return Response(json.dumps(videos), mimetype='text/plain') #Response('{"message":"URL added  successfully , video start processing"}', mimetype='text/plain')            
-    print(json.dumps(videos))            
+            return Response('{"message":"URL added  successfully , video start processing"}', mimetype='text/plain')
     if list_url is not None:
         #data = {url:videos, objectOfInterests: subject_of_interes}
         #for video in videos:
         return Response(json.dumps(videos), mimetype='text/plain')
-        
     if delete_url is not None:
         for video in videos:
             if video[0] == delete_url:
