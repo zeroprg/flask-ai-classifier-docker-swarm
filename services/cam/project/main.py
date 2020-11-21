@@ -167,7 +167,7 @@ def initialize_video_streams(url=None):
         i = len(videos)
     #  initialise picam or IPCam
     else:
-        arg = prod.get('video_file' + str(i), None)
+        arg = prod.args.get('video_file' + str(i), None)
     while arg is not None:
         if not (i, arg) in videos:
             camright.append(args.get('cam_right' + str(i), None))
