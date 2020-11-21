@@ -168,7 +168,8 @@ def initialize_video_streams(url=None):
     #  initialise picam or IPCam
     else:
         arg = prod.args.get('video_file' + str(i), None)
-    while arg is not None:
+    logger.info('Video urls:')
+    while arg is not None:        
         if not (i, arg) in videos:
             camright.append(args.get('cam_right' + str(i), None))
             camleft.append(args.get('cam_left' + str(i), None))
@@ -176,7 +177,8 @@ def initialize_video_streams(url=None):
             videos.append((str(i), arg))
             imagesQueue.append(Queue(maxsize=IMAGES_BUFFER + 5))
             i += 1
-            arg = args.get('video_file' + str(i), None)
+            arg = prod.args.get('video_file' + str(i), None)
+            logger.info(arg)
 
     # Start process
     time.sleep(2.0)
@@ -336,7 +338,7 @@ def urls():
             initialize_video_streams(add_url)
             start_one_stream_processes(cam=len(videos) - 1)
             # return index() #redirect("/")
-            return Response('{"message":"URL added  successfully , video start processing"}', mimetype='text/plain')
+            return Response(json.dumps(videos), mimetype='text/plain')
     if list_url is not None:
         #data = {url:videos, objectOfInterests: subject_of_interes}
         #for video in videos:
