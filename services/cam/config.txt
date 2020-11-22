@@ -8,7 +8,7 @@ video_file1=http://110.54.126.130:50000/cgi-bin/camera?resolution=1200&amp;quali
 
 video_file2=http://145.53.212.190:8001/mjpg/video.mjpg
 video_file3=http://203.77.210.41:2000/mjpg/video.mjpg
-
+video_file4=http://78.27.189.141/mjpg/video.mjpg
 #Japanees Laundry:
 #video_file3=http://180.13.193.172:8083/-wvhttp-01-/GetOneShot?image_size=640x480&frame_count=1000000000
 
