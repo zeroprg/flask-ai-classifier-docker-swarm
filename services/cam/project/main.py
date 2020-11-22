@@ -161,25 +161,26 @@ def initialize_video_streams(url=None):
     i = 0
     arg = None
     right = None
-    left = None
+    left = None    
     if url is not None:
         arg = url
         i = len(videos)
+        logger.info('new url:' + url)
     #  initialise picam or IPCam
     else:
         arg = prod.args.get('video_file' + str(i), None)
     logger.info('Video urls:')
     while arg is not None:        
         if not (i, arg) in videos:
-            camright.append(args.get('cam_right' + str(i), None))
-            camleft.append(args.get('cam_left' + str(i), None))
+            camright.append(prod.args.get('cam_right' + str(i), None))
+            camleft.append(prod.args.get('cam_left' + str(i), None))
             CameraMove(camright[i], camleft[i])
             videos.append((str(i), arg))
             imagesQueue.append(Queue(maxsize=IMAGES_BUFFER + 5))
             i += 1
             arg = prod.args.get('video_file' + str(i), None)
             logger.info(arg)
-
+    logger.info(videos)
     # Start process
     time.sleep(2.0)
    # fps = FPS().start()
@@ -319,11 +320,17 @@ def gen_params(cam=0, time1=0, time2=5*60*60*1000, object_of_interest=[]):
     ret = json.dumps(ls, default=str)  # , indent = 4)
     logger.debug(ret)
     return ret
-def ping_video_url(url):
-    video = mimetypes.MimeTypes().guess_type(url)[0]
-    if( video =='video/mp4'): return True
-    return False
 
+
+def ping_video_url(url):
+    """ Ping url """
+    try:
+        vs = cv2.VideoCapture(url)
+        flag, frame = vs.read()
+        ret = flag
+    except:
+        ret = False
+    return flag
 
 @main_blueprint.route('/urls', methods=['GET', 'POST'])
 @cross_origin(origin='http://localhost:{}'.format(port))
@@ -334,11 +341,15 @@ def urls():
     delete_url = request.args.get('delete', default=None)
     update_url = request.args.get('update', default=None)
     if add_url is not None:
-        if ping_video_url(add_url):
+        logger.info('adding a new video urls ' + add_url)
+        if ping_video_url(add_url):            
             initialize_video_streams(add_url)
             start_one_stream_processes(cam=len(videos) - 1)
             # return index() #redirect("/")
-            return Response(json.dumps(videos), mimetype='text/plain')
+            return Response('{"message":"URL added successfully"}', mimetype='text/plain')
+        else:
+            return None, 500
+            #Response('{"message":"URL has no video"}', mimetype='text/plain')    
     if list_url is not None:
         #data = {url:videos, objectOfInterests: subject_of_interes}
         #for video in videos:
