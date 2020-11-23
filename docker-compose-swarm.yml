@@ -7,11 +7,11 @@ services:
     image: zeroprg/flask-docker-swarm_cam:latest
 #    command: gunicorn --bind 0.0.0.0:3020 manage:app
     deploy:
-      replicas: 1
+      replicas: 4
       restart_policy:
         condition: on-failure
-      placement:
-        constraints: [node.role == manager]
+ #     placement:
+ #       constraints: [node.role == manager]
     ports:
       - 3020:3020
     environment:
@@ -35,8 +35,8 @@ services:
       replicas: 4
       restart_policy:
         condition: on-failure
-      placement:
-        constraints: [node.role == worker]
+  #    placement:
+  #      constraints: [node.role == worker]
     ports:
       - 4000:4000
     environment:
@@ -63,8 +63,8 @@ services:
       replicas: 4
       restart_policy:
         condition: on-failure
-      placement:
-        constraints: [node.role == worker]
+#      placement:
+#        constraints: [node.role == worker]
     volumes:
       - data-volume:/var/lib/postgresql/data
     ports:
