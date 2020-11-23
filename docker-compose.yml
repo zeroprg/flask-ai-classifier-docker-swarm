@@ -77,7 +77,7 @@ services:
       - 80:80
     depends_on:
       - web
-#      - cam  
+      - cam  
     networks:
       - app
 
