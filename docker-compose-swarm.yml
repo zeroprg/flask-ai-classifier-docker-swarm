@@ -13,8 +13,9 @@ services:
       placement:
         constraints: [node.role == manager]
     ports:
-      - 4010:4010
+      - 3020:3020
     environment:
+      - PORT=3020
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_IP_ADDRESS=192.168.0.167
@@ -31,63 +32,63 @@ services:
     image: zeroprg/flask-docker-swarm_web:latest
 #   command: gunicorn --bind 0.0.0.0:4000 manage:app
     deploy:
-      replicas: 5
+      replicas: 4
       restart_policy:
         condition: on-failure
-#      placement:
-#        constraints: [node.role == worker]
+      placement:
+        constraints: [node.role == worker]
     ports:
       - 4000:4000
     environment:
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
-      - DB_IP_ADDRESS=192.168.0.167
-      - DB_USER_NAME=postgres
+      - DB_USER=postgres
+      - DB_IP_ADDRESS=192.168.0.167    
       - DB_PASSWORD=postgres
 #    secrets:
 #      - secret_code
-#    depends_on:
-#      - db
+    depends_on:
+      - db
     networks:
       - app
     healthcheck:
       test: curl --fail http://localhost:4000/ping || exit 1
       interval: 10s
-      timeout: 2s
+      timeout: 5s
       retries: 5
 
- # db:
- #   image: zeroprg/flask-docker-swarm_db:latest
- #   deploy:
- #     replicas: 5
- #     restart_policy:
- #       condition: on-failure
- #     placement:
- #       constraints: [node.role == manager]
- #   volumes:
- #     - data-volume:/var/lib/postgresql/data
- #   ports:
- #     - 5432:5432
- #   environment:
- #     - POSTGRES_USER=postgres
- #     - POSTGRES_PASSWORD=postgres
- #   networks:
- #     - app
+  db:
+    image: zeroprg/flask-docker-swarm_db:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+    volumes:
+      - data-volume:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - app
 
   nginx:
     image: zeroprg/flask-docker-swarm_nginx:latest
 #    deploy:
 #           mode: global
     deploy:
-      replicas: 5
+      replicas: 1
       restart_policy:
         condition: on-failure
       placement:
-        constraints: [node.role == worker]
+        constraints: [node.role == manager]
     ports:
       - 80:80
     depends_on:
-      - web
+      - cam
     networks:
       - app
 
