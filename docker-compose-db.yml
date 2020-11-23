@@ -1,57 +1,40 @@
 version: '3.5'
 
 services:
-
-#  cam:
-#    build:
-#      context: ./services/cam
-#      dockerfile: Dockerfile 
-#    image: zeroprg/flask-docker-swarm_cam:latest
+   cam:
+    image: zeroprg/flask-docker-swarm_cam:latest
 #    command: gunicorn --bind 0.0.0.0:3020 manage:app
-#    ports:
-#      - 3020:3020
-#    environment:
-#      - FLASK_ENV=production
-#      - APP_SETTINGS=/home/app/web/config.txt
-#      - DB_USER=postgres
-#      - DB_PASSWORD=postgres
-#    secrets:
-#      - secret_code
-#    depends_on:
-#      - db
-#      - web
-#    networks:
-#      - app
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+    ports:
+      - 3020:3020
+    environment:
+      - PORT=3020
+      - FLASK_ENV=production
+      - APP_SETTINGS=/home/app/web/config.txt
+      - DB_IP_ADDRESS=192.168.0.167
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      - db
+      #- web
+    networks:
+      - app
 
 
-#  web:
-#    build:
-#      context: ./services/web
-#      dockerfile: Dockerfile
-#    image: zeroprg/flask-docker-swarm_web:latest
-#    command: gunicorn --bind 0.0.0.0:4000 manage:app
-
-#    ports:
-#      - 4000:4000 
-#    environment:
-#      - FLASK_ENV=production
-#      - APP_SETTINGS=/home/app/web/config.txt
-#      - DB_USER=postgres
-#      - DB_IP_ADDRESS=192.168.0.167
-#      - DB_PASSWORD=postgres
-#      - SECRET_CODE=myprecious
-#    depends_on:
-#      - db
-#    networks:
-#      - app
-
-  db:
-    build:
-      context: ./services/db
-      dockerfile: Dockerfile
+   db:
     image: zeroprg/flask-docker-swarm_db:latest
-    restart: always
-    volumes:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+      volumes:
       - data-volume:/var/lib/postgresql/data
     ports:
       - 5432:5432
@@ -64,21 +47,22 @@ services:
 
 
 
-  nginx:
-    build:
-      context: ./services/nginx
-      dockerfile: Dockerfile
+   nginx:
     image: zeroprg/flask-docker-swarm_nginx:latest
 
-    restart: always
-    ports:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+      ports:
       - 80:80
     depends_on:
-      - web
+      - cam
     networks:
       - app
-
-
+      
 networks:
   app:
     driver: bridge
