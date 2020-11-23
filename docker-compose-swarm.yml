@@ -60,11 +60,11 @@ services:
   db:
     image: zeroprg/flask-docker-swarm_db:latest
     deploy:
-      replicas: 1
+      replicas: 4
       restart_policy:
         condition: on-failure
       placement:
-        constraints: [node.role == manager]
+        constraints: [node.role == worker]
     volumes:
       - data-volume:/var/lib/postgresql/data
     ports:
