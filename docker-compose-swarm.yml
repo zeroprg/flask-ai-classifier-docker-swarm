@@ -22,7 +22,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
     depends_on:
-#      - db
+      - db
       - web
     networks:
       - app
