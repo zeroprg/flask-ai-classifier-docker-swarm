@@ -35,7 +35,7 @@ services:
       placement:
         constraints: [node.role == manager]
       volumes:
-      - data-volume:/var/lib/postgresql/data
+       - data-volume:/var/lib/postgresql/data
     ports:
       - 5432:5432
     environment:
@@ -62,11 +62,11 @@ services:
       - cam
     networks:
       - app
-      
+
 networks:
   app:
     driver: bridge
 
-volumes:
-  data-volume:
-    driver: local
+#volumes:
+ # data-volume:
+  #  driver: local
