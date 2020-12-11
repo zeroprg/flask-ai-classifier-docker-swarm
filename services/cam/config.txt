@@ -1,16 +1,26 @@
-
-#Traffic controls cameras:
-#video_file1=http://203.77.210.41:2000/mjpg/video.mjpg
-
-#video_file0=http://107.85.197.18:8080/-wvhttp-01-/GetOneShot?image_size=1920x1080&frame_count=100
-video_file0=http://213.226.254.135:91/mjpg/video.mjpg
-video_file1=http://110.54.126.130:50000/cgi-bin/camera?resolution=1200&amp;quality=1&amp
-
-video_file2=http://145.53.212.190:8001/mjpg/video.mjpg
-video_file3=http://203.77.210.41:2000/mjpg/video.mjpg
-video_file4=http://78.27.189.141/mjpg/video.mjpg
-#Japanees Laundry:
-#video_file3=http://180.13.193.172:8083/-wvhttp-01-/GetOneShot?image_size=640x480&frame_count=1000000000
+video_file0=http://213.226.254.135:91/mjpg/video.mjpg 
+video_file1=http://110.54.126.130:50000/cgi-bin/camera?resolution=1200&amp;quality=1&amp 
+video_file2=http://145.53.212.190:8001/mjpg/video.mjpg 
+video_file3=http://192.168.0.100:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=16061678710320.35579881408547887 
+video_file4=http://78.27.189.141/mjpg/video.mjpg 
+video_file5=http://200.52.68.182:8081/cgi-bin/camera?resolution=640 
+video_file6=http://80.12.90.221:8082/mjpg/video.mjpg 
+video_file7=http://210.54.39.237:8888/shot.jpg?rnd=654321 
+video_file8=http://83.103.195.172:82/mjpg/video.mjpg 
+video_file9=http://84.92.94.35:81/mjpg/video.mjpg 
+video_file10=http://99.42.39.171:82/mjpg/video.mjpg 
+video_file11=http://82.207.41.104:8080/cam_1.cgi 
+video_file12=http://108.222.132.93:8082/out.jpg?q=30 
+video_file13=http://80.13.120.225:8083/mjpg/video.mjpg 
+video_file14=http://50.64.62.147:9000/mjpg/video.mjpg 
+video_file15=http://98.155.244.58/mjpg/video.mjpg 
+video_file16=http://119.197.80.97:83/SnapshotJPEG?Resolution=640x480 
+video_file17=http://210.139.19.134:82/cgi-bin/camera?resolution=640 
+video_file18=http://119.197.80.97:82/nphMotionJpeg?Resolution=640x480 
+video_file19=http://185.49.168.74:8001/mjpg/video.mjpg 
+video_file20=http://91.235.175.140:8081/mjpg/video.mjpg 
+video_file21=http://117.247.85.98:8001/mjpg/video.mjpg 
+video_file22=http://87.26.188.210:81/cgi-bin/faststream.jpg?stream=half 
 
 
 #Parking Lots:
@@ -18,11 +28,8 @@ video_file4=http://78.27.189.141/mjpg/video.mjpg
 #video_file1=http://159.255.189.4:8081/mjpg/video.mjpg
 #video_file0=http://213.226.254.135:91/mjpg/video.mjpg
 
-#Jacusi
-#video_file2=http://208.72.70.171:80/mjpg/video.mjpg
-
 #Hotel in Sochi
-#video_file0=http://158.58.130.148/mjpg/video.mjpg
+video_file23=http://158.58.130.148/mjpg/video.mjpg
 
 #Park in Moscow
 #video_file0=http://95.215.176.83:8084/mjpg/video.mjpg
@@ -52,7 +59,7 @@ video_file4=http://78.27.189.141/mjpg/video.mjpg
 prototxt=MobileNetSSD_deploy.prototxt.txt
 #model=yolo-coco/yolov3-tiny.weights
 model=MobileNetSSD_deploy.caffemodel
-confidence=0.10
+confidence=0.15
 
 #server for object classifications
 CLASSIFIER_SERVER = http://192.168.0.167/classify

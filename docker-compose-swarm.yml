@@ -5,20 +5,19 @@ services:
 
   cam:
     image: zeroprg/flask-docker-swarm_cam:latest
-#    command: gunicorn --bind 0.0.0.0:3020 manage:app
     deploy:
-      replicas: 4
+      replicas: 1
       restart_policy:
         condition: on-failure
- #     placement:
- #       constraints: [node.role == manager]
+      placement:
+        constraints: [node.role == manager]
     ports:
       - 3020:3020
     environment:
       - PORT=3020
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
-      - DB_IP_ADDRESS=192.168.0.167
+      - DB_IP_ADDRESS=localhost
       - DB_USER=postgres
       - DB_PASSWORD=postgres
     depends_on:
@@ -30,61 +29,95 @@ services:
 
   web:
     image: zeroprg/flask-docker-swarm_web:latest
-#   command: gunicorn --bind 0.0.0.0:4000 manage:app
     deploy:
       replicas: 4
       restart_policy:
         condition: on-failure
-  #    placement:
-  #      constraints: [node.role == worker]
+      placement:
+        constraints: [node.role == worker]
     ports:
       - 4000:4000
     environment:
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_USER=postgres
-      - DB_IP_ADDRESS=192.168.0.167    
+      - DB_IP_ADDRESS=localhost
       - DB_PASSWORD=postgres
-#    secrets:
-#      - secret_code
     depends_on:
       - db
     networks:
       - app
-   # healthcheck:
-   #   test: curl --fail http://localhost:4000/ping || exit 1
-   #   interval: 10s
-   #   timeout: 5s
-   #   retries: 5
+    healthcheck:
+      test: curl --fail http://localhost:4000/ping || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   db:
+    hostname: 'primary'
+    image: zeroprg/flask-docker-swarm_db:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+      placement:
+        constraints: 
+          - node.role == manager
+#          - node.labels.type == primary
+    volumes:
+      - data-volume:/var/lib/postgresql/data
+    ports:
+      - "5432"
+
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - MAX_CONNECTIONS=10
+      - MAX_WAL_SENDERS=5
+      - PG_MODE=primary
+    networks:
+      - app
+
+  db_replica:
     image: zeroprg/flask-docker-swarm_db:latest
     deploy:
       replicas: 4
       restart_policy:
         condition: on-failure
-#      placement:
-#        constraints: [node.role == worker]
+
+      placement:
+        constraints:
+          - node.role == worker
+          - node.labels.type != primary
     volumes:
       - data-volume:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - "5432"
+
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - MAX_CONNECTIONS=10
+      - MAX_WAL_SENDERS=5
+      - PG_MODE=replica
+      - PG_PRIMARY_HOST=primary
+      - PG_PRIMARY_PORT=5432
+    depends_on:
+      - db
+
     networks:
       - app
 
+
   nginx:
     image: zeroprg/flask-docker-swarm_nginx:latest
-#    deploy:
-#           mode: global
     deploy:
       replicas: 1
       restart_policy:
         condition: on-failure
       placement:
-        constraints: [node.role == manager]
+        constraints: [node.role == worker]
     ports:
       - 80:80
     depends_on:
@@ -105,17 +138,13 @@ services:
     networks:
       - app
 
+
 networks:
   app:
     driver: overlay
-    ipam:
-       driver: default
-       config:
-           - subnet: 192.168.0.0/16 
+
 volumes:
   data-volume:
     driver: local
 
-#secrets:
-#  secret_code:
-#    external: true
+

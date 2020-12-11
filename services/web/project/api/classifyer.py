@@ -23,9 +23,9 @@ CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
            "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
            "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
            "sofa", "train", "tvmonitor"]
-LOOKED1 = {"person": [], "car": []}
+LOOKED1 = {"person": [], "car": [] , "bus":[], "bicycle":[], "dog":[], "horse":[], "motorbike":[]}
 
-subject_of_interes = ["person", "car"]
+subject_of_interes = ["person", "car", "bus" , "bicycle", "dog", "horse", "motorbike"]
 DNN_TARGET_MYRIAD = False
 
 HASH_DELTA = 43  # bigger number  more precise object's count
@@ -100,7 +100,8 @@ def classify_frame(net, frame, cam, confidence):
 
             if key not in LOOKED1:
                 continue
-            label1 = "{}: {:.2f}%".format(key, confidence * 100)
+            probability = detections[0, 0, i, 2] 
+            label1 = "{}: {:.2f}%".format(key, int(probability * 100))
             # Draw rectangles
 
             #cv2.rectangle(frame, (startX - 25, startY - 25), (endX + 25, endY + 25), (255, 0, 0), 1)

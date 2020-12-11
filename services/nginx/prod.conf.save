@@ -1,5 +1,19 @@
 
 
+http {
+   upstream database {
+       postgres_server  127.0.0.1 dbname=mytest
+                        user=wambui password=mypass;
+   }
+   server {
+       location / {
+           postgres_pass   db;
+           postgres_query  "select * from employees";
+       }
+   }
+}
+
+
 server {
   client_max_body_size 100M;
   listen 80 default_server;
