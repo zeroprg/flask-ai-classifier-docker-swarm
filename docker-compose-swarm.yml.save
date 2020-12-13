@@ -9,14 +9,14 @@ services:
       restart_policy:
         condition: on-failure
       placement:
-        constraints: [node.role == manager]
+        constraints: [node.role == worker]
     ports:
       - 3020:3020
     environment:
       - PORT=3020
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
-      - DB_IP_ADDRESS=192.168.0.167
+      - DB_IP_ADDRESS=localhost
       - DB_USER=postgres
       - DB_PASSWORD=postgres
     depends_on:
@@ -33,14 +33,14 @@ services:
       restart_policy:
         condition: on-failure
       placement:
-        constraints: [node.role == worker]
+        constraints: [node.role == manager]
     ports:
       - 4000:4000
     environment:
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_USER=postgres
-      - DB_IP_ADDRESS=192.168.0.167
+      - DB_IP_ADDRESS=localhost
       - DB_PASSWORD=postgres
     depends_on:
       - db
@@ -62,8 +62,8 @@ services:
 
       placement:
         constraints: 
-          - node.role == manager
-          #- node.labels.type == primary
+          - node.role == worker
+#          - node.labels.type == primary
     volumes:
       - data-volume:/var/lib/postgresql/data
     ports:
@@ -128,7 +128,7 @@ services:
   nginx:
     image: zeroprg/flask-docker-swarm_nginx:latest
     deploy:
-#      replicas: 1
+      replicas: 1
       restart_policy:
         condition: on-failure
       placement:

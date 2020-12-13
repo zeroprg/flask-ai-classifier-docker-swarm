@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: zeroprg/flask-ai-classifier-docker-swarm_ui:latest
+    volumes:
+      - '.:/app'
+      - '/app/node_modules'
+    ports:
+      - 5000:5000
+    environment:
+      - CHOKIDAR_USEPOLLING=true
