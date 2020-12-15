@@ -36,7 +36,7 @@ IMG_PAGINATOR = 40
 
 SHOW_VIDEO = False
 
-port = '3020' #prod.PORT
+port = prod.PORT
 
 class CameraMove:
     def __init__(self, move_left, move_right, timestep=10):
