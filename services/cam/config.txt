@@ -11,16 +11,15 @@ video_file9=http://84.92.94.35:81/mjpg/video.mjpg
 video_file10=http://99.42.39.171:82/mjpg/video.mjpg 
 video_file11=http://82.207.41.104:8080/cam_1.cgi 
 video_file12=http://108.222.132.93:8082/out.jpg?q=30 
-video_file13=http://80.13.120.225:8083/mjpg/video.mjpg 
-video_file14=http://50.64.62.147:9000/mjpg/video.mjpg 
-video_file15=http://98.155.244.58/mjpg/video.mjpg 
-video_file16=http://119.197.80.97:83/SnapshotJPEG?Resolution=640x480 
-video_file17=http://210.139.19.134:82/cgi-bin/camera?resolution=640 
-video_file18=http://119.197.80.97:82/nphMotionJpeg?Resolution=640x480 
-video_file19=http://185.49.168.74:8001/mjpg/video.mjpg 
-video_file20=http://91.235.175.140:8081/mjpg/video.mjpg 
-video_file21=http://117.247.85.98:8001/mjpg/video.mjpg 
-video_file22=http://87.26.188.210:81/cgi-bin/faststream.jpg?stream=half 
+video_file13=http://50.64.62.147:9000/mjpg/video.mjpg 
+video_file14=http://98.155.244.58/mjpg/video.mjpg 
+video_file15=http://119.197.80.97:83/SnapshotJPEG?Resolution=640x480 
+video_file16=http://210.139.19.134:82/cgi-bin/camera?resolution=640 
+video_file17=http://119.197.80.97:82/nphMotionJpeg?Resolution=640x480 
+video_file18=http://185.49.168.74:8001/mjpg/video.mjpg 
+video_file19=http://91.235.175.140:8081/mjpg/video.mjpg 
+video_file20=http://117.247.85.98:8001/mjpg/video.mjpg 
+video_file21=http://87.26.188.210:81/cgi-bin/faststream.jpg?stream=half 
 
 
 #Parking Lots:
@@ -59,10 +58,10 @@ video_file23=http://158.58.130.148/mjpg/video.mjpg
 prototxt=MobileNetSSD_deploy.prototxt.txt
 #model=yolo-coco/yolov3-tiny.weights
 model=MobileNetSSD_deploy.caffemodel
-confidence=0.25
+confidence=0.35
 
 #server for object classifications
-CLASSIFIER_SERVER = http://192.168.0.167/classify
+CLASSIFIER_SERVER = http://192.168.0.167:4000/classify
 
 #Database configuration (Postgres)
 DB_IP_ADDRESS=192.168.0.167

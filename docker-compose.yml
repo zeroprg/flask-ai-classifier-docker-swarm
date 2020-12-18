@@ -1,4 +1,3 @@
-
 version: '3.5'
 
 services:
@@ -8,18 +7,16 @@ services:
       context: ./services/cam
       dockerfile: Dockerfile 
     image: zeroprg/flask-docker-swarm_cam:latest
-    #command: gunicorn --bind 0.0.0.0:3020 manage:app
     ports:
       - 3020:3020
     environment:
       - PORT=3020
+      - CLASSIFIER_SERVER=http://192.168.0.167/classify
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_IP_ADDRESS=192.168.0.167
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-#    secrets:
-#      - secret_code
     depends_on:
       - db
       - web
@@ -52,14 +49,18 @@ services:
       context: ./services/db
       dockerfile: Dockerfile
     image: zeroprg/flask-docker-swarm_db:latest
-    restart: always
-    volumes:
-      - data-volume:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+       - 5432:5432
+    volumes:
+       - postgres=/home/odroid/projects/data/postgres/
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+       - POSTGRES_USER=postgres
+       - POSTGRES_PASSWORD=postgres
+       - POSTGRES_DB=streamer
+       - PGDATA=/home/odroid/projects/data/postgres/
+    networks:
+       - postgres
+    restart: unless-stopped
     networks:
       - app
 
