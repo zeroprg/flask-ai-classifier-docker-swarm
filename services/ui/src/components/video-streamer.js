@@ -38,21 +38,21 @@ class VideoStreamer extends Component {
         
         return (            
                 <section id={'section'+camera.cam} key={'section'+camera.cam} style={{display: 'block'}}>
-                    <div className="row">
-                        <div className="col-sm-12">
+                <div className="row">
+                    <div className="col-sm-2">
+                           <Video key={camera.cam} camera = {camera} showBoxes={false}/> 
+                        </div>  
+                        <div className="col-sm-10">
                           <ObjectOfInterestPlot cam={camera.cam}
                                                 timerange={this.state.timerange} 
                                                 onParamsChanged={this.onParamsChanged.bind(this)}
                                                 onTimeChanged={this.onTimeChanged.bind(this)}
                                                 object_of_interest={this.props.object_of_interest}/>
-                        </div> 
-                    </div> {/* className row */}
+                    </div> 
+                </div> {/* className row */}
 
                 <div className="row">
-                <div className="col-sm-6">
-                    <Video key={camera.cam} camera = {camera} showBoxes={false}/> 
-                </div>  
-                <div className="col-sm-6">                           
+                  <div className="col-sm-12">                           
                     <Tabs  defaultActiveKey="founded_objects" id="uncontrolled-tab">
                         <Tab eventKey="founded_objects" title="Founded Objects" className="tabcontent">
                             <ObjectOfInterest object_of_interest={this.state.object_of_interest}

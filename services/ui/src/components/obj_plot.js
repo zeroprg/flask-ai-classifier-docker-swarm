@@ -20,7 +20,7 @@ import Plotter from './plotter';
    
       const useStyles = makeStyles({
         root: {
-          paddingLeft: '20px',
+          paddingLeft: '10px',
         },
       });
       const classes = useStyles();
