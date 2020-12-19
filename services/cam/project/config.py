@@ -21,6 +21,7 @@ class ProductionConfig:
     DB_NAME = os.environ.get("DB_NAME")
     CLASSIFIER_SERVER  = os.environ.get("CLASSIFIER_SERVER")
     SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
+    CONFIDENCE=os.environ.get("CONFIDENCE")
     TRACK_MODIFICATIONS = False
     # read config file from app_settings
     args = configure(app_settings)
@@ -36,5 +37,4 @@ class ProductionConfig:
             SQLALCHEMY_DATABASE_URI = 'sqlite://frame.db'
 
     if CLASSIFIER_SERVER is None or CLASSIFIER_SERVER =='' : CLASSIFIER_SERVER =  args["CLASSIFIER_SERVER"]
-
-
+    if CONFIDENCE is None or CONFIDENCE =='' : CONFIDENCE =  args["confidence"]

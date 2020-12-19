@@ -104,8 +104,8 @@ class App extends Component {
                         <h1 className="animated fadeInDown">AI processed video streams from public cameras.</h1>
                         <h3> This is free smart cloud storage  for cameras video streams works on ODROID ARM based computers   (100% python , no php  for more information check 
                         <a href="//aicameras.ca" target="_blank" rel="noopener noreferrer"> http://aicameras.ca</a> ), bellow public available video-streams: </h3>
+                       {/*The way to reference child component ref={(cd) => this.child = cd} */}
                         <InputURL updateparams={this.updateparams.bind(this)}
-                                 {/* ref={(cd) => this.child = cd} */}
                                   addURL={this.addNewURL.bind(this)}/> 
                                
                         {isVideoAndStatistic && <URLlist updateparams={this.updateparams.bind(this)} 

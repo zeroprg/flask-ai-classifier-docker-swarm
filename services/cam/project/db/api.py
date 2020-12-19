@@ -13,15 +13,13 @@ class Sql:
         :param db_file: database file
         :return: Connection object or None
         """
-        
         self.engine = None
+        self.limit = 50
         metadata = sql.MetaData()
-        
         if(  DATABASE_URI is None or DATABASE_URI == ''):
             self.engine = sql.create_engine('sqlite://frame.db')
             conn = engine.connect()
             conn.execute("PRAGMA journal_mode=WAL")
-            
         else:
             self.engine = sql.create_engine('postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME))
 
@@ -42,54 +40,82 @@ class Sql:
             self.engine = sql.create_engine('sqlite://frame.db')
             conn = engine.connect()
             conn.execute("PRAGMA journal_mode=WAL")
-            
         else:
-            
             self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI)
 
         self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
         self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
+        self.urls = sql.Table('urls', metadata, autoload=True, autoload_with=self.engine)
+        self.obj_stat = sql.Table('obj_stat', metadata, autoload=True, autoload_with=self.engine)
 
 
         #conn = self.engine.connect()
         ##self.getConn().autocommit = False
-    
+
     def getConn(self):
         return self.engine.connect()
 
- 
-    def select_all_objects(self):
+# ####################  Obj_stat operations ######################################## #
+
+
+    def select_all_obj_stat(self):
         """
-        Query all rows in the tasks table
-        :param conn: the Connection object
+        Query all rows in the urls table
         :return:
         """
-        #cur = conn.cursor()
-        #cur.execute("SELECT hashcode, currentdate, currentime, type, x_dim, y_dim FROM objects  ORDER BY currentime DESC ")
-        query = sql.select([self.objects]).limit(50).all()
+        query = sql.select([self.obj_stat]).limit(self.limit).all()
         ResultProxy = self.getConn().execute(query)
         rows = ResultProxy.fetchall()
-        #for row in rows:
-        #    print(row)
         return rows
+
+    def insert_obj_stat(self, params):
+        try:
+            values = {'cam_uuid': param['cam_uuid'],'type': param['type'], 'last_10min':param['last_10min'], 'last_hour': param['last_hour'], 'last_day': param['last_day'] }
+            query = sql.insert(self.obj_stat)
+            ResultProxy = self.getConn().execute(query, values)
+            print(" insert_obj_stat was {0} with params: {1}".format(ResultProxy.is_insert ,params))
+        except Exception as e:
+            print(" e: {}".format( e))
+
+# ####################  Urls operations ######################################## #
+
+
+    def select_all_urls(self):
+        """
+        Query all rows in the urls table
+        :return:
+        """
+        query = sql.select([self.urls]).limit(self.limit).all()
+        ResultProxy = self.getConn().execute(query)
+        rows = ResultProxy.fetchall()
+        return rows
+
+    def insert_urls(self, params):
+        try:
+            values = {'url': param['url'], 'cam':param['cam'] } # , 'email': param['email'] }
+            query = sql.insert(self.urls)
+            ResultProxy = self.getConn().execute(query, values)
+            print(" insert_obj_stat was {0} with params: {1}".format(ResultProxy.is_insert ,params))
+        except Exception as e:
+            print(" e: {}".format( e))
+
+
+# ####################  Statistic operations ######################################## #
 
     def insert_statistic(self, params):
         for param in params:
             hashcodes = ''
             length = len(param['hashcodes'])
-        # for i in range(length): hashcodes += str(param['hashcodes'][i]) + ',' if i < length - 1 else str(param['hashcodes'][i])
             hashcodes = str(param['hashcodes'])
         if param['y'] == 0: return # never store dummy noise
         try:
-            #cur.execute("INSERT INTO statistic(type,currentime,y,text,hashcodes,cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")",
-            #     (param['name'], param['x'],  param['text'], hashcodes, param['cam']))
             values = {'type': param['name'],'currentime': param['x'], 'y': param['y'], 'hashcodes': hashcodes, 'cam':param['cam'] }     
             query = sql.insert(self.statistic)
             ResultProxy = self.getConn().execute(query, values)
             print(" insert_statistic was {0} with params: {1}".format(ResultProxy.is_insert ,params))    
         except Exception as e:
             print(" e: {}".format( e))
-        
+
 
     def select_statistic_by_time(self, cam, time1, time2, obj):
         """
@@ -116,7 +142,7 @@ class Sql:
                                                               self.statistic.columns.type.in_(tuple_),
                                                               self.statistic.columns.currentime.between(time2, time1)
                                                              )
-                                                    ).order_by(text("currentime asc"))                                                                                         
+                                                    ).order_by(text("currentime asc"))
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()    
 
@@ -133,9 +159,21 @@ class Sql:
         #print(rows)
         return rows
 
+# ####################  Objects operations ######################################## #
+
+    def select_all_objects(self):
+        """
+        Query all rows in the tasks table
+        :param conn: the Connection object
+        :return:
+        """
+        query = sql.select([self.objects]).limit(self.limit).all()
+        ResultProxy = self.getConn().execute(query)
+        rows = ResultProxy.fetchall()
+        return rows
+
 
     def insert_frame(self, hashcode, date, time, type, numpy_array, x_dim, y_dim, cam):
-        
         if y_dim <25 or x_dim <25 or x_dim/y_dim > 4.7 or y_dim/x_dim > 4.7: return
         #cur.execute("UPDATE objects SET currentime="+self.P+" WHERE hashcode="+self.P, (time, str(hashcode)))
         #print("cam= {}, x_dim={}, y_dim={}".format(cam, x_dim, y_dim))
@@ -143,7 +181,6 @@ class Sql:
         jpg_as_base64='data:image/jpeg;base64,'+ base64.b64encode(buffer).decode('utf-8')
 
 
-        
         try:
             #cur.execute("INSERT INTO objects (hashcode, currentdate, currentime, type, frame, x_dim, y_dim, cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")", 
             #(str(hashcode), date, time, type, str(jpg_as_base64), int(x_dim), int(y_dim), int(cam)))
@@ -160,18 +197,16 @@ class Sql:
         :param conn: the Connection object
         :param cam, time1, time2 in epoch seconds
         :return:
-        """    
+        """
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects WHERE cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
-        
         query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam, 
                                                               self.objects.columns.currentime.between(time1, time2)
                                                              )
                                                 ).order_by(text("currentime desc"))
-                                                                                    
+
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor] 
-#        rows = [ {'cam':v['çam'] , 'hashcode':v['hashcode'],  'currentdate':v['currentdate'], 'currentime':v['currentime'], 'type': v['type'], 'frame': v['frame'], 'lastdate': v['lastdate'], 'lasttime': v['lasttime']  } for v in ResultProxy ]
+        rows = [dict(r) for r in cursor]
 
         return rows
 
@@ -201,14 +236,9 @@ class Sql:
                                                               self.objects.columns.currentime.between(time2, time1)
                                                          )
                                                 ).order_by(text("currentime desc")).limit(n_rows).offset(offset)
-                                     
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor] 
-
-        #cursor = ResultProxy.fetchall()
-        #rows = [ {'cam':v['çam'] , 'hashcode':v['hashcode'],  'currentdate':v['currentdate'], 'currentime':v['currentime'], 'type': v['type'], 'frame': v['frame'], 'lastdate': v['lastdate'], 'lasttime': v['lasttime']  } for v in cursor ]
-        #print(rows[0])
+        rows = [dict(r) for r in cursor]
         return rows
 
 

@@ -20,6 +20,8 @@ video_file18=http://185.49.168.74:8001/mjpg/video.mjpg
 video_file19=http://91.235.175.140:8081/mjpg/video.mjpg 
 video_file20=http://117.247.85.98:8001/mjpg/video.mjpg 
 video_file21=http://87.26.188.210:81/cgi-bin/faststream.jpg?stream=half 
+video_file22=http://158.58.130.148/mjpg/video.mjpg 
+video_file23=http://32.208.120.218/mjpg/video.mjpg 
 
 
 #Parking Lots:
@@ -58,10 +60,10 @@ video_file23=http://158.58.130.148/mjpg/video.mjpg
 prototxt=MobileNetSSD_deploy.prototxt.txt
 #model=yolo-coco/yolov3-tiny.weights
 model=MobileNetSSD_deploy.caffemodel
-confidence=0.35
+confidence=0.55
 
 #server for object classifications
-CLASSIFIER_SERVER = http://192.168.0.167:4000/classify
+CLASSIFIER_SERVER = http://192.168.0.167/classify
 
 #Database configuration (Postgres)
 DB_IP_ADDRESS=192.168.0.167

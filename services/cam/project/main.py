@@ -129,7 +129,7 @@ p_get_frame = None
 
 
 def start_one_stream_processes(cam):
-    Detection(prod.CLASSIFIER_SERVER, float(prod.args["confidence"]), prod.args["prototxt"], prod.args["model"], videos[cam][1],
+    Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["prototxt"], prod.args["model"], videos[cam].get("url"),
               imagesQueue[cam], cam)
 
     logger.info("p_classifiers for cam:" + str(cam) + " started")
@@ -161,7 +161,7 @@ def initialize_video_streams(url=None):
     i = 0
     arg = None
     right = None
-    left = None    
+    left = None
     if url is not None:
         arg = url
         i = len(videos)
@@ -170,20 +170,25 @@ def initialize_video_streams(url=None):
     else:
         arg = prod.args.get('video_file' + str(i), None)
     logger.info('Video urls:')
-    while arg is not None:        
+    while arg is not None:
         if not (i, arg) in videos:
             camright.append(prod.args.get('cam_right' + str(i), None))
             camleft.append(prod.args.get('cam_left' + str(i), None))
             CameraMove(camright[i], camleft[i])
-            videos.append((str(i), arg))
+
+            videos.append( { "cam": str(i), "url": arg } )
             imagesQueue.append(Queue(maxsize=IMAGES_BUFFER + 5))
             i += 1
             arg = prod.args.get('video_file' + str(i), None)
+	    try:
+		db.insert_urls({'url': arg , 'cam': i })
+	    except:
+		continue
             logger.info(arg)
+    videos = db.select_all_urls()
     logger.info(videos)
     # Start process
     time.sleep(2.0)
-   # fps = FPS().start()
 
 def detect(cam):
     """Video streaming generator function."""
@@ -293,7 +298,6 @@ def imgs_at_time():
 def gen_array_of_imgs(cam, delta=10000, currentime=int(time.time()*1000)):
     time1 = currentime - delta
     time2 = currentime + delta
-    #db = Sql(DB_IP_ADDRESS)
     rows = db.select_frame_by_time(cam, time1, time2)
     x = json.dumps(rows, default=str)
     return x
@@ -315,7 +319,6 @@ def gen_params(cam=0, time1=0, time2=5*60*60*1000, object_of_interest=[]):
     """Parameters streaming generator function."""
  
     print("time1: {} time2: {}".format(time1, time2))
-    #db = Sql(DB_IP_ADDRESS)
     ls = db.select_statistic_by_time(cam, time1, time2, object_of_interest)
     ret = json.dumps(ls, default=str)  # , indent = 4)
     logger.debug(ret)
@@ -338,32 +341,47 @@ def urls():
     """Add/Delete/Update a new video url, list all availabe urls."""
     list_url = request.args.get('list', default=None)
     add_url = request.args.get('add', default=None)
-    delete_url = request.args.get('delete', default=None)
-    update_url = request.args.get('update', default=None)
+    deleted_id = request.args.get('delete', default=None)
+    updated_url = request.args.get('updated', default=None)
+    cam_id = request.args.get('id', default=None)
+
     if add_url is not None:
         logger.info('adding a new video urls ' + add_url)
-        if ping_video_url(add_url):            
+        if ping_video_url(add_url):
             initialize_video_streams(add_url)
-            start_one_stream_processes(cam=len(videos) - 1)
-            # return index() #redirect("/")
-            return Response('{"message":"URL added successfully"}', mimetype='text/plain')
+	    cam=len(videos) - 1
+            start_one_stream_processes(cam)
+            try:
+		params= {'url': add_url, 'cam': cam }
+		db.insert_urls(params)
+                return Response('{"message":"URL added successfully"}', mimetype='text/plain')
+	    except:
+		return None, 500
         else:
             return None, 500
-            #Response('{"message":"URL has no video"}', mimetype='text/plain')    
+            #Response('{"message":"URL has no video"}', mimetype='text/plain')
     if list_url is not None:
-        #data = {url:videos, objectOfInterests: subject_of_interes}
-        #for video in videos:
+	videos = db.select_all_urls()
         return Response(json.dumps(videos), mimetype='text/plain')
-    if delete_url is not None:
+    if deleted_id is not None:
         for video in videos:
-            if video[0] == delete_url:
+            if video["id"] == deleted_id:
                 videos.remove(video)
-                return Response('{"message":"URL deleted successfully"}', mimetype='text/plain')
-    if update_url is not None:
-        index = request.args.get('index', default=None)
-        if index is not None:
-            videos[index][1] == update_url
-            return Response('{"message":"URL updated successfully"}', mimetype='text/plain')
+		try:
+		   db.delete_url_by_id(deleted_id)
+	           return Response('{"message":"URL deleted successfully"}', mimetype='text/plain')
+		except:
+	           return None, 500
+    if updated_url is not None:
+        for video in videos:
+            if video["id"] == cam_id :
+                video["url"] = updated_url
+		try:
+		   db.update_urls_by_id(cam_id, updated_url)
+	           return Response('{"message":"URL updated successfully"}', mimetype='text/plain')
+		except:
+	           return None, 500
+
 
 
 @main_blueprint.route('/params_feed')
