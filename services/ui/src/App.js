@@ -15,6 +15,23 @@ const notify = () => toast("This URL already exist !");
 class App extends Component {
   state = { urls: [], videoalignment: 'video' }
 
+  saveURLForm(url) {          
+    this.setState({ isLoading: true});
+    const DEFAULT_QUERY = global.config.API + "urls?add="+ url + "&email="+this.state.email
+    console.log(" start:")
+    fetch(DEFAULT_QUERY)
+        .then(() => {
+                this.setState({ isLoading: false, url: '' });
+                this.state.urls.add(url);
+                //TODO add success popup message 
+             })
+        .catch(error => {
+            //TODO add popup message here through error handling
+            this.setState({ error, isLoading: false, url: 'Wrong url, no video on this IP' })
+            });
+    } 
+
+
   addNewURL(url){
   
     if(this.state.urls){
@@ -22,9 +39,9 @@ class App extends Component {
             if(val.url === url) {
                 return
             }
-        this.child.saveURLForm();
-        this.setState({url:true})
-        setTimeout(this.setState, 1000,{url:true});
+        this.saveURLForm(url);
+  //      this.setState({url:true})
+//      setTimeout(this.setState, 1000,{url:true});
     }    
   }
 
@@ -88,7 +105,7 @@ class App extends Component {
                         <h3> This is free smart cloud storage  for cameras video streams works on ODROID ARM based computers   (100% python , no php  for more information check 
                         <a href="//aicameras.ca" target="_blank" rel="noopener noreferrer"> http://aicameras.ca</a> ), bellow public available video-streams: </h3>
                         <InputURL updateparams={this.updateparams.bind(this)}
-                                  ref={(cd) => this.child = cd}
+                                 {/* ref={(cd) => this.child = cd} */}
                                   addURL={this.addNewURL.bind(this)}/> 
                                
                         {isVideoAndStatistic && <URLlist updateparams={this.updateparams.bind(this)} 

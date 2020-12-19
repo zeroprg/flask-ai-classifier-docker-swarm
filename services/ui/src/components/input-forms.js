@@ -28,19 +28,7 @@ class InputURL extends Component {
         event.preventDefault();
       }
     
-      saveURLForm() {          
-        this.setState({ isLoading: true});
-        const DEFAULT_QUERY = global.config.API + "urls?add="+this.state.url + "&email="+this.state.email
-        console.log(" start:")
-        fetch(DEFAULT_QUERY)
-            .then(() => {
-                    this.setState({ isLoading: false, url: '' });
-                 })
-            .catch(error => {
-                this.setState({ error, isLoading: false, url: 'Wrong url, no video on this IP' })
-                });
-        } 
-
+     
     render() {
         return (
             <div>
