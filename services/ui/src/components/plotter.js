@@ -9,7 +9,7 @@ class Plotter extends Component {
     }
     
     resize() {
-        this.setState({width: window.innerWidth });
+        this.setState({width: window.innerWidth*0.6 });
     }
     
     componentWillUnmount() {
@@ -27,7 +27,7 @@ class Plotter extends Component {
         if( this.props && this.props.data.length>0)
         return (
 
-            <XYPlot xType="time" width={this.state.width}  height={300}
+            <XYPlot xType="time" width={this.state.width}  height={230}
                 xDomain={[ time - this.props.timerange.end*ONE_HOUR, time - this.props.timerange.start*ONE_HOUR ]}
             >
                 <DiscreteColorLegend

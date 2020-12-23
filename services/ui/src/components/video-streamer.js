@@ -39,10 +39,10 @@ class VideoStreamer extends Component {
         return (            
                 <section id={'section'+camera.cam} key={'section'+camera.cam} style={{display: 'block'}}>
                 <div className="row">
-                    <div className="col-sm-2">
+                    <div className="col-sm-4">
                            <Video key={camera.cam} camera = {camera} showBoxes={false}/> 
                         </div>  
-                        <div className="col-sm-10">
+                        <div className="col-sm-8">
                           <ObjectOfInterestPlot cam={camera.cam}
                                                 timerange={this.state.timerange} 
                                                 onParamsChanged={this.onParamsChanged.bind(this)}
