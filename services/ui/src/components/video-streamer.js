@@ -40,6 +40,7 @@ class VideoStreamer extends Component {
                 <section id={'section'+camera.cam} key={'section'+camera.cam} style={{display: 'block'}}>
                 <div className="row">
                     <div className="col-sm-4">
+                           {this.props.child}
                            <Video key={camera.cam} camera = {camera} showBoxes={false}/> 
                         </div>  
                         <div className="col-sm-8">

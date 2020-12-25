@@ -2,21 +2,24 @@ import React, { Component, Fragment } from 'react';
 
 import Video from './video';
 import VideoStreamer from './video-streamer';
-import Media from 'react-media';
+
+import { Menu, Item } from "react-gooey-nav";
+import VideoStat from './video-statist';
 
 class VideoStreamers extends Component {
     // shared between childs functions
+    
     updateparams = (param) => {
         this.setState({param:param});
     }
 
+    
 
     constructor(props) {
         super(props);
-        this.state = {value: ''};        
+        this.state = {value: '' , showvideo: true};        
         this.url = props.url;
       }
-
 
     componentWillMount() {
         this.object_of_interest = ['car','person','cat', 'dog', 'truck','bus', 'train', 'motobike'];
@@ -61,7 +64,7 @@ render() {
     const isOnlyVideos = param.videoalignment === 'video';
     const isStatistic = param.videoalignment === 'statistic';
     const isVideoAndStatistic = param.videoalignment === 'both';
-
+    
 
 
     if (error) {
@@ -74,34 +77,11 @@ render() {
     if (isOnlyVideos || isStatistic){
     return (
         <div className="row">
-            {urls.map( url => 
-            <Media queries={{
-                small: "(max-width: 500px)",
-                medium: "(min-width: 600px) and (max-width: 1366px)",
-                large: "(min-width: 1367px)"
-                }}>
-             {matches => (
-                 <Fragment>
-                    {matches.small && 
-                        <div key={'cam'+url.cam} className="col-sm-12"><Video camera = {url} /></div> 
-                    }
-                    {matches.medium && 
-                        <div key={'cam'+url.cam} className="col-sm-6"><Video camera = {url} /></div> 
-                    }
-                    {matches.large && 
-                        <div key={'cam'+url.cam} className="col-sm-4"><Video camera = {url} /></div> 
-                    }
-
-                 </Fragment>
-             )}
-            </Media>    
-            )}
+            {urls.map( camera => <VideoStat camera={camera} timerange = {this.timerange}  object_of_interest={this.object_of_interest}/> )}
         </div>
         )
-
     } else if(isVideoAndStatistic) {    
     return (            
-       
         <span>
             {urls.map( camera =>               
             <VideoStreamer key={camera.url} camera={camera} timerange = {this.timerange}  object_of_interest={this.object_of_interest}/>
