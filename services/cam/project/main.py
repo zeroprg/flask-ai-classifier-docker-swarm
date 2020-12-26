@@ -164,7 +164,7 @@ def initialize_video_streams(url=None):
     left = None
     if url is not None:
         arg = url
-        i = len(videos)
+      s  i = len(videos)
         logger.info('new url:' + url)
     #  initialise picam or IPCam
     else:
@@ -180,11 +180,13 @@ def initialize_video_streams(url=None):
             imagesQueue.append(Queue(maxsize=IMAGES_BUFFER + 5))
             i += 1
             arg = prod.args.get('video_file' + str(i), None)
-	    try:
-		db.insert_urls({'url': arg , 'cam': i })
-	    except:
-		continue
-            logger.info(arg)
+        try:
+            db.insert_urls({'url': arg , 'cam': i })
+        except:
+            return None, 500
+            
+
+        logger.info(arg)
     videos = db.select_all_urls()
     logger.info(videos)
     # Start process
@@ -349,38 +351,39 @@ def urls():
         logger.info('adding a new video urls ' + add_url)
         if ping_video_url(add_url):
             initialize_video_streams(add_url)
-	    cam=len(videos) - 1
+            cam = len(videos)-1
             start_one_stream_processes(cam)
             try:
-		params= {'url': add_url, 'cam': cam }
-		db.insert_urls(params)
+                params = {'url': add_url, 'cam': cam}
+                db.insert_urls(params)
                 return Response('{"message":"URL added successfully"}', mimetype='text/plain')
-	    except:
-		return None, 500
-        else:
-            return None, 500
-            #Response('{"message":"URL has no video"}', mimetype='text/plain')
-    if list_url is not None:
-	videos = db.select_all_urls()
+            except:
+                return None, 500
+            else:
+                return Response('{"message":"URL has no video"}', mimetype='text/plain')
+
+    elif list_url is not None:
+        videos = db.select_all_urls()
         return Response(json.dumps(videos), mimetype='text/plain')
-    if deleted_id is not None:
+
+    elif deleted_id is not None:
         for video in videos:
             if video["id"] == deleted_id:
                 videos.remove(video)
-		try:
-		   db.delete_url_by_id(deleted_id)
-	           return Response('{"message":"URL deleted successfully"}', mimetype='text/plain')
-		except:
-	           return None, 500
-    if updated_url is not None:
+            try:
+                db.delete_url_by_id(deleted_id)
+                return Response('{"message":"URL deleted successfully"}', mimetype='text/plain')
+            except:
+                return None, 500
+    elif updated_url is not None:
         for video in videos:
-            if video["id"] == cam_id :
+            if video["id"] == cam_id:
                 video["url"] = updated_url
-		try:
-		   db.update_urls_by_id(cam_id, updated_url)
-	           return Response('{"message":"URL updated successfully"}', mimetype='text/plain')
-		except:
-	           return None, 500
+            try:
+                db.update_urls_by_id(cam_id, updated_url)
+            except:
+                return None, 500
+        return Response('{"message":"URLs updated successfully"}', mimetype='text/plain')
 
 
 
