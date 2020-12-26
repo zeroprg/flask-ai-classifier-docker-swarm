@@ -164,7 +164,7 @@ def initialize_video_streams(url=None):
     left = None
     if url is not None:
         arg = url
-      s  i = len(videos)
+        i = len(videos)
         logger.info('new url:' + url)
     #  initialise picam or IPCam
     else:
