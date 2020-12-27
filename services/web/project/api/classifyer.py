@@ -28,7 +28,7 @@ LOOKED1 = {"person": [], "car": [] , "bus":[], "bicycle":[], "dog":[], "horse":[
 subject_of_interes = ["person", "car", "bus" , "bicycle", "dog", "horse", "motorbike"]
 DNN_TARGET_MYRIAD = False
 
-HASH_DELTA = 43  # bigger number  more precise object's count
+HASH_DELTA = 43  # how many bits difference between 2 hashcodes
 DIMENSION_X = 300
 DIMENSION_Y = 300
 piCameraResolution = (640, 480)  # (1024,768) #(640,480)  #(1920,1080) #(1080,720) # (1296,972)
@@ -138,7 +138,7 @@ def classify_frame(net, frame, cam, confidence):
 
                 now = datetime.datetime.now()
                 day = "{date:%Y-%m-%d}".format(date=now)
-                db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, x_dim, y_dim, cam)
+                db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, startX, startY, x_dim, y_dim, cam)
             params = do_statistic(cam, hashes)
             #db.getConn().commit()
 
@@ -152,10 +152,19 @@ def classify_frame(net, frame, cam, confidence):
 
 
 class ImageHashCodesCountByTimer(ObjCountByTimer):
+    def bitdiff(a, b):
+        d = a ^ b
+        return countSetBits(d)
+
+    def countSetBits(n):
+        count =0
+        while(n):
+            count += n&1
+            n >>=1
+        return count
+
     def equals(self, hash1, hash2):
-        delta = hash1 - hash2
-        if delta < 0:
-            delta -= delta
+        delta = bitdiff(hash1, hash2)
         return delta < HASH_DELTA
 
 
