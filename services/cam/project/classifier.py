@@ -38,9 +38,8 @@ piCameraRate = 16
 NUMBER_OF_THREADS = 1
 
 class Detection:
-    def __init__(self, classify_server, confidence, prototxt, model, video_url, output_queue, cam):
+    def __init__(self, classify_server, confidence, model, video_url, output_queue,  cam_uuid):
         self.confidence = confidence
-        self.prototxt = prototxt
         self.model = model
         self.video_url = video_url
         self.hashes = {}        
@@ -50,7 +49,7 @@ class Detection:
         for i in range(NUMBER_OF_THREADS):
             p_get_frame = Process(target=self.classify,
                                   args=(classify_server
-                                  ,output_queue, cam))
+                                  ,output_queue, cam_uuid))
             p_get_frame.daemon = True
             p_get_frame.start()
             time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
@@ -66,7 +65,7 @@ class Detection:
             except:
                 print('Exception during reading stream by URL:{0}'.format(self.video_url))
                 return
-            result = call_classifier(classify_server, frame, cam, self.confidence)
+            result = call_classifier(classify_server, frame, cam, self.confidence, self.model)
             if(result is  not None ):
                 print("cam {0} result: {1}".format(cam, result))
                 if 'rectangles' in result : 
@@ -106,9 +105,9 @@ class Detection:
 
 
 
-def call_classifier(classify_server, frame, cam, confidence):
+def call_classifier(classify_server, frame, cam, confidence, model):
     _,data = cv2.imencode('.jpg', frame) # frame.tolist() #  , _ , _ = compress_nparr(frame)
-    parameters = {'cam': cam, 'confidence': confidence}
+    parameters = {'cam': cam, 'confidence': confidence, 'model': model}
     data = {'params': parameters, 'array': base64.b64encode(data).decode('utf-8')}
     jsonResponse = None
     try:

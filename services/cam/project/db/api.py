@@ -18,7 +18,7 @@ class Sql:
         metadata = sql.MetaData()
         if(  DATABASE_URI is None or DATABASE_URI == ''):
             self.engine = sql.create_engine('sqlite://frame.db')
-            conn = engine.connect()
+            conn = self.engine.connect()
             conn.execute("PRAGMA journal_mode=WAL")
         else:
             self.engine = sql.create_engine('postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME))
@@ -34,11 +34,12 @@ class Sql:
         :return: Connection object or None
         """
         self.engine = None
+        self.limit = 50
         metadata = sql.MetaData()
 
         if(  SQLALCHEMY_DATABASE_URI is None or SQLALCHEMY_DATABASE_URI == ''):
             self.engine = sql.create_engine('sqlite://frame.db')
-            conn = engine.connect()
+            conn = self.engine.connect()
             conn.execute("PRAGMA journal_mode=WAL")
         else:
             self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI)
@@ -85,19 +86,30 @@ class Sql:
         Query all rows in the urls table
         :return:
         """
-        query = sql.select([self.urls]).limit(self.limit).all()
+        query = sql.select([self.urls])
         ResultProxy = self.getConn().execute(query)
         rows = ResultProxy.fetchall()
         return rows
 
     def insert_urls(self, params):
-        try:
-            values = {'url': param['url'], 'cam':param['cam'] } # , 'email': param['email'] }
+        try:            
             query = sql.insert(self.urls)
-            ResultProxy = self.getConn().execute(query, values)
-            print(" insert_obj_stat was {0} with params: {1}".format(ResultProxy.is_insert ,params))
+            ResultProxy = self.getConn().execute(query, params)
+            print(" insert_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
         except Exception as e:
             print(" e: {}".format( e))
+
+    def update_urls(self, params):
+        try:            
+            if params["id"] is not None:
+                query = sql.update(self.urls).where(self.urls == params["id"]).values(cam=params["cam"], os=params["os"], url=params["url"])
+            else:    
+                query = sql.update(self.urls).where(self.urls == params["url"]).values(cam=params["cam"], os=params["os"])
+            ResultProxy = self.getConn().execute(query, params)
+            print(" update_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
+        except Exception as e:
+            print(" e: {}".format( e))
+
 
 
 # ####################  Statistic operations ######################################## #
@@ -105,7 +117,6 @@ class Sql:
     def insert_statistic(self, params):
         for param in params:
             hashcodes = ''
-            length = len(param['hashcodes'])
             hashcodes = str(param['hashcodes'])
         if param['y'] == 0: return # never store dummy noise
         try:

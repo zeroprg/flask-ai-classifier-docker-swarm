@@ -13,6 +13,7 @@ import cv2
 from project.config import  ProductionConfig as prod
 from project.classifier import Detection
 from project import db
+import platform 
 
 from flask import Blueprint, Response, request, g, send_from_directory
 from flask_cors import cross_origin, CORS
@@ -24,14 +25,22 @@ logger.addHandler(console)
 logger.debug('DEBUG mode')
 
 
+def comp_node():
+    # if its windows
+    if os.name == 'nt':
+        return  platform.node()
+    else:
+        return os.name[1]
+
 DELETE_FILES_LATER = 8 #   (8hours)
 ENCODING = "utf-8"
 IMAGES_BUFFER = 100
 
 
-videos = []
+
 camleft = []
 camright = []
+videos = []
 IMG_PAGINATOR = 40
 
 SHOW_VIDEO = False
@@ -127,10 +136,9 @@ fps = None
 p_get_frame = None
 
 
-
-def start_one_stream_processes(cam):
-    Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["prototxt"], prod.args["model"], videos[cam].get("url"),
-              imagesQueue[cam], cam)
+def start_one_stream_processes(video, cam):
+    Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], video[1],
+              imagesQueue[cam], video[0])
 
     logger.info("p_classifiers for cam:" + str(cam) + " started")
 
@@ -149,19 +157,17 @@ def start():
     # initialize the video stream, allow the cammera sensor to warmup,
     # and initialize the FPS counter
     logger.info("[INFO] starting video stream...")
-    initialize_video_streams()
-    for cam in range(len(videos)):
-        start_one_stream_processes(cam)
+    videos = initialize_video_streams()
+    for cam in range(0,len(videos)-1):
+        start_one_stream_processes(videos[cam],cam)
 
 
 
 # initialize the video stream, allow the cammera sensor to warmup,
 # and initialize the FPS counter
-def initialize_video_streams(url=None):
+def initialize_video_streams(url=None, videos=[]):
     i = 0
     arg = None
-    right = None
-    left = None
     if url is not None:
         arg = url
         i = len(videos)
@@ -172,29 +178,29 @@ def initialize_video_streams(url=None):
     logger.info('Video urls:')
     while arg is not None:
         if not (i, arg) in videos:
-            camright.append(prod.args.get('cam_right' + str(i), None))
-            camleft.append(prod.args.get('cam_left' + str(i), None))
-            CameraMove(camright[i], camleft[i])
-
-            videos.append( { "cam": str(i), "url": arg } )
-            imagesQueue.append(Queue(maxsize=IMAGES_BUFFER + 5))
-            i += 1
+            #camright.append(prod.args.get('cam_right' + str(i), None))
+            #camleft.append(prod.args.get('cam_left' + str(i), None))
+            #CameraMove(camright[i], camleft[i])
+            params = { 'cam': i, 'url': arg , 'os': comp_node()}
+            try:
+                db.insert_urls(params)
+            except:
+                try:
+                    db.update_urls(params)
+                except: continue     
+            videos.append( params )
+            imagesQueue.append(Queue(maxsize=IMAGES_BUFFER + 5))    
             arg = prod.args.get('video_file' + str(i), None)
-        try:
-            db.insert_urls({'url': arg , 'cam': i })
-        except:
-            return None, 500
-            
-
-        logger.info(arg)
+            i += 1 
+            logger.info(arg)
     videos = db.select_all_urls()
     logger.info(videos)
     # Start process
-    time.sleep(2.0)
+    #time.sleep(1.0)
+    return videos
 
 def detect(cam):
     """Video streaming generator function."""
-    label = ''
     try:
         # logger.debug('imagesQueue:', imagesQueue.empty())
         while True:
@@ -350,9 +356,9 @@ def urls():
     if add_url is not None:
         logger.info('adding a new video urls ' + add_url)
         if ping_video_url(add_url):
-            initialize_video_streams(add_url)
+            videos = initialize_video_streams(add_ur,videos)
             cam = len(videos)-1
-            start_one_stream_processes(cam)
+            start_one_stream_processes(videos[cam],cam)
             try:
                 params = {'url': add_url, 'cam': cam}
                 db.insert_urls(params)
@@ -363,8 +369,8 @@ def urls():
                 return Response('{"message":"URL has no video"}', mimetype='text/plain')
 
     elif list_url is not None:
-        videos = db.select_all_urls()
-        return Response(json.dumps(videos), mimetype='text/plain')
+        url_list = db.select_all_urls()
+        return Response(json.dumps(url_list), mimetype='text/plain')
 
     elif deleted_id is not None:
         for video in videos:
@@ -380,7 +386,8 @@ def urls():
             if video["id"] == cam_id:
                 video["url"] = updated_url
             try:
-                db.update_urls_by_id(cam_id, updated_url)
+                params = {'id': cam_id, 'url': updated_url,  'os': os.uname()[1]}
+                db.update_urls(params)
             except:
                 return None, 500
         return Response('{"message":"URLs updated successfully"}', mimetype='text/plain')
