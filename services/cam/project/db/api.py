@@ -102,9 +102,9 @@ class Sql:
     def update_urls(self, params):
         try:            
             if params["id"] is not None:
-                query = sql.update(self.urls).where(self.urls == params["id"]).values(cam=params["cam"], os=params["os"], url=params["url"])
+                query = sql.update(self.urls).where(self.urls.c.id == params["id"]).values(cam=params["cam"], os=params["os"], url=params["url"])
             else:    
-                query = sql.update(self.urls).where(self.urls == params["url"]).values(cam=params["cam"], os=params["os"])
+                query = sql.update(self.urls).where(self.urls.c.url == params["url"]).values(cam=params["cam"], os=params["os"])
             ResultProxy = self.getConn().execute(query, params)
             print(" update_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
         except Exception as e:
