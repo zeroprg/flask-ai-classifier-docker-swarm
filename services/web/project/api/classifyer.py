@@ -28,7 +28,7 @@ LOOKED1 = {"person": [], "car": [] , "bus":[], "bicycle":[], "dog":[], "horse":[
 subject_of_interes = ["person", "car", "bus" , "bicycle", "dog", "horse", "motorbike"]
 DNN_TARGET_MYRIAD = False
 
-HASH_DELTA = 43  # how many bits difference between 2 hashcodes
+HASH_DELTA = 7  # how many bits difference between 2 hashcodes
 DIMENSION_X = 300
 DIMENSION_Y = 300
 piCameraResolution = (640, 480)  # (1024,768) #(640,480)  #(1920,1080) #(1080,720) # (1296,972)
@@ -164,7 +164,7 @@ class ImageHashCodesCountByTimer(ObjCountByTimer):
         return count
 
     def equals(self, hash1, hash2):
-        delta = self.bitdiff(self, hash1, hash2)
+        delta = self.bitdiff(hash1, hash2)
         return delta < HASH_DELTA
 
 
