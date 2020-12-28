@@ -168,21 +168,21 @@ class ImageHashCodesCountByTimer(ObjCountByTimer):
         return delta < HASH_DELTA
 
 
-def do_statistic(cam, hashes):
+def do_statistic(cam, cam_uuid, hashes):
     # Do some statistic work here
     params = get_parameters_json(hashes, cam, cam_uuid)
     db.insert_statistic(params)
     return params
 
 
-def get_parameters_json(hashes, cam):
+def get_parameters_json(hashes, cam, cam_uuid):
     ret = []
     for key in hashes:
         # logging.debug(images[key])
         trace = Trace()
         trace.name = key.split()[0]
         trace.cam = cam
-        trace.cam_uuid
+        trace.cam_uuid = cam_uuid
         tm = int(time.time()*1000)  # strftime("%H:%M:%S", localtime())
         trace.hashcodes = hashes[key].toString()
         trace.x = tm
