@@ -7,5 +7,5 @@
         // rest of your translation object
     },
     // other global config variables you wish
-    API: "//198.166.220.49:3020/",
+    API:  "//localhost:5000/" // "//198.166.220.49:3020/",
 };

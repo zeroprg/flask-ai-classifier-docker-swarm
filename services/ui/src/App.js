@@ -47,8 +47,8 @@ class App extends Component {
 
   updateurls(urls){
      //convert from one format [[1,'url1'], [1,'url2']] to another [{cam:0, url:url}, {{cam:1, url:ur2}}] 
-     const urls_ = urls.map( data => { var l = {cam:data[0], url:data[1] }; return l; }); 
-     this.setState({urls:urls_});
+     //const urls_ = urls.map( data => { var l = {cam:data[0], url:data[1] }; return l; }); 
+     this.setState({urls:urls});
   }
 
   updateparams = (param) => {

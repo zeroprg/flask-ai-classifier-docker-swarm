@@ -88,7 +88,8 @@ class Sql:
         """
         query = sql.select([self.urls])
         ResultProxy = self.getConn().execute(query)
-        rows = ResultProxy.fetchall()
+        cursor = ResultProxy.fetchall()
+        rows = [dict(r) for r in cursor]
         return rows
 
     def insert_urls(self, params):
@@ -180,7 +181,8 @@ class Sql:
         """
         query = sql.select([self.objects]).limit(self.limit).all()
         ResultProxy = self.getConn().execute(query)
-        rows = ResultProxy.fetchall()
+        cursor = ResultProxy.fetchall()
+        rows = [dict(r) for r in cursor]
         return rows
 
 

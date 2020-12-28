@@ -43,7 +43,7 @@ from flask import Blueprint, jsonify, request
 
 hashes = {}
 
-def classify_frame(net, frame, cam, confidence):
+def classify_frame(net, frame, cam, cam_uuid, confidence):
     topic_label = ''
     rectangles = []
     # print(" Classify frame ... --->")
@@ -139,7 +139,7 @@ def classify_frame(net, frame, cam, confidence):
                 now = datetime.datetime.now()
                 day = "{date:%Y-%m-%d}".format(date=now)
                 db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, startX, startY, x_dim, y_dim, cam)
-            params = do_statistic(cam, hashes)
+            params = do_statistic(cam, cam_uuid,  hashes)
             #db.getConn().commit()
 
         # draw at the top left corner of the screen
@@ -152,11 +152,11 @@ def classify_frame(net, frame, cam, confidence):
 
 
 class ImageHashCodesCountByTimer(ObjCountByTimer):
-    def bitdiff(a, b):
+    def bitdiff(self, a, b):
         d = a ^ b
-        return countSetBits(d)
+        return self.countSetBits(d)
 
-    def countSetBits(n):
+    def countSetBits(self, n):
         count =0
         while(n):
             count += n&1
@@ -164,13 +164,13 @@ class ImageHashCodesCountByTimer(ObjCountByTimer):
         return count
 
     def equals(self, hash1, hash2):
-        delta = bitdiff(hash1, hash2)
+        delta = self.bitdiff(self, hash1, hash2)
         return delta < HASH_DELTA
 
 
 def do_statistic(cam, hashes):
     # Do some statistic work here
-    params = get_parameters_json(hashes, cam)
+    params = get_parameters_json(hashes, cam, cam_uuid)
     db.insert_statistic(params)
     return params
 
@@ -182,6 +182,7 @@ def get_parameters_json(hashes, cam):
         trace = Trace()
         trace.name = key.split()[0]
         trace.cam = cam
+        trace.cam_uuid
         tm = int(time.time()*1000)  # strftime("%H:%M:%S", localtime())
         trace.hashcodes = hashes[key].toString()
         trace.x = tm
@@ -197,7 +198,7 @@ def get_parameters_json(hashes, cam):
 class Trace(dict):
     def __init__(self):
         dict.__init__(self)
-        self.cam = 0
+        self.cam = ''
         self.x = 0
         self.y = 0
         self.name = ''

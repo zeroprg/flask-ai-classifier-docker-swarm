@@ -137,8 +137,8 @@ p_get_frame = None
 
 
 def start_one_stream_processes(video, cam):
-    Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], video[1],
-              imagesQueue[cam], video[0])
+    Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], video["url"],
+              imagesQueue[cam], cam, video["id"])
 
     logger.info("p_classifiers for cam:" + str(cam) + " started")
 
@@ -372,9 +372,9 @@ def urls():
                 return Response('{"message":"URL has no video"}', mimetype='text/plain')
 
     elif list_url is not None:
-        url_list = db.select_all_urls()
-        return Response(json.dumps(url_list, default=str))
-
+        url_list = db.select_all_urls() 
+        return Response(json.dumps(url_list, default=str), mimetype='text/json')
+        
     elif deleted_id is not None:
         for video in videos:
             if video["id"] == deleted_id:

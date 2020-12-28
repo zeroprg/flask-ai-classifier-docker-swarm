@@ -91,7 +91,7 @@ def classify():
 	    )
     frame =  from_base64(base64_data)
     LOG.info("Hit /classify route: ", params)
-    post_array = classify_frame(net, frame, params['cam'], params['confidence'])
+    post_array = classify_frame(net, frame, params['cam'], params['cam_uuid'], params['confidence'])
     return Response(json.dumps(post_array, default=int), mimetype='text/plain')
 
 def uncompress_nparr(bytestring):
