@@ -30,7 +30,7 @@ def comp_node():
     if os.name == 'nt':
         return  platform.node()
     else:
-        return os.name[1]
+        return os.uname()[1]
 
 DELETE_FILES_LATER = 8 #   (8hours)
 ENCODING = "utf-8"
