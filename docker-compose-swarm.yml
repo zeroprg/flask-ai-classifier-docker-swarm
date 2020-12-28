@@ -53,37 +53,36 @@ services:
       timeout: 5s
       retries: 5
 
-  db:
-    hostname: 'primary'
-    image: zeroprg/flask-docker-swarm_db:latest
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints: 
-          - node.role == manager
-    volumes:
-       - data-volume:/var/lib/postgresql/data
- #      - data-volume=/home/odroid/projects/data/postgres/
-    ports:
-      - 5432:5432
-    environment:
-       - PGHOST=/tmp
-       - POSTGRES_USER=postgres
-       - POSTGRES_PASSWORD=postgres
-       - POSTGRES_DB=streamer
-       - PGDATA=/var/lib/postgresql/data
-       - MAX_CONNECTIONS=60
-       - MAX_WAL_SENDERS=5
-       - PG_MODE=primary
-    networks:
-      - app
+ # db:
+ #   hostname: 'primary'
+ #   image: zeroprg/flask-docker-swarm_db:latest
+ #   deploy:
+ #     replicas: 1
+ #     restart_policy:
+ #       condition: on-failure
+ #     placement:
+ #       constraints: 
+ #         - node.role == manager
+ #   volumes:
+ #      - data-volume:/var/lib/postgresql/data
+ #    ports:
+ #     - 5432:5432
+ #   environment:
+ #      - PGHOST=/tmp
+ #      - POSTGRES_USER=postgres
+ #      - POSTGRES_PASSWORD=postgres
+ #      - POSTGRES_DB=streamer
+ #      - PGDATA=/var/lib/postgresql/data
+ #      - MAX_CONNECTIONS=60
+ #      - MAX_WAL_SENDERS=5
+ #      - PG_MODE=primary
+ #   networks:
+ #     - app
 
   db_replica:
     image: zeroprg/flask-docker-swarm_db:latest
     deploy:
-      replicas: 1
+      replicas: 2
       restart_policy:
         condition: on-failure
       placement:
