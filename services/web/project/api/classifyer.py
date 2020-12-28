@@ -138,7 +138,7 @@ def classify_frame(net, frame, cam, cam_uuid, confidence):
 
                 now = datetime.datetime.now()
                 day = "{date:%Y-%m-%d}".format(date=now)
-                db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, startX, startY, x_dim, y_dim, cam)
+                db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, startX, startY, x_dim, y_dim, cam, cam_uuid)
             params = do_statistic(cam, cam_uuid,  hashes)
             #db.getConn().commit()
 
