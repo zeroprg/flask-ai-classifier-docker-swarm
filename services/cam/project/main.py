@@ -370,7 +370,7 @@ def urls():
 
     elif list_url is not None:
         url_list = db.select_all_urls()
-        return Response(json.dumps(url_list), mimetype='text/plain')
+        return Response(json.dumps(url_list))# use it for dictionaries, mimetype='text/plain')
 
     elif deleted_id is not None:
         for video in videos:
