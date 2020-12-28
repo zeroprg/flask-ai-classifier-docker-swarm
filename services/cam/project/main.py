@@ -186,8 +186,11 @@ def initialize_video_streams(url=None, videos=[]):
                 db.insert_urls(params)
             except:
                 try:
+                    log.info("trying to update with own computer name")
                     db.update_urls(params)
-                except: continue     
+                except:
+                     continue     
+            
             videos.append( params )
             imagesQueue.append(Queue(maxsize=IMAGES_BUFFER + 5))    
             arg = prod.args.get('video_file' + str(i), None)
