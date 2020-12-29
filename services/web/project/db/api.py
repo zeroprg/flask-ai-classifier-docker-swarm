@@ -83,7 +83,7 @@ class Sql:
         try:
             #cur.execute("INSERT INTO statistic(type,currentime,y,text,hashcodes,cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")",
             #     (param['name'], param['x'],  param['text'], hashcodes, param['cam']))
-            values = {'type': param['name'], 'currentime': param['x'], 'y': param['y'], 'hashcodes': hashcodes, 'cam_uuid':param['cam'] }     
+            values = {'type': param['name'], 'currentime': param['x'], 'y': param['y'], 'hashcodes': hashcodes, 'cam':param['cam_uuid'] }     
             query = sql.insert(self.statistic)
             ResultProxy = self.getConn().execute(query, values)
             print(" insert_statistic was {0} with params: {1}".format(ResultProxy.is_insert ,params))    
@@ -112,7 +112,7 @@ class Sql:
         #cur.execute("SELECT type, currentime as x0, currentime + 30000 as x, y as y FROM statistic WHERE type IN" +str+ " AND cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY type,currentime ASC", #DeSC
         #    (cam, time2, time1 ))
 
-        query = sql.select([self.statistic]).where(sql.and_(self.statistic.columns.cam_uuid == cam, 
+        query = sql.select([self.statistic]).where(sql.and_(self.statistic.columns.cam == cam, 
                                                             self.statistic.columns.type.in_(tuple_),
                                                             self.statistic.columns.currentime.between(time2, time1)
                                                              )
@@ -148,7 +148,7 @@ class Sql:
             #cur.execute("INSERT INTO objects (hashcode, currentdate, currentime, type, frame, x_dim, y_dim, cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")", 
             #(str(hashcode), date, time, type, str(jpg_as_base64), int(x_dim), int(y_dim), int(cam)))
             values = {'hashcode': hashcode, 'currentdate': date, 'currentime': time, 'type': type, 'frame':str(jpg_as_base64),
-                      'width': int(x_dim),'height': int(y_dim), 'x_dim': int(startX), 'y_dim': int(startY) , 'cam_uuid':cam_uuid, 'cam':cam }     
+                      'width': int(x_dim),'height': int(y_dim), 'x_dim': int(startX), 'y_dim': int(startY) , 'cam':cam_uuid}     
             query = sql.insert(self.objects)
             ResultProxy = self.getConn().execute(query, values)
             #print(" insert_frame was {0} with params: {1}".format(ResultProxy.is_insert ,values))
@@ -164,7 +164,7 @@ class Sql:
         """    
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects WHERE cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
         
-        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam_uuid == cam, 
+        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam, 
                                                           self.objects.columns.currentime.between(time1, time2)
                                                          )
                                                 ).order_by(text("currentime desc"))
@@ -197,7 +197,7 @@ class Sql:
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects where cam="+self.P+" AND  type IN " +str+ " AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC LIMIT "+self.P+" OFFSET "+self.P+"", 
         #    (cam, time2, time1,n_rows,offset,))
         #fetched_rows = cur.fetchall()
-        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam_uuid == cam, 
+        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam, 
                                                           self.objects.columns.type.in_(tuple_),
                                                           self.objects.columns.currentime.between(time2, time1)
                                                          )

@@ -24,7 +24,13 @@ CREATE INDEX index_type ON objects USING btree (type);
 
 drop  table  statistic;
 
-CREATE TABLE statistic(type VARCHAR(15), currentime int8, y int2, cam int2, cam_uuid uuid, hashcodes VARCHAR(410));
+CREATE TABLE public.statistic (
+	"type" text NULL,
+	currentime int8 NULL,
+	y int2 NULL,
+	hashcodes VARCHAR(410) NULL,
+	cam uuid NULL
+);
 
 drop  table  urls;
 
