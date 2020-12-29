@@ -255,7 +255,7 @@ def moreparams():
     object_of_interest = request.args.get('object_of_interest', type=None)
     #print("object_of_interest: " + str(object_of_interest)[1:-1])
 
-    cam = request.args.get('cam', default=0, type=int)
+    cam = request.args.get('cam', default=0, type=str)
     if hour_back1 != '':
         hour_back1 = int(hour_back1)
     else:
@@ -302,7 +302,7 @@ def imgs_at_time():
     """ Read list of json files or return one specific  for specific time """
     seconds = request.args.get('time', default=int(time.time()*1000), type=int)
     delta = request.args.get('delta', default=10000, type=int)
-    cam = request.args.get('cam', default=0, type=int)
+    cam = request.args.get('cam', default=0, type=str)
     return Response(gen_array_of_imgs(cam, delta=delta, currentime=seconds), mimetype='text/plain')
 
 
@@ -359,17 +359,16 @@ def urls():
     if add_url is not None:
         logger.info('adding a new video urls ' + add_url)
         if ping_video_url(add_url):
+            before = len(videos)
             videos = initialize_video_streams(add_ur,videos)
-            cam = len(videos)-1
-            start_one_stream_processes(videos[cam],cam)
-            try:
-                params = {'url': add_url, 'cam': cam}
-                db.insert_urls(params)
+            after = len(videos)
+            if before < after: 
+                start_one_stream_processes(videos[after -1 ], after -1 )
                 return Response('{"message":"URL added successfully"}', mimetype='text/plain')
-            except:
-                return None, 500
             else:
-                return Response('{"message":"URL has no video"}', mimetype='text/plain')
+                return Response('{"message":"URL already exist it was  added successfully before"}', mimetype='text/plain')  
+        else:
+            return Response('{"message":"URL has no video"}', mimetype='text/plain')
 
     elif list_url is not None:
         url_list = db.select_all_urls() 
