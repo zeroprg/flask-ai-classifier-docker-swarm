@@ -241,7 +241,7 @@ def serve_static(filename):
 def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
     # gen(Camera()),
-    cam = request.args.get('cam', default=0, type=int)
+    cam = request.args.get('cam', default=0, type=str)
     return Response(detect(int(cam)),  # mimetype='text/event-stream')
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
@@ -280,7 +280,7 @@ def moreimgs():
     object_of_interest = request.args.get('object_of_interest', type=None)
     #print("object_of_interest: " + str(object_of_interest)[1:-1])
 
-    cam = request.args.get('cam', default=0, type=int)
+    cam = request.args.get('cam', default=0, type=str)
     if hour_back1 != '':
         hour_back1 = int(hour_back1)
     else:
