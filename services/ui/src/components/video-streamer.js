@@ -41,10 +41,10 @@ class VideoStreamer extends Component {
                 <div className="row">
                     <div className="col-sm-4">
                            {this.props.child}
-                           <Video key={camera.cam} camera = {camera} showBoxes={false}/> 
+                           <Video key={camera.id} camera = {camera} showBoxes={false}/> 
                         </div>  
                         <div className="col-sm-8">
-                          <ObjectOfInterestPlot cam={camera.cam}
+                          <ObjectOfInterestPlot cam={camera.id}
                                                 timerange={this.state.timerange} 
                                                 onParamsChanged={this.onParamsChanged.bind(this)}
                                                 onTimeChanged={this.onTimeChanged.bind(this)}
@@ -58,7 +58,7 @@ class VideoStreamer extends Component {
                         <Tab eventKey="founded_objects" title="Founded Objects" className="tabcontent">
                             <ObjectOfInterest object_of_interest={this.state.object_of_interest}
                                 timerange={this.state.timerange}
-                                cam={camera.cam}
+                                cam={camera.id}
                             />    
                         </Tab>
     {/*                 <Tab eventKey="events" title="Events Notify" className="tabcontent">
