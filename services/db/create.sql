@@ -1,5 +1,6 @@
+ --create database streamer;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-drop  table  objects;
+---drop  table  objects;
 
 CREATE TABLE objects (
 	hashcode int8 NOT NULL,
@@ -11,8 +12,7 @@ CREATE TABLE objects (
 	frame text NULL,
 	x_dim int2 NULL,
 	y_dim int2 NULL,
-	cam int2 NULL,
-	cam_uuid uuid NULL,
+	cam uuid NULL,
 	width int2 NULL,
 	height int2 NULL,
 	CONSTRAINT objects_pkey PRIMARY KEY (hashcode)
@@ -22,9 +22,9 @@ CREATE INDEX index_cam_hashcode ON objects USING btree (cam, hashcode);
 CREATE INDEX index_currentime ON objects USING btree (currentime DESC);
 CREATE INDEX index_type ON objects USING btree (type);
 
-drop  table  statistic;
+--drop  table  statistic;
 
-CREATE TABLE public.statistic (
+CREATE TABLE statistic (
 	"type" text NULL,
 	currentime int8 NULL,
 	y int2 NULL,
@@ -32,7 +32,7 @@ CREATE TABLE public.statistic (
 	cam uuid NULL
 );
 
-drop  table  urls;
+--drop  table  urls;
 
 CREATE OR REPLACE FUNCTION currentime_gen()
   RETURNS int8 
@@ -57,17 +57,6 @@ CREATE TABLE urls (
 	CONSTRAINT urls_un UNIQUE (url)
 );
 
-drop  table  obj_stat;
-CREATE TABLE obj_stat (
-   cam_uuid uuid NOT NULL,
-   type VARCHAR NOT NULL,
-   last_10min int2,
-   last_hour int2,
-   last_date int2
-
-);
-
-
 
 
 
@@ -90,5 +79,36 @@ CREATE TRIGGER modify_urls
   ON urls
   FOR  ROW
   EXECUTE PROCEDURE modify_urls();
+
+
+CREATE TABLE Latest10min
+as
+select camSummary.cam , urls.url, urls.cam as rate ,"type",  count(*) from 
+	(select cam ,"type" , count(*), min(objects.currentdate),  min(currentime) as starttime ,max(currentime) as endtime, (max(currentime)- min(currentime) )/1000 as seconds,  x_dim , y_dim
+		from objects where extract(epoch from now()) - currentime/1000 < 36000 
+		group by "type", cam, x_dim, y_dim
+		having  max(currentime)- min(currentime)  > 0 and  (max(currentime)- min(currentime) )/1000 <36000
+		order by cam, "type") as camSummary, urls where urls.id = camSummary.cam
+group by camSummary.cam, "type", urls.url, urls.cam;
+
+CREATE TABLE LatestHour
+as
+select camSummary.cam , urls.url, urls.cam as rate ,"type",  count(*) from 
+	(select cam ,"type" , count(*), min(objects.currentdate),  min(currentime) as starttime ,max(currentime) as endtime, (max(currentime)- min(currentime) )/1000 as seconds,  x_dim , y_dim
+		from objects where extract(epoch from now()) - currentime/1000 < 216000
+		group by "type", cam, x_dim, y_dim
+		having  max(currentime)- min(currentime)  > 0 and  (max(currentime)- min(currentime) )/1000 <216000
+		order by cam, "type") as camSummary, urls where urls.id = camSummary.cam
+group by camSummary.cam, "type", urls.url, urls.cam;
+
+CREATE TABLE Latest6Hours
+as
+select camSummary.cam , urls.url, urls.cam as rate ,"type",  count(*) from 
+	(select cam ,"type" , count(*), min(objects.currentdate),  min(currentime) as starttime ,max(currentime) as endtime, (max(currentime)- min(currentime) )/1000 as seconds,  x_dim , y_dim
+		from objects where extract(epoch from now()) - currentime/1000 < 1296000
+		group by "type", cam, x_dim, y_dim
+		having  max(currentime)- min(currentime)  > 0 and  (max(currentime)- min(currentime) )/1000 <1296000
+		order by cam, "type") as camSummary, urls where urls.id = camSummary.cam
+group by camSummary.cam, "type", urls.url, urls.cam;
 
 COMMIT;
