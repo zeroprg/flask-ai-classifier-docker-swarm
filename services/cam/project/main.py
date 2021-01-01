@@ -194,12 +194,12 @@ def initialize_video_streams(url=None, videos=[]):
                 logger.info(arg)
     videos_ = db.select_all_urls()
     for video in videos_:
-        params = { 'cam': video['id'], 'url': video['url'], 'os': comp_node()}
+        params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node()}
         try:
-            logger.info("trying to update with own computer name")
+            logger.info("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
             db.update_urls(params)
-        except:
-            pass
+        except Exception as e:
+            logger.info("Exception {}".format(e))
         else:
             imagesQueue[video['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
     videos = db.select_all_urls()            
@@ -325,8 +325,8 @@ def gen_array_of_imgs(cam, delta=10000, currentime=int(time.time()*1000)):
 
 
 
-def gen_params(cam=0, time1=0, time2=5*60*60*1000, object_of_interest=[]):
-    """Parameters streaming generator function."""
+def gen_params(cam='', time1=0, time2=5*60*60*1000, object_of_interest=[]):
+    """Parameters streaming generatorcd .. function."""
  
     print("time1: {} time2: {}".format(time1, time2))
     ls = db.select_statistic_by_time(cam, time1, time2, object_of_interest)
@@ -362,7 +362,7 @@ def urls():
             videos = initialize_video_streams(add_ur,videos)
             after = len(videos)
             if before < after: 
-                start_one_stream_processes(videos[after -1 ], after -1 )
+                start_one_stream_processes(videos[after -1 ] )
                 return Response('{"message":"URL added successfully"}', mimetype='text/plain')
             else:
                 return Response('{"message":"URL already exist it was  added successfully before"}', mimetype='text/plain')  
