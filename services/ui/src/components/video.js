@@ -43,7 +43,7 @@ const Video = ({camera, showBoxesAroundObjects}) => {
                
             </div>
             <img id={'stream'+camera.cam}  className={classes.root}
-                 src={ showBoxes ? HOST+"video_feed?cam="+camera.cam : camera.url } 
+                 src={ showBoxes ? HOST+"video_feed?cam="+camera.id : camera.url } 
                  alt="Video Streamer"/>
             </span>
   );
