@@ -15,7 +15,7 @@ from project.classifier import Detection
 from project import db
 import platform 
 
-from flask import Blueprint, Response, request, g, send_from_directory
+from flask import Blueprint, Response, request, g,redirect, url_for, send_from_directory
 from flask_cors import cross_origin, CORS
 
 logger = logging.getLogger('logger')
@@ -84,7 +84,7 @@ def change_res(camera, width, height):
     camera.set(4, height)
 
 
-def get_frame(images_queue, cam):
+def get_frame(images_queue):
     while True:
         try:
             images_queue.get()
@@ -128,7 +128,7 @@ def destroy():
 
 separator = "="
 args = {}
-imagesQueue = []
+imagesQueue = {}
 detections = None
 vs = None
 
@@ -136,15 +136,16 @@ fps = None
 p_get_frame = None
 
 
-def start_one_stream_processes(video, cam):
-    Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], video["url"],
-              imagesQueue[cam], cam, video["id"])
+def start_one_stream_processes(video):
+    if imagesQueue.get(video['id'], None) is not None :
+        Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
+                imagesQueue[video['id']],video)
 
-    logger.info("p_classifiers for cam:" + str(cam) + " started")
+        logger.info("p_classifiers for cam:" + video['id'] + " started")
 
-    p = Process(target=get_frame, args=(imagesQueue[cam], cam))
-    p.daemon = True
-    p.start()
+  #  p = Process(target=get_frame, args=(imagesQueue[cam], cam))
+  #  p.daemon = True
+  #  p.start()
 
 
 
@@ -159,7 +160,7 @@ def start():
     logger.info("[INFO] starting video stream...")
     videos = initialize_video_streams()
     for cam in range(0,len(videos)-1):
-        start_one_stream_processes(videos[cam],cam)
+        start_one_stream_processes(videos[cam])
 
 
 
@@ -181,22 +182,28 @@ def initialize_video_streams(url=None, videos=[]):
             #camright.append(prod.args.get('cam_right' + str(i), None))
             #camleft.append(prod.args.get('cam_left' + str(i), None))
             #CameraMove(camright[i], camleft[i])
-            params = { 'cam': i, 'url': arg , 'os': comp_node()}
+            params = { 'cam': i, 'url': arg } #, 'os': comp_node()}
+
             try:
+                videos.append(params)
                 db.insert_urls(params)
-            except:
-                try:
-                    log.info("trying to update with own computer name")
-                    db.update_urls(params)
-                except:
-                     continue     
-            
-            videos.append( params )
-            imagesQueue.append(Queue(maxsize=IMAGES_BUFFER + 5))    
-            arg = prod.args.get('video_file' + str(i), None)
-            i += 1 
-            logger.info(arg)
-    videos = db.select_all_urls()
+            except: pass  
+            finally:
+                arg = prod.args.get('video_file' + str(i), None)
+                i += 1 
+                logger.info(arg)
+    videos_ = db.select_all_urls()
+    for video in videos_:
+        params = { 'cam': video['id'], 'url': video['url'], 'os': comp_node()}
+        try:
+            logger.info("trying to update with own computer name")
+            db.update_urls(params)
+        except:
+            pass
+        else:
+            imagesQueue[video['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+    videos = db.select_all_urls()            
+
     logger.info(videos)
     # Start process
     #time.sleep(1.0)
@@ -240,9 +247,12 @@ def serve_static(filename):
 @cross_origin(origin='http://localhost:{}'.format(port))
 def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
-    # gen(Camera()),
+    
     cam = request.args.get('cam', default=0, type=str)
-    return Response(detect(int(cam)),  # mimetype='text/event-stream')
+    if imagesQueue.get(cam, None) is None:
+        redirect(url_for('video_feed'))
+    else:    
+        return Response(detect(cam),  # mimetype='text/event-stream')
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
@@ -312,17 +322,6 @@ def gen_array_of_imgs(cam, delta=10000, currentime=int(time.time()*1000)):
     rows = db.select_frame_by_time(cam, time1, time2)
     x = json.dumps(rows, default=str)
     return x
-
-
-def gen(camera):
-    """Video streaming generator function."""
-    try:
-        while True:
-            frame = camera.get_frame()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-    except GeneratorExit:
-        pass
 
 
 

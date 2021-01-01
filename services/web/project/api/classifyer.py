@@ -9,7 +9,7 @@ from project.db.api import Sql
 from project import db
 
 import cv2
-import dhash
+
 from PIL import Image
 import time
 import datetime
@@ -43,8 +43,10 @@ from flask import Blueprint, jsonify, request
 
 hashes = {}
 
-def classify_frame(net, frame, cam, cam_uuid, confidence):
+def classify_frame(net, frame, params):
     topic_label = ''
+    cam = params['cam']
+    confidence = params['confidence']
     rectangles = []
     # print(" Classify frame ... --->")
     _frame = cv2.resize(frame, (DIMENSION_X, DIMENSION_Y))
@@ -138,8 +140,8 @@ def classify_frame(net, frame, cam, cam_uuid, confidence):
 
                 now = datetime.datetime.now()
                 day = "{date:%Y-%m-%d}".format(date=now)
-                db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, startX, startY, x_dim, y_dim, cam, cam_uuid)
-            params = do_statistic(cam, cam_uuid,  hashes)
+                db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, startX, startY, x_dim, y_dim, cam)
+            params = do_statistic(cam,  hashes)
             #db.getConn().commit()
 
         # draw at the top left corner of the screen
@@ -168,21 +170,20 @@ class ImageHashCodesCountByTimer(ObjCountByTimer):
         return delta < HASH_DELTA
 
 
-def do_statistic(cam, cam_uuid, hashes):
+def do_statistic(cam, hashes):
     # Do some statistic work here
-    params = get_parameters_json(hashes, cam, cam_uuid)
+    params = get_parameters_json(hashes, cam)
     db.insert_statistic(params)
     return params
 
 
-def get_parameters_json(hashes, cam, cam_uuid):
+def get_parameters_json(hashes, cam):
     ret = []
     for key in hashes:
         # logging.debug(images[key])
         trace = Trace()
         trace.name = key.split()[0]
-        trace.cam = cam
-        trace.cam_uuid = cam_uuid
+        trace.cam = cam       
         tm = int(time.time()*1000)  # strftime("%H:%M:%S", localtime())
         trace.hashcodes = hashes[key].toString()
         trace.x = tm

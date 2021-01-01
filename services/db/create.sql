@@ -81,34 +81,85 @@ CREATE TRIGGER modify_urls
   EXECUTE PROCEDURE modify_urls();
 
 
-CREATE TABLE Latest10min
-as
-select camSummary.cam , urls.url, urls.cam as rate ,"type",  count(*) from 
-	(select cam ,"type" , count(*), min(objects.currentdate),  min(currentime) as starttime ,max(currentime) as endtime, (max(currentime)- min(currentime) )/1000 as seconds,  x_dim , y_dim
-		from objects where extract(epoch from now()) - currentime/1000 < 36000 
-		group by "type", cam, x_dim, y_dim
-		having  max(currentime)- min(currentime)  > 0 and  (max(currentime)- min(currentime) )/1000 <36000
-		order by cam, "type") as camSummary, urls where urls.id = camSummary.cam
-group by camSummary.cam, "type", urls.url, urls.cam;
 
-CREATE TABLE LatestHour
-as
-select camSummary.cam , urls.url, urls.cam as rate ,"type",  count(*) from 
-	(select cam ,"type" , count(*), min(objects.currentdate),  min(currentime) as starttime ,max(currentime) as endtime, (max(currentime)- min(currentime) )/1000 as seconds,  x_dim , y_dim
-		from objects where extract(epoch from now()) - currentime/1000 < 216000
-		group by "type", cam, x_dim, y_dim
-		having  max(currentime)- min(currentime)  > 0 and  (max(currentime)- min(currentime) )/1000 <216000
-		order by cam, "type") as camSummary, urls where urls.id = camSummary.cam
-group by camSummary.cam, "type", urls.url, urls.cam;
+CREATE OR REPLACE VIEW public.latest10min
+AS SELECT objects.cam,
+    objects.type,
+    count(*) AS last10min,
+    min(objects.currentdate) AS date,
+    min(objects.currentime) AS starttime,
+    max(objects.currentime) AS endtime,
+    (max(objects.currentime) - min(objects.currentime)) / 60000 AS minutes
+   FROM objects
+  WHERE (date_part('epoch'::text, now()) - (objects.currentime / 1000)::double precision) < (3600::double precision)
+  GROUP BY objects.type, objects.cam
+ HAVING ((max(objects.currentime) - min(objects.currentime)) / 60000) < 10;
 
-CREATE TABLE Latest6Hours
-as
-select camSummary.cam , urls.url, urls.cam as rate ,"type",  count(*) from 
-	(select cam ,"type" , count(*), min(objects.currentdate),  min(currentime) as starttime ,max(currentime) as endtime, (max(currentime)- min(currentime) )/1000 as seconds,  x_dim , y_dim
-		from objects where extract(epoch from now()) - currentime/1000 < 1296000
-		group by "type", cam, x_dim, y_dim
-		having  max(currentime)- min(currentime)  > 0 and  (max(currentime)- min(currentime) )/1000 <1296000
-		order by cam, "type") as camSummary, urls where urls.id = camSummary.cam
-group by camSummary.cam, "type", urls.url, urls.cam;
+    
+CREATE OR REPLACE VIEW public.latest6hours
+AS SELECT objects.cam,
+    objects.type,
+    count(*) AS last6hours,
+    min(objects.currentdate) AS date,
+    min(objects.currentime) AS starttime,
+    max(objects.currentime) AS endtime,
+    (max(objects.currentime) - min(objects.currentime)) / 60000 AS minutes
+   FROM objects
+  WHERE (date_part('epoch'::text, now()) - (objects.currentime / 1000)::double precision) < (216000::double precision * 6::double precision)
+  GROUP BY objects.type, objects.cam
+ HAVING ((max(objects.currentime) - min(objects.currentime)) / 60000) < 360;
+
+ CREATE OR REPLACE VIEW public.latest12hours
+AS SELECT objects.cam,
+    objects.type,
+    count(*) AS last12hours,
+    min(objects.currentdate) AS date,
+    min(objects.currentime) AS starttime,
+    max(objects.currentime) AS endtime,
+    (max(objects.currentime) - min(objects.currentime)) / 60000 AS minutes
+   FROM objects
+  WHERE (date_part('epoch'::text, now()) - (objects.currentime / 1000)::double precision) < (216000::double precision * 12::double precision)
+  GROUP BY objects.type, objects.cam
+ HAVING ((max(objects.currentime) - min(objects.currentime)) / 60000) < 720;
+
+CREATE OR REPLACE VIEW public.latesthour
+AS SELECT objects.cam,
+    objects.type,
+    count(*) AS lasthour,
+    min(objects.currentdate) AS date,
+    min(objects.currentime) AS starttime,
+    max(objects.currentime) AS endtime,
+    (max(objects.currentime) - min(objects.currentime)) / 60000 AS minutes
+   FROM objects
+  WHERE (date_part('epoch'::text, now()) - (objects.currentime / 1000)::double precision) < (216000::double precision )
+  GROUP BY objects.type, objects.cam
+ HAVING ((max(objects.currentime) - min(objects.currentime)) / 60000) < 60;
+
+create or replace view public.obj_stat AS
+	select
+		distinct u.cam,
+		u.url,
+		lm."type" type1,
+		max(lm.last10min) last10min,
+		l."type" type2 ,
+		max(l.lasthour) lasthour ,
+		l6."type" type3,
+		max(l6.last6hours) last6hours
+	from
+		urls u
+	left join latest10min lm on
+		lm.cam = u.id
+	left join latesthour l on
+		lm.cam = u.id
+	left join latest6hours l6 on
+		l6.cam = u.id
+	group by
+		u.cam,
+		u.url,
+		lm."type",
+		l."type" ,
+		l6."type" 
+;
+
 
 COMMIT;

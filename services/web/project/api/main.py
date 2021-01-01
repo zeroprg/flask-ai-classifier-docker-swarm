@@ -83,7 +83,7 @@ def classify():
     net = get_net()
     data = request.get_json()
     params = data['params']
-    print("cam: {0} , confidence: {1} ".format(params['cam'], params['confidence']))
+    LOG.info("cam: {0} , confidence: {1} ".format(params['cam'], params['confidence']))
     base64_data = str(data['array'])
     if (base64_data is None ):
 	    return jsonify(
@@ -91,7 +91,7 @@ def classify():
 	    )
     frame =  from_base64(base64_data)
     LOG.info("Hit /classify route: ", params)
-    post_array = classify_frame(net, frame, params['cam'], params['cam_uuid'], params['confidence'])
+    post_array = classify_frame(net, frame, params)
     return Response(json.dumps(post_array, default=int), mimetype='text/plain')
 
 def uncompress_nparr(bytestring):
