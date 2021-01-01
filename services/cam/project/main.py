@@ -7,6 +7,7 @@ import time
 import logging
 import mimetypes
 import json
+import requests
 import cv2
 
 #from db.api import Sql
@@ -43,10 +44,10 @@ camleft = []
 camright = []
 videos = []
 IMG_PAGINATOR = 40
-
 SHOW_VIDEO = False
-
 port = prod.PORT
+IP_ADDRESS = prod.IP_ADDRESS
+
 
 class CameraMove:
     def __init__(self, move_left, move_right, timestep=10):
@@ -209,14 +210,16 @@ def initialize_video_streams(url=None, videos=[]):
         else:            
             try:
                 params['videos_length'] = len(imagesQueue)
-                response = requests.post(deny_service_url, data=params)
-            except Exception as e:
+                """ Make external call to Docker gateway if its present"""
+                r = requests.post('http//{}:{}{}'.format(IP_ADDRESS,port,deny_service_url) , data=params)
+                r.raise_for_status()
+            except  requests.exceptions.HTTPError as e:
                 """ Servicing this video was not denied other nodes satisfied with grabbing this video """
                 imagesQueue[video['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
             else:  
                 """ Service was denied: stop processes associated with this video then remove video from  Queue dictionary """
-                if detectors.get(cam, None) is not None: del detectors[cam]
-                if imagesQueue.get(cam, None) is not None:del imagesQueue[cam]
+                if detectors.get(params['id'], None) is not None: del detectors[params['id']]
+                if imagesQueue.get(params['id'], None) is not None:del imagesQueue[params['id']]
             
     videos = db.select_all_urls()            
     
@@ -258,15 +261,14 @@ def serve_static(filename):
     return send_from_directory(os.path.join(root_dir, 'static', 'js'), filename)
 
 
-@main_blueprint.route(deny_service_url)
+@main_blueprint.route(deny_service_url, methods=['GET','POST'])
 @cross_origin(origin='http://localhost:{}'.format(port))
-
 def deny_service():
     cam = request.args.get('cam', default=0, type=str)
     os_name = request.args.get('os', default=0, type=str)
     other_node_video_length = request.args.get('videos_length', default=0, type=int)
     if os_name == comp_node():
-        return None, 400
+        return None, 200
     """ if request come rom different node  """
  
     """ Griddy algorithm started here  if  list of videos too big and my list too small """
@@ -281,10 +283,10 @@ def deny_service():
             logger.info("Exception {}".format(e))
         else:
           """ Signal to request initiator to remove this video from his list """
-          return None, 500
+          return None, 412
 
 
-    return None, 400      
+    return None, 200      
                 
    
 
@@ -347,7 +349,6 @@ def moreimgs():
     else:
         hour_back2 = 1  # default value: 60 min back
     print("cam: {}, hour_back1:{}, hour_back2:{}, object_of_interest: {}".format(cam, hour_back1, hour_back2, object_of_interest))
-    #db = Sql(DB_IP_ADDRESS)
     rows = db.select_last_frames(cam=cam, time1=hour_back1, time2=hour_back2, obj=object_of_interest)
     return Response(json.dumps(rows,default=str), mimetype='text/plain')
 

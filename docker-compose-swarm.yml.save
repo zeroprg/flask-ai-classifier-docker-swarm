@@ -16,7 +16,7 @@ services:
       - PORT=3020
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
-      - DB_IP_ADDRESS=localhost
+      - IP_ADDRESS=localhost
       - DB_USER=postgres
       - DB_PASSWORD=postgres
     depends_on:
@@ -40,7 +40,7 @@ services:
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_USER=postgres
-      - DB_IP_ADDRESS=localhost
+      - IP_ADDRESS=localhost
       - DB_PASSWORD=postgres
     depends_on:
       - db
