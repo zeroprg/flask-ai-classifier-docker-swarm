@@ -71,7 +71,7 @@ class Sql:
 
     def insert_obj_stat(self, params):
         try:
-            values = {'cam_uuid': param['cam_uuid'],'type': param['type'], 'last_10min':param['last_10min'], 'last_hour': param['last_hour'], 'last_day': param['last_day'] }
+            values = {'cam_uuid': params['cam_uuid'],'type': params['type'], 'last_10min':params['last_10min'], 'last_hour': params['last_hour'], 'last_day': params['last_day'] }
             query = sql.insert(self.obj_stat)
             ResultProxy = self.getConn().execute(query, values)
             print(" insert_obj_stat was {0} with params: {1}".format(ResultProxy.is_insert ,params))
@@ -86,7 +86,7 @@ class Sql:
         Query all rows in the urls table
         :return:
         """
-        query = sql.select([self.urls])
+        query = sql.select([self.urls]).order_by(text("cam asc"))
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -275,14 +275,7 @@ def main():
 
     # create a database connection
     sql = Sql(database)
-    conn = sql.getConn()
-    with conn:
-        print("1. Query objects by time:")
-        sql.select_frame_by_time("2019-01-01 00:00:00.00.000", "2019-12-31 00:00:00.00.000")
-
-        print("2. Query all objects")
-        sql.select_all_stats()
- 
+    conn = sql.getConn() 
  
 if __name__ == '__main__':
     main()
