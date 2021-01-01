@@ -35,7 +35,8 @@ def comp_node():
 DELETE_FILES_LATER = 8 #   (8hours)
 ENCODING = "utf-8"
 IMAGES_BUFFER = 100
-
+#  --------------------  constanst and definitions -------------------------
+deny_service_url = '/deny_service'
 
 
 camleft = []
@@ -126,10 +127,12 @@ def destroy():
     #conn.close()
 
 
-separator = "="
+
+""" 'Global' variables """
+
 args = {}
 imagesQueue = {}
-detections = None
+detectors = {}
 vs = None
 
 fps = None
@@ -138,7 +141,7 @@ p_get_frame = None
 
 def start_one_stream_processes(video):
     if imagesQueue.get(video['id'], None) is not None :
-        Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
+        detectors[video['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
                 imagesQueue[video['id']],video)
 
         logger.info("p_classifiers for cam:" + video['id'] + " started")
@@ -168,6 +171,7 @@ def start():
 # and initialize the FPS counter
 def initialize_video_streams(url=None, videos=[]):
     i = 0
+    #myVideos = []
     arg = None
     if url is not None:
         arg = url
@@ -193,17 +197,29 @@ def initialize_video_streams(url=None, videos=[]):
                 i += 1 
                 logger.info(arg)
     videos_ = db.select_all_urls()
+    """ Update all videos as mine , start greeding algorithm here ..."""
     for video in videos_:
         params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node()}
         try:
             logger.info("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
             db.update_urls(params)
+            
         except Exception as e:
             logger.info("Exception {}".format(e))
-        else:
-            imagesQueue[video['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+        else:            
+            try:
+                params['videos_length'] = len(imagesQueue)
+                response = requests.post(deny_service_url, data=params)
+            except Exception as e:
+                """ Servicing this video was not denied other nodes satisfied with grabbing this video """
+                imagesQueue[video['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+            else:  
+                """ Service was denied: stop processes associated with this video then remove video from  Queue dictionary """
+                if detectors.get(cam, None) is not None: del detectors[cam]
+                if imagesQueue.get(cam, None) is not None:del imagesQueue[cam]
+            
     videos = db.select_all_urls()            
-
+    
     logger.info(videos)
     # Start process
     #time.sleep(1.0)
@@ -241,6 +257,36 @@ def serve_static(filename):
     root_dir = os.path.dirname(os.getcwd())
     return send_from_directory(os.path.join(root_dir, 'static', 'js'), filename)
 
+
+@main_blueprint.route(deny_service_url)
+@cross_origin(origin='http://localhost:{}'.format(port))
+
+def deny_service():
+    cam = request.args.get('cam', default=0, type=str)
+    os_name = request.args.get('os', default=0, type=str)
+    other_node_video_length = request.args.get('videos_length', default=0, type=int)
+    if os_name == comp_node():
+        return None, 400
+    """ if request come rom different node  """
+ 
+    """ Griddy algorithm started here  if  list of videos too big and my list too small """
+    if len(imagesQueue) < other_node_video_length:
+        """ grab this video """
+        try:
+            params = { 'id': cam, 'os': comp_node()}
+            logger.info("trying to update where id:{} with  os {}".format(params['id'], params['os']))
+            db.update_urls(params)
+            imagesQueue[cam] = Queue(maxsize=IMAGES_BUFFER + 5)            
+        except Exception as e:
+            logger.info("Exception {}".format(e))
+        else:
+          """ Signal to request initiator to remove this video from his list """
+          return None, 500
+
+
+    return None, 400      
+                
+   
 
 
 @main_blueprint.route('/video_feed', methods=['GET'])
