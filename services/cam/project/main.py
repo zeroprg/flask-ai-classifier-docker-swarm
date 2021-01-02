@@ -313,10 +313,6 @@ def deny_service():
             """ Signal to request initiator to remove this video from his list and add to this node list"""
             imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5) 
             return None, 412
-    else:
-        """ Signal to remove this video from this node list """
-        cam = params['id']
-        if imagesQueue.get(cam, None) is not None: del imagesQueue[cam]
     return None, 200      
                 
    
@@ -329,8 +325,7 @@ def video_feed():
     
     cam = request.args.get('cam', default=0, type=str)
     if imagesQueue.get(cam, None) is None:
-        url = 'http://{}:{}{}?cam={}'.format(IP_ADDRESS,port,'/video_feed', cam)
-        redirect(url)
+        redirect(url_for('video_feed'))
     else:    
         return Response(detect(cam),  # mimetype='text/event-stream')
                     mimetype='multipart/x-mixed-replace; boundary=frame')
