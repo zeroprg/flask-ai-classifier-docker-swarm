@@ -325,9 +325,9 @@ def video_feed():
     
     cam = request.args.get('cam', default=0, type=str)
     if imagesQueue.get(cam, None) is None:
-        redirect(url_for('video_feed'))
+        redirect(url_for('main.video_feed'))
     else:    
-        return Response(detect(cam),  # mimetype='text/event-stream')
+        return Response(detect(cam),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
