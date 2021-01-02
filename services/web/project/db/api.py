@@ -112,9 +112,9 @@ class Sql:
         #cur.execute("SELECT type, currentime as x0, currentime + 30000 as x, y as y FROM statistic WHERE type IN" +str+ " AND cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY type,currentime ASC", #DeSC
         #    (cam, time2, time1 ))
 
-        query = sql.select([self.statistic]).where(sql.and_(self.statistic.columns.cam == cam, 
-                                                            self.statistic.columns.type.in_(tuple_),
-                                                            self.statistic.columns.currentime.between(time2, time1)
+        query = sql.select([self.statistic]).where(sql.and_(self.statistic.c.cam == cam, 
+                                                            self.statistic.c.type.in_(tuple_),
+                                                            self.statistic.c.currentime.between(time2, time1)
                                                              )
                                                     ).order_by(text("currentime asc"))                                                                                         
         ResultProxy = self.getConn().execute(query)
@@ -164,8 +164,8 @@ class Sql:
         """    
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects WHERE cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
         
-        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam, 
-                                                          self.objects.columns.currentime.between(time1, time2)
+        query = sql.select([self.objects]).where(sql.and_(self.objects.c.cam == cam, 
+                                                          self.objects.c.currentime.between(time1, time2)
                                                          )
                                                 ).order_by(text("currentime desc"))
                                                                                     
@@ -197,9 +197,9 @@ class Sql:
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects where cam="+self.P+" AND  type IN " +str+ " AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC LIMIT "+self.P+" OFFSET "+self.P+"", 
         #    (cam, time2, time1,n_rows,offset,))
         #fetched_rows = cur.fetchall()
-        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam, 
-                                                          self.objects.columns.type.in_(tuple_),
-                                                          self.objects.columns.currentime.between(time2, time1)
+        query = sql.select([self.objects]).where(sql.and_(self.objects.c.cam == cam, 
+                                                          self.objects.c.type.in_(tuple_),
+                                                          self.objects.c.currentime.between(time2, time1)
                                                          )
                                                 ).order_by(text("currentime desc")).limit(n_rows).offset(offset)
                                      
