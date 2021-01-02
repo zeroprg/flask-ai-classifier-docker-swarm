@@ -241,14 +241,7 @@ def initialize_video_streams(url=None, videos=[]):
             url = 'http://{}:{}{}'.format(IP_ADDRESS,port,deny_service_url)
             params['videos_length'] = len(imagesQueue)
             """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
-            delegate_service(url, params=params)
-           # p_caller = Process(target=delegate_service, args=(url, params))
-           # p_caller.daemon = True
-           # p_caller.start()
-            
- 
-            
-                 
+            #delegate_service(url, params=params)
             
     videos = db.select_all_urls()            
     
@@ -325,7 +318,7 @@ def video_feed():
     
     cam = request.args.get('cam', default=0, type=str)
     if imagesQueue.get(cam, None) is None:
-        redirect(url_for('main.video_feed'))
+        redirect(url_for('video_feed'))
     else:    
         return Response(detect(cam),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
