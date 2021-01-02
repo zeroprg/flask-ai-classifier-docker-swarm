@@ -40,12 +40,12 @@ def delegate_service(url, params=None):
 
     except urllib.error.HTTPError as e:
         # Email admin / log
-        print(f'HTTPError: {e.code} for {url}')
+        logger.info('HTTPError: {} for {}'.format(e.code,url))
         # Re-raise the exception for the decorator
         raise urllib.error.HTTPError
     except urllib.error.URLError as e:
         # Email admin / log
-        print(f'URLError: {e.code} for {url}')
+        logger.info('URLError: {} for {}'.format(e.code,url))
         # Re-raise the exception for the decorator
         raise urllib.error.URLError
     else:  
