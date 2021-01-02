@@ -8,13 +8,17 @@ import logging
 import mimetypes
 import json
 import requests
+import urllib.request
+import urllib.error
 import cv2
+import asyncio
 
-#from db.api import Sql
+
 from project.config import  ProductionConfig as prod
 from project.classifier import Detection
 from project import db
 import platform 
+from project.sleep_decorator import sleep
 
 from flask import Blueprint, Response, request, g,redirect, url_for, send_from_directory
 from flask_cors import cross_origin, CORS
@@ -24,6 +28,32 @@ logger.setLevel(logging.INFO)
 console = logging.StreamHandler()
 logger.addHandler(console)
 logger.debug('DEBUG mode')
+
+@sleep(1)
+def delegate_service(url, params=None):  
+    try:
+        r = requests.post(url,data=params)
+        r.raise_for_status()
+    except  requests.exceptions.HTTPError as e:
+        """ Servicing this video was not denied other nodes satisfied with grabbing this video """
+        imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+
+    except urllib.error.HTTPError as e:
+        # Email admin / log
+        print(f'HTTPError: {e.code} for {url}')
+        # Re-raise the exception for the decorator
+        raise urllib.error.HTTPError
+    except urllib.error.URLError as e:
+        # Email admin / log
+        print(f'URLError: {e.code} for {url}')
+        # Re-raise the exception for the decorator
+        raise urllib.error.URLError
+    else:  
+        """  Website is up
+             Service was denied: stop processes associated with this video then remove video from  Queue dictionary """
+        if detectors.get(params['id'], None) is not None: del detectors[params['id']]
+        if imagesQueue.get(params['id'], None) is not None:del imagesQueue[params['id']]
+
 
 
 def comp_node():
@@ -162,7 +192,7 @@ def start():
     # initialize the video stream, allow the cammera sensor to warmup,
     # and initialize the FPS counter
     logger.info("[INFO] starting video stream...")
-    videos = initialize_video_streams()
+    videos =  initialize_video_streams()
     for cam in range(0,len(videos)-1):
         start_one_stream_processes(videos[cam])
 
@@ -207,19 +237,18 @@ def initialize_video_streams(url=None, videos=[]):
             
         except Exception as e:
             logger.info("Exception {}".format(e))
-        else:            
-            try:
-                params['videos_length'] = len(imagesQueue)
-                """ Make external call to Docker gateway if its present"""
-                r = requests.post('http//{}:{}{}'.format(IP_ADDRESS,port,deny_service_url) , data=params)
-                r.raise_for_status()
-            except  requests.exceptions.HTTPError as e:
-                """ Servicing this video was not denied other nodes satisfied with grabbing this video """
-                imagesQueue[video['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-            else:  
-                """ Service was denied: stop processes associated with this video then remove video from  Queue dictionary """
-                if detectors.get(params['id'], None) is not None: del detectors[params['id']]
-                if imagesQueue.get(params['id'], None) is not None:del imagesQueue[params['id']]
+        else:
+            url = 'http://{}:{}{}'.format(IP_ADDRESS,port,deny_service_url)
+            params['videos_length'] = len(imagesQueue)
+            """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
+            delegate_service(url, params=params)
+           # p_caller = Process(target=delegate_service, args=(url, params))
+           # p_caller.daemon = True
+           # p_caller.start()
+            
+ 
+            
+                 
             
     videos = db.select_all_urls()            
     
@@ -261,31 +290,32 @@ def serve_static(filename):
     return send_from_directory(os.path.join(root_dir, 'static', 'js'), filename)
 
 
-@main_blueprint.route(deny_service_url, methods=['GET','POST'])
+@main_blueprint.route(deny_service_url, methods=['POST'])
 @cross_origin(origin='http://localhost:{}'.format(port))
 def deny_service():
-    cam = request.args.get('cam', default=0, type=str)
-    os_name = request.args.get('os', default=0, type=str)
-    other_node_video_length = request.args.get('videos_length', default=0, type=int)
-    if os_name == comp_node():
+    params = request.form.to_dict()
+    logger.info(params)
+    if params['os'] == comp_node():
         return None, 200
     """ if request come rom different node  """
  
     """ Griddy algorithm started here  if  list of videos too big and my list too small """
-    if len(imagesQueue) < other_node_video_length:
+    if len(imagesQueue) < int(params['videos_length']):
         """ grab this video """
         try:
-            params = { 'id': cam, 'os': comp_node()}
-            logger.info("trying to update where id:{} with  os {}".format(params['id'], params['os']))
+            params['os'] =  comp_node()
+            logger.info("trying to update where id: {} with  url:{} os: {}".format(params['id'], params['url'], params['os']))
             db.update_urls(params)
-            imagesQueue[cam] = Queue(maxsize=IMAGES_BUFFER + 5)            
+                      
         except Exception as e:
             logger.info("Exception {}".format(e))
         else:
-          """ Signal to request initiator to remove this video from his list """
-          return None, 412
-
-
+            """ Signal to request initiator to remove this video from his list and add to this node list"""
+            imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5) 
+            return None, 412
+    else:
+        """ Signal to remove this video from this node list """
+        del imagesQueue[params['id']]
     return None, 200      
                 
    
