@@ -11,7 +11,7 @@ import requests
 import urllib.request
 import urllib.error
 import cv2
-import asyncio
+
 
 
 from project.config import  ProductionConfig as prod
