@@ -289,25 +289,23 @@ def serve_static(filename):
 def deny_service():
     params = request.form.to_dict()
     logger.info(params)
-    if params['os'] == comp_node():
-        return None, 200
+
     """ if request come rom different node  """
  
     """ Griddy algorithm started here  if  list of videos too big and my list too small """
-    if len(imagesQueue) < int(params['videos_length']):
+    if len(imagesQueue) <= int(params['videos_length']):
         """ grab this video """
         try:
             params['os'] =  comp_node()
             logger.info("trying to update where id: {} with  url:{} os: {}".format(params['id'], params['url'], params['os']))
             db.update_urls(params)
-                      
         except Exception as e:
             logger.info("Exception {}".format(e))
         else:
             """ Signal to request initiator to remove this video from his list and add to this node list"""
             imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5) 
-            return None, 412
-    return None, 200      
+            return None, 200
+    return None, 412      
                 
    
 
