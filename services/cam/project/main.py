@@ -35,8 +35,11 @@ def delegate_service(url, params=None):
         r = requests.post(url,data=params)
         r.raise_for_status()
     except  requests.exceptions.HTTPError as e:
-        """ Servicing this video was not denied other nodes satisfied with grabbing this video """
-        imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+        """  Website is up
+             Service was denied: stop processes associated with this video then remove video from  Queue dictionary """
+        if detectors.get(params['id'], None) is not None: del detectors[params['id']]
+        if imagesQueue.get(params['id'], None) is not None: del imagesQueue[params['id']]
+
 
     except urllib.error.HTTPError as e:
         # Email admin / log
@@ -48,12 +51,10 @@ def delegate_service(url, params=None):
         logger.info('URLError: {} for {}'.format(e.code,url))
         # Re-raise the exception for the decorator
         raise urllib.error.URLError
-    else:  
-        """  Website is up
-             Service was denied: stop processes associated with this video then remove video from  Queue dictionary """
-        if detectors.get(params['id'], None) is not None: del detectors[params['id']]
-        if imagesQueue.get(params['id'], None) is not None:del imagesQueue[params['id']]
-
+    else: 
+        """ Servicing this video was not denied other nodes satisfied with grabbing this video """
+        imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+ 
 
 
 def comp_node():
@@ -241,7 +242,7 @@ def initialize_video_streams(url=None, videos=[]):
             url = 'http://{}:{}{}'.format(IP_ADDRESS,port,deny_service_url)
             params['videos_length'] = len(imagesQueue)
             """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
-            #delegate_service(url, params=params)
+            delegate_service(url, params=params)
             
     videos = db.select_all_urls()            
     
