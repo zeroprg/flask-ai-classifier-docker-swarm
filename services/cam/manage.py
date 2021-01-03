@@ -1,3 +1,5 @@
+from multiprocessing import Process
+
 from flask.cli import FlaskGroup
 import logging
 from flask import g
@@ -6,10 +8,11 @@ from sqlalchemy import text
 
 from project import create_app, db
 
+from project.main import  start
+
 app = create_app()
 cli = FlaskGroup(create_app=create_app)
 
-from project.main import  start
 #@cli.command("recreate_db")
 #def recreate_db():
 #    db.drop_all()
@@ -39,10 +42,13 @@ def seed_db():
         objects = sql.Table('objects', metadata, autoload=True, autoload_with=db.engine)
 
     print("Database connection health was fine !!!")
-    
+
+
 
 if __name__ == "__main__":
-    # start threads to read video steams
+
     start()
     cli()
+
+    
 

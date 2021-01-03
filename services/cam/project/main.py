@@ -20,7 +20,7 @@ from project import db
 import platform 
 from project.sleep_decorator import sleep
 
-from flask import Blueprint, Response, request, g,redirect, url_for, send_from_directory
+from flask import Blueprint, Response, request, g, redirect, url_for, send_from_directory
 from flask_cors import cross_origin, CORS
 
 logger = logging.getLogger('logger')
@@ -29,33 +29,13 @@ console = logging.StreamHandler()
 logger.addHandler(console)
 logger.debug('DEBUG mode')
 
-@sleep(1)
-def delegate_service(url, params=None):  
-    try:
-        r = requests.post(url,data=params)
-        r.raise_for_status()
-    except  requests.exceptions.HTTPError as e:
-        """  Website is up
-             Service was denied: stop processes associated with this video then remove video from  Queue dictionary """
-        if detectors.get(params['id'], None) is not None: del detectors[params['id']]
-        if imagesQueue.get(params['id'], None) is not None: del imagesQueue[params['id']]
 
-
-    except urllib.error.HTTPError as e:
-        # Email admin / log
-        logger.info('HTTPError: {} for {}'.format(e.code,url))
-        # Re-raise the exception for the decorator
-        raise urllib.error.HTTPError
-    except urllib.error.URLError as e:
-        # Email admin / log
-        logger.info('URLError: {} for {}'.format(e.code,url))
-        # Re-raise the exception for the decorator
-        raise urllib.error.URLError
-    else: 
-        """ Servicing this video was not denied other nodes satisfied with grabbing this video """
-        imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
  
-
+  
+def get_quues():
+    if 'quues' not in g:
+        g.quues = {}
+    return g.quues   
 
 def comp_node():
     # if its windows
@@ -76,8 +56,8 @@ camright = []
 videos = []
 IMG_PAGINATOR = 40
 SHOW_VIDEO = False
-port = prod.PORT
-IP_ADDRESS = prod.IP_ADDRESS
+port = 5000 # prod.PORT
+IP_ADDRESS = "localhost" #prod.IP_ADDRESS
 
 
 class CameraMove:
@@ -171,7 +151,8 @@ fps = None
 p_get_frame = None
 
 
-def start_one_stream_processes(video):
+def start_one_stream_processes(video, prod=prod, detectors=detectors, imagesQueue=imagesQueue):
+    #print(imagesQueue)
     if imagesQueue.get(video['id'], None) is not None :
         detectors[video['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
                 imagesQueue[video['id']],video)
@@ -186,6 +167,7 @@ def start_one_stream_processes(video):
 
 
 def start():
+    time.sleep(1)
     logger.info("[INFO] loading model...")
     # construct a child process *indepedent* from our main process of
     # execution
@@ -193,10 +175,38 @@ def start():
     # initialize the video stream, allow the cammera sensor to warmup,
     # and initialize the FPS counter
     logger.info("[INFO] starting video stream...")
-    videos =  initialize_video_streams()
-    for cam in range(0,len(videos)-1):
-        start_one_stream_processes(videos[cam])
+    initialize_video_streams()
+  
 
+#@sleep(1)
+def deny_service_call(url, params=None, imagesQueue=imagesQueue, detectors=detectors, prod = prod, IMAGES_BUFFER=IMAGES_BUFFER):  
+    time.sleep(24)
+
+    try:
+        r = requests.post(url,data=params)
+        print(r)
+        #r.raise_for_status()
+        if r.status_code == 412 :
+            """ Servicing this video was denied other nodes didn't grab this video """       
+            imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+            detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
+                imagesQueue[params['id']], params)
+
+            logger.info("Adding a new imagesQueue with {}".format(params['id']))
+            logger.info(imagesQueue)       
+        else: # code 200 Ok  successefully deny this service on another node
+            """ get this service to myself """          
+            try:
+                logger.info("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
+                db.update_urls(params)                
+            except Exception as e:
+                logger.info("Exception {}".format(e))
+
+    except Exception as e:
+        # Email admin / log
+        logger.info('HTTPError: {} for {}'.format(e,url))
+        # Re-raise the exception for the decorator
+        raise urllib.error.HTTPError
 
 
 # initialize the video stream, allow the cammera sensor to warmup,
@@ -242,10 +252,18 @@ def initialize_video_streams(url=None, videos=[]):
             url = 'http://{}:{}{}'.format(IP_ADDRESS,port,deny_service_url)
             params['videos_length'] = len(imagesQueue)
             """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
-            delegate_service(url, params=params)
+            #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)
+            imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+            detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
+            imagesQueue[params['id']], params)
+ 
+            p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
+            p_deny_service.daemon=False
+            p_deny_service.start()
+            
             
     videos = db.select_all_urls()            
-    
+
     logger.info(videos)
     # Start process
     #time.sleep(1.0)
@@ -262,6 +280,8 @@ def detect(cam):
                 yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + iterable + b'\r\n'
     except GeneratorExit:
         pass
+
+
 
 
 ###################### Flask API #########################
@@ -288,24 +308,24 @@ def serve_static(filename):
 @cross_origin(origin='http://localhost:{}'.format(port))
 def deny_service():
     params = request.form.to_dict()
-    logger.info(params)
-
-    """ if request come rom different node  """
- 
+    logger.debug(params)  
+    if  params['os'] ==  comp_node():
+        msg = "Video with id:{} was failed to delegate to the same node: {}".format(params['id'],params['os'])
+        logger.debug(msg)
+        return Response({"message":msg} , mimetype='text/plain', status=412)    
+    """ if request come rom different node  """ 
     """ Griddy algorithm started here  if  list of videos too big and my list too small """
-    if len(imagesQueue) <= int(params['videos_length']):
-        """ grab this video """
-        try:
-            params['os'] =  comp_node()
-            logger.info("trying to update where id: {} with  url:{} os: {}".format(params['id'], params['url'], params['os']))
-            db.update_urls(params)
-        except Exception as e:
-            logger.info("Exception {}".format(e))
-        else:
-            """ Signal to request initiator to remove this video from his list and add to this node list"""
-            imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5) 
-            return None, 200
-    return None, 412      
+    if len(imagesQueue) > int(params['videos_length']) +1 :
+            """ delete this video service """
+            if detectors.get(params['id'], None) is not None: del detectors[params['id']]
+            if imagesQueue.get(params['id'], None) is not None: del imagesQueue[params['id']]
+           #  logger.info("------------------- !!!!!!!! Was updated !!!!!!!!!!!! --------------------")
+            msg = "Video with id:{} successfully deleted on node: {}".format(params['id'],params['os'])
+            return Response({"message":msg}, mimetype='text/plain', status=200)
+    else:
+        msg = "Video with id:{} was failed to delegate to node: {}".format(params['id'],comp_node())
+        logger.debug(msg)
+    return Response({"message":msg} , mimetype='text/plain', status=412)    
                 
    
 
@@ -314,11 +334,10 @@ def deny_service():
 @cross_origin(origin='http://localhost:{}'.format(port))
 def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
-    
     cam = request.args.get('cam', default=0, type=str)
-    if imagesQueue.get(cam, None) is None:
-        redirect(url_for('video_feed'))
-    else:    
+    logger.debug(imagesQueue) 
+    logger.debug("imagesQueue len: {}".format(len(imagesQueue)))
+    if imagesQueue.get(cam, None) is not None:
         return Response(detect(cam),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
@@ -342,7 +361,7 @@ def moreparams():
         hour_back2 = int(hour_back2)
     else:
         hour_back2 = 1  # default value: 60 min back
-    print("cam: {}, hour_back:{}, now_in_seconds:{}".format(cam, hour_back1, hour_back2))
+    logger.debug("cam: {}, hour_back:{}, now_in_seconds:{}".format(cam, hour_back1, hour_back2))
 
     params = gen_params(cam=cam, time1=hour_back1, time2=hour_back2 ,object_of_interest=object_of_interest)
     return Response(params, mimetype='text/plain')
