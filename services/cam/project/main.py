@@ -56,8 +56,8 @@ camright = []
 videos = []
 IMG_PAGINATOR = 40
 SHOW_VIDEO = False
-port = 5000 # prod.PORT
-IP_ADDRESS = "localhost" #prod.IP_ADDRESS
+port =  prod.PORT
+IP_ADDRESS = prod.IP_ADDRESS
 
 
 class CameraMove:
@@ -255,11 +255,11 @@ def initialize_video_streams(url=None, videos=[]):
             #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)
             imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
             detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-            imagesQueue[params['id']], params)
+                imagesQueue[params['id']], params)
  
-            p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
-            p_deny_service.daemon=False
-            p_deny_service.start()
+            #p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
+            #p_deny_service.daemon=False
+            #p_deny_service.start()
             
             
     videos = db.select_all_urls()            
