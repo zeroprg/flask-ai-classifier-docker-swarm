@@ -2,7 +2,7 @@ from multiprocessing import Process
 
 from flask.cli import FlaskGroup
 import logging
-from flask import g
+
 import  sqlalchemy as sql
 from sqlalchemy import text
 

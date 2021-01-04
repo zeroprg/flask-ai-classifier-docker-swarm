@@ -30,13 +30,6 @@ logger.addHandler(console)
 logger.debug('DEBUG mode')
 
 
- 
-  
-def get_quues():
-    if 'quues' not in g:
-        g.quues = {}
-    return g.quues   
-
 def comp_node():
     # if its windows
     if os.name == 'nt':
@@ -46,14 +39,14 @@ def comp_node():
 
 DELETE_FILES_LATER = 8 #   (8hours)
 ENCODING = "utf-8"
-IMAGES_BUFFER = 100
+IMAGES_BUFFER = 150
 #  --------------------  constanst and definitions -------------------------
 deny_service_url = '/deny_service'
 
 
 camleft = []
 camright = []
-videos = []
+
 IMG_PAGINATOR = 40
 SHOW_VIDEO = False
 port =  prod.PORT
@@ -145,6 +138,7 @@ def destroy():
 args = {}
 imagesQueue = {}
 detectors = {}
+videos = []
 vs = None
 
 fps = None
@@ -153,11 +147,11 @@ p_get_frame = None
 
 def start_one_stream_processes(video, prod=prod, detectors=detectors, imagesQueue=imagesQueue):
     #print(imagesQueue)
-    if imagesQueue.get(video['id'], None) is not None :
-        detectors[video['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                imagesQueue[video['id']],video)
+    #if imagesQueue.get(video['id'], None) is not None :
+    detectors[video['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
+            imagesQueue[video['id']],video)
 
-        logger.info("p_classifiers for cam:" + video['id'] + " started")
+    logger.info("p_classifiers for cam:" + video['id'] + " started")
 
   #  p = Process(target=get_frame, args=(imagesQueue[cam], cam))
   #  p.daemon = True
@@ -177,10 +171,10 @@ def start():
     logger.info("[INFO] starting video stream...")
     initialize_video_streams()
   
-
+ 
 #@sleep(1)
 def deny_service_call(url, params=None, imagesQueue=imagesQueue, detectors=detectors, prod = prod, IMAGES_BUFFER=IMAGES_BUFFER):  
-    time.sleep(24)
+    time.sleep(20)
 
     try:
         r = requests.post(url,data=params)
@@ -191,6 +185,7 @@ def deny_service_call(url, params=None, imagesQueue=imagesQueue, detectors=detec
             imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
             detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
                 imagesQueue[params['id']], params)
+           
 
             logger.info("Adding a new imagesQueue with {}".format(params['id']))
             logger.info(imagesQueue)       
@@ -213,7 +208,7 @@ def deny_service_call(url, params=None, imagesQueue=imagesQueue, detectors=detec
 # and initialize the FPS counter
 def initialize_video_streams(url=None, videos=[]):
     i = 0
-    #myVideos = []
+    
     arg = None
     if url is not None:
         arg = url
@@ -231,9 +226,9 @@ def initialize_video_streams(url=None, videos=[]):
             params = { 'cam': i, 'url': arg } #, 'os': comp_node()}
 
             try:
-                videos.append(params)
+                videos.append(params)                
                 db.insert_urls(params)
-            except: pass  
+            except: pass
             finally:
                 arg = prod.args.get('video_file' + str(i), None)
                 i += 1 
@@ -243,20 +238,19 @@ def initialize_video_streams(url=None, videos=[]):
     for video in videos_:
         params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node()}
         try:
-            logger.info("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
-            db.update_urls(params)
-            
+            logger.debug("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
+            db.update_urls(params)            
         except Exception as e:
             logger.info("Exception {}".format(e))
         else:
-            url = 'http://{}:{}{}'.format(IP_ADDRESS,port,deny_service_url)
             params['videos_length'] = len(imagesQueue)
             """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
             #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)
             imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
             detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
                 imagesQueue[params['id']], params)
- 
+            logger.info("p_classifiers for cam:" + video['id'] + " started")    
+            #url = 'http://{}:{}{}'.format(IP_ADDRESS,port,deny_service_url)
             #p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
             #p_deny_service.daemon=False
             #p_deny_service.start()
@@ -315,7 +309,7 @@ def deny_service():
         return Response({"message":msg} , mimetype='text/plain', status=412)    
     """ if request come rom different node  """ 
     """ Griddy algorithm started here  if  list of videos too big and my list too small """
-    if len(imagesQueue) > int(params['videos_length']) +1 :
+    if len(imagesQueue) > int(params['videos_length']) :
             """ delete this video service """
             if detectors.get(params['id'], None) is not None: del detectors[params['id']]
             if imagesQueue.get(params['id'], None) is not None: del imagesQueue[params['id']]
@@ -340,6 +334,7 @@ def video_feed():
     if imagesQueue.get(cam, None) is not None:
         return Response(detect(cam),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+    else: redirect('http://{}:{}{}'.format(IP_ADDRESS,port,'/video_feed'))
 
 
 @main_blueprint.route('/moreparams')
@@ -426,8 +421,10 @@ def ping_video_url(url):
         vs = cv2.VideoCapture(url)
         flag, frame = vs.read()
         ret = flag
-    except:
+    except Exception as e:
         ret = False
+        logger.info("Exception in ping url: {}".format(e))
+        
     return flag
 
 @main_blueprint.route('/urls', methods=['GET', 'POST'])
@@ -443,16 +440,16 @@ def urls():
     if add_url is not None:
         logger.info('adding a new video urls ' + add_url)
         if ping_video_url(add_url):
-            before = len(videos)
-            videos = initialize_video_streams(add_ur,videos)
-            after = len(videos)
-            if before < after: 
-                start_one_stream_processes(videos[after -1 ] )
-                return Response('{"message":"URL added successfully"}', mimetype='text/plain')
+            try:
+                
+                params = { 'url': add_ur }  
+                db.insert_urls(params)
+            except:
+                return Response('{"message":"URL already exist it was added successfully before"}', mimetype='text/plain', status=500)           
             else:
-                return Response('{"message":"URL already exist it was  added successfully before"}', mimetype='text/plain')  
+                return Response('{"message":"URL added successfully"}', mimetype='text/plain',status=200)
         else:
-            return Response('{"message":"URL has no video"}', mimetype='text/plain')
+            return Response('{"message":"URL has no video"}', mimetype='text/plain',status=500)
 
     elif list_url is not None:
         url_list = db.select_all_urls() 
