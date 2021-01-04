@@ -3,8 +3,8 @@ video_file1=http://110.54.126.130:50000/cgi-bin/camera?resolution=1200&amp;quali
 video_file2=http://145.53.212.190:8001/mjpg/video.mjpg 
 video_file3=http://192.168.0.101:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=16061678710320.35579881408547887 
 video_file4=http://78.27.189.141/mjpg/video.mjpg 
-video_file5=http://200.52.68.182:8081/cgi-bin/camera?resolution=640 
-video_file6=http://80.12.90.221:8082/mjpg/video.mjpg 
+video_file5=http://14.160.87.118:85/cgi-bin/camera?resolution=820&amp;quality=1&amp;Language=0&amp;1609741154
+video_file6=http://202.175.114.212/cgi-bin/camera?resolution=820&amp;quality=1&amp;Language=0&amp;1609741315
 video_file7=http://210.54.39.237:8888/shot.jpg?rnd=654321 
 video_file8=http://83.103.195.172:82/mjpg/video.mjpg 
 video_file9=http://84.92.94.35:81/mjpg/video.mjpg 
@@ -60,7 +60,7 @@ video_file23=http://158.58.130.148/mjpg/video.mjpg
 prototxt=MobileNetSSD_deploy.prototxt.txt
 #model=yolo-coco/yolov3-tiny.weights
 model=MobileNetSSD_deploy.caffemodel
-confidence=0.55
+confidence=0.39
 
 #server for object classifications
 CLASSIFIER_SERVER = http://192.168.0.167/classify
