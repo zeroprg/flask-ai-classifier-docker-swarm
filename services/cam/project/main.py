@@ -443,12 +443,17 @@ def urls():
             try:
                 
                 params = { 'url': add_url }  
-                db.insert_urls(params)
+                id = db.insert_urls(params)                
             except Exception as e:
                 logger.debug("Exception during saving url:{} : {}".format(add_url,e))
                 msg = "URL already exist it was already  added successfully"
                 return Response({"message":msg}, mimetype='text/plain', status=500)           
             else:
+                cam = len(imagesQueue)
+                params = { 'id': id, 'url': add_url, 'cam': cam, 'os': comp_node()}
+                imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+                detectors[params['id'] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
+                    imagesQueue[params['id']], params)
                 return Response('{"message":"URL added successfully"}', mimetype='text/plain',status=200)
         else:
             return Response('{"message":"URL has no video"}', mimetype='text/plain',status=500)

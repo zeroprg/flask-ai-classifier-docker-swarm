@@ -96,9 +96,13 @@ class Sql:
         try:            
             query = sql.insert(self.urls)
             ResultProxy = self.getConn().execute(query, params)
+            row_id = None
+            for result in ResultProxy: row_id = result['id']
             print(" insert_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
         except Exception as e:
             print(" e: {}".format( e))
+        return row_id
+ 
 
     def update_urls(self, params):
         try:            
