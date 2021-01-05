@@ -41,7 +41,7 @@ class Detection:
     def __init__(self, classify_server, confidence, model,  output_queue, video):
         self.confidence = confidence
         self.model = model
-        self.video_url = video['url']
+        self.video_url = video['url'] + '?' if '?' not in  video['url'] else '&' + 'stream=full&needlength'
         self.hashes = {}        
         self.topic_label = 'no data'
         self.net = self.video_s = None
@@ -93,7 +93,7 @@ class Detection:
         return video_s
 
     def read_video_stream(self, video_s):
-        # print("Read video stream .. " + self.video_url)
+        # print("Read video stream .. " + self.video_url) 
         if 'picam' == self.video_url:
             frame = video_s.read()
         else:
