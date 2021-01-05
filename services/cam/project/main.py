@@ -442,10 +442,12 @@ def urls():
         if ping_video_url(add_url):
             try:
                 
-                params = { 'url': add_ur }  
+                params = { 'url': add_url }  
                 db.insert_urls(params)
-            except:
-                return Response('{"message":"URL already exist it was added successfully before"}', mimetype='text/plain', status=500)           
+            except Exception as e:
+                logger.debug("Exception during saving url:{} : {}".format(add_url,e))
+                msg = "URL already exist it was already  added successfully"
+                return Response({"message":msg}, mimetype='text/plain', status=500)           
             else:
                 return Response('{"message":"URL added successfully"}', mimetype='text/plain',status=200)
         else:
