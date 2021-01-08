@@ -36,7 +36,7 @@ const Video = ({camera, showBoxesAroundObjects}) => {
 
         //style={{padding-top:'100px;'}}
     return(<span>
-            <div class="custom-control custom-checkbox" style={{paddingTop:'100px;'}} >
+           <div class="custom-control custom-checkbox" style={{paddingTop:'100px;'}} >
                 <input type="checkbox" class="custom-control-input" id={"checked"+ camera.cam} 
                        onChange={changeCheckBoxInput}/> 
                 <label class="custom-control-label" for={"checked"+ camera.cam}> Show catched objects for {camera.url}</label>

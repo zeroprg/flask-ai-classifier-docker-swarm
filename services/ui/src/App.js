@@ -1,33 +1,54 @@
 import React, { Component } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-  import 'react-toastify/dist/ReactToastify.css';
-  
-
+import { alertService } from './components/alert/alert_services'; 
+import { Alert } from './components/alert/alert';
 
 import URLlist from './components/urls'
 import InputURL from './components/input-forms'
 import VideoStreamers from './components/video-streamers'
 
-const notify = () => toast("This URL already exist !");
 
 
 
 class App extends Component {
-  state = { urls: [], videoalignment: 'video' }
+    state = { urls: [], videoalignment: 'video' }
+    constructor(props) {
+        super(props);
 
-  saveURLForm(url) {          
+        this.state = {
+            urls:[],
+            videoalignment: 'video',
+         //   autoClose: true,
+         //   keepAfterRouteChange: false
+        };
+    }    
+
+  saveURLForm(url) {
+    const autoClose = true;
+    const keepAfterRouteChange = true;            
     this.setState({ isLoading: true});
     const DEFAULT_QUERY = global.config.API + "urls?add="+ url + "&email="+this.state.email
     console.log(" start:")
     fetch(DEFAULT_QUERY)
-        .then(() => {
+        .then((response) => {
                 this.setState({ isLoading: false, url: '' });
-                this.state.urls.add(url);
-                //TODO add success popup message 
-             })
+                const statusCode = response.status;
+                switch(statusCode){
+                case 500 : 
+                    alertService.error('Error adding  <b>'+url+'</b> its already exist', { autoClose, keepAfterRouteChange })  
+                    break;
+                case 400 : 
+                    alertService.error('Error adding  <b>'+url+'</b> no video on this url', { autoClose, keepAfterRouteChange })  
+                    break;    
+                case 200: {
+                    this.state.urls.unshift(url);
+                    this.setState({url:''});
+                    alertService.success('Success!! ${url}', { autoClose, keepAfterRouteChange })
+                 }
+                }
+              })
         .catch(error => {
-            //TODO add popup message here through error handling
-            this.setState({ error, isLoading: false, url: 'Wrong url, no video on this IP' })
+            this.setState({ isLoading: false})
+            alertService.error('Error for ${url}: ${error}', { autoClose, keepAfterRouteChange })
             });
     } 
 
@@ -89,18 +110,20 @@ class App extends Component {
   render() {
     const isVideoAndStatistic = this.state.videoalignment === 'statistic';  
     return (  
-    <div className="App">
+    <div className="App"> 
+
       <header className="App-header">
         <section className="hero">
             <div className="texture-overlay"></div>
             <div className="container">
-               {/* <div class="row nav-wrapper"/> */}
-
+               {/* <div className="row nav-wrapper"/> */}
+               <Alert></Alert>
                 <div className="hero-content">
                     <div className="col-md-12">
                         {/*<a href=""></a> */}
                     </div>
                     <div className="col-md-12">
+                       
                         <h1 className="animated fadeInDown">AI processed video streams from public cameras.</h1>
                         <h3> This is free smart cloud storage  for cameras video streams works on ODROID ARM based computers   (100% python , no php  for more information check 
                         <a href="//aicameras.ca" target="_blank" rel="noopener noreferrer"> http://aicameras.ca</a> ), bellow public available video-streams: </h3>
@@ -123,16 +146,16 @@ class App extends Component {
 
     
  
-        <div class="feature-bg">
-            <div class="row">
-                <div class="col-md-12 nopadding">
-                    <div class="features-slider">
-                        <ul class="slides" id="featuresSlider">
+        <div className="feature-bg">
+            <div className="row">
+                <div className="col-md-12 nopadding">
+                    <div className="features-slider">
+                        <ul className="slides" id="featuresSlider">
                             <li>
                                 <h1>Counting objects</h1>
                                 <p>
                                     Appling existing  <a href="https://www.pyimagesearch.com/2020/01/27/yolo-and-tiny-yolo-object-detection-on-the-raspberry-pi-and-movidius-ncs/">YOLO Tiny V3</a>
-                                    Model network to surveillance cameras live video streams <a href="http://aicams.ca" class="arrow-btn">aicams.ca</a> to
+                                    Model network to surveillance cameras live video streams <a href="http://aicams.ca" className="arrow-btn">aicams.ca</a> to
                                     calculate occupancy number on video screen
                                 </p>
                             </li>

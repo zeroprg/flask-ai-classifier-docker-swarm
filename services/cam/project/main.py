@@ -456,7 +456,7 @@ def urls():
                     imagesQueue[params['id']], params)
                 return Response('{"message":"URL added successfully"}', mimetype='text/plain',status=200)
         else:
-            return Response('{"message":"URL has no video"}', mimetype='text/plain',status=500)
+            return Response('{"message":"URL has no video"}', mimetype='text/plain',status=400)
 
     elif list_url is not None:
         url_list = db.select_all_urls() 

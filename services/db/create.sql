@@ -45,11 +45,12 @@ END;
 $$;
 
 
+CREATE SEQUENCE url_cam_seq;
 
 CREATE TABLE urls (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	url varchar NOT NULL,
-	cam int2 NOT NULL,
+	cam int2 NULL DEFAULT nextval(url_cam_seq),
 	email varchar NULL,
 	os varchar(30) NULL,
 	currenttime int8 NOT NULL DEFAULT currentime_gen(),
