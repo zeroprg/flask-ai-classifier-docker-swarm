@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { alertService } from './components/alert_services'; 
+import { alertService } from './components/alert/alert_services'; 
 import { Alert } from './components/alert/alert';
 
 import URLlist from './components/urls'

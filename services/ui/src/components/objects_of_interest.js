@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const ObjectOfInterest = (props) => {
     
-    const PAGINATOR = 100
+    const PAGINATOR = 300
 
     const popup_image = (event) =>{
         if(event.target.classList.contains('img_thumb')){

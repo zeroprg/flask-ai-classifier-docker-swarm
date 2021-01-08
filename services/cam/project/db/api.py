@@ -34,7 +34,7 @@ class Sql:
         :return: Connection object or None
         """
         self.engine = None
-        self.limit = 50
+        self.limit = 500
         metadata = sql.MetaData()
 
         if(  SQLALCHEMY_DATABASE_URI is None or SQLALCHEMY_DATABASE_URI == ''):

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { history } from './helpers';
-import { alertService, alertType } from '../alert_services';
+import { alertService, alertType } from './alert_services';
 
 const propTypes = {
     id: PropTypes.string,

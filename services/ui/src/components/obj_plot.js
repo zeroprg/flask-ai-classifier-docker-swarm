@@ -84,7 +84,7 @@ import Plotter from './plotter';
       <TimeRange onParamsChanged={onTimeChanged} timerange={props.timerange}/>
       <SelectObj onParamsChanged={onParamsChanged} 
                  object_of_interest={props.object_of_interest}
-                 selected_object_of_interest={[props.object_of_interest[0]]}/>
+                 selected_object_of_interest={props.object_of_interest}/>
       <Plotter id="plotter" key={timerange} data={data} timerange = {timerange} /> 
     </div>
     );

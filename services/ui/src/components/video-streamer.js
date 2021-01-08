@@ -8,16 +8,12 @@ import Video from './video';
 
 class VideoStreamer extends Component {
     
-    
-
-    componentWillMount() {
-        // initial state
-    this.setState({
+    state = {
         isLoading : false,
-        timerange: {start: 0, end: 1},
+        timerange: this.props.timerange,
         object_of_interest: this.props.object_of_interest
-        })
-    }
+        }
+
 
     onTimeChanged = (timerange)=>{
             this.setState( {timerange: timerange} );
