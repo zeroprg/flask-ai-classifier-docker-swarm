@@ -93,19 +93,18 @@ class Sql:
         return rows
 
     def insert_urls(self, params):
-        try:            
+        try:
             query = sql.insert(self.urls)
             ResultProxy = self.getConn().execute(query, params)
             row_id = None
-            for result in ResultProxy: row_id = result['id']
+            for result in ResultProxy: row  = result
             print(" insert_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
         except Exception as e:
             print(" e: {}".format( e))
-        return row_id
- 
+        return row 
 
     def update_urls(self, params):
-        try:            
+        try:
             if params['id'] is not None:
                 query = sql.update(self.urls).where(self.urls.c.id == params['id']).values(cam=params['cam'], os=params['os'], url=params['url'])
             else:    

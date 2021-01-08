@@ -442,17 +442,17 @@ def urls():
         if ping_video_url(add_url):
             try:
                 
-                params = { 'url': add_url }  
-                id = db.insert_urls(params)                
+                params = { 'url': add_url }
+                params = db.insert_urls(params)
             except Exception as e:
                 logger.debug("Exception during saving url:{} : {}".format(add_url,e))
                 msg = "URL already exist it was already  added successfully"
                 return Response({"message":msg}, mimetype='text/plain', status=500)           
             else:
-                cam = len(imagesQueue)
-                params = { 'id': id, 'url': add_url, 'cam': cam, 'os': comp_node()}
+                
+                params['os'] = comp_node()
                 imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-                detectors[params['id'] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
+                detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
                     imagesQueue[params['id']], params)
                 return Response('{"message":"URL added successfully"}', mimetype='text/plain',status=200)
         else:
