@@ -6,7 +6,7 @@ import VideoStreamer from './video-streamer';
 import { Menu, Item } from "react-gooey-nav";
 import VideoStat from './video-statist';
 
-const object_of_interest = ['car','person','cat', 'dog', 'truck','bus', 'train', 'motobike'];
+const object_of_interest = ['car','person'];
 const timerange = {start: 0, end: 6};
 class VideoStreamers extends Component {
     // shared between childs functions

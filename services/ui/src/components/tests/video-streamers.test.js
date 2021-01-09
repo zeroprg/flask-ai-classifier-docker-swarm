@@ -25,7 +25,7 @@ afterEach(() => {
 it("renders VideoStreamers data", async () => {
     const fakeVideoStreamers = {
         cameras:[{cam:0,url:'http://203.77.210.41:2000/mjpg/video.mjpg'}, {cam:1,url:'http://203.77.210.41:2000/mjpg/video.mjpg'},{cam:2,url:'http://203.77.210.41:2000/mjpg/video.mjpg'}, {cam:3,url:'http://203.77.210.41:2000/mjpg/video.mjpg'}],
-        objectOfInterests: ['car','person','cat', 'dog', 'track', 'motobike']
+        objectOfInterests: ['car','person']
     }
 
  /* fix it
