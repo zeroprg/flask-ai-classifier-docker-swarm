@@ -366,8 +366,8 @@ def moreparams():
 @cross_origin(origin='http://localhost:{}'.format(port))
 def moreimgs():
     """ Read list of json files or return one specific  for specific time """
-    hour_back1 = request.args.get('hour_back1', default=1, type=int)
-    hour_back2 = request.args.get('hour_back2', default=0, type=int)
+    hour_back1 = request.args.get('hour_back1', default=0, type=int)
+    hour_back2 = request.args.get('hour_back2', default=1, type=int)
     object_of_interest = request.args.get('object_of_interest', type=None)
     #print("object_of_interest: " + str(object_of_interest)[1:-1])
 

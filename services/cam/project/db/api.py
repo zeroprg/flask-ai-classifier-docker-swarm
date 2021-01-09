@@ -14,7 +14,7 @@ class Sql:
         :return: Connection object or None
         """
         self.engine = None
-        self.limit = 100
+        self.limit = 70
         metadata = sql.MetaData()
         if(  DATABASE_URI is None or DATABASE_URI == ''):
             self.engine = sql.create_engine('sqlite://frame.db')
@@ -34,7 +34,7 @@ class Sql:
         :return: Connection object or None
         """
         self.engine = None
-        self.limit = 100
+        self.limit = 70
         metadata = sql.MetaData()
 
         if(  SQLALCHEMY_DATABASE_URI is None or SQLALCHEMY_DATABASE_URI == ''):
@@ -153,7 +153,7 @@ class Sql:
         #cur.execute("SELECT type, currentime as x0, currentime + 30000 as x, y as y FROM statistic filter type IN" +str+ " AND cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY type,currentime ASC", #DeSC
         #    (cam, time2, time1 ))
 
-        query = sql.select([self.statistic]).when(sql.and_(self.statistic.columns.cam == cam, 
+        query = sql.select([self.statistic]).where(sql.and_(self.statistic.columns.cam == cam, 
                                                               self.statistic.columns.currentime < time1,
                                                               self.statistic.columns.currentime > time2, 
                                                               self.statistic.columns.type.in_(tuple_)
@@ -226,7 +226,7 @@ class Sql:
 
 
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects filter cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
-        query = sql.select([self.objects]).when(sql.and_(self.objects.columns.cam == cam,                                                           
+        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam,                                                           
                                                               self.objects.columns.currentime < time1,
                                                               self.objects.columns.currentime > time2
                                                              )
@@ -259,7 +259,7 @@ class Sql:
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects filter cam="+self.P+" AND  type IN " +str+ " AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC LIMIT "+self.P+" OFFSET "+self.P+"", 
         #    (cam, time2, time1,n_rows,offset,))
         #fetched_rows = cur.fetchall()
-        query = sql.select([self.objects]).when(sql.and_(self.objects.columns.cam == cam,
+        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam,
                                                               self.objects.columns.currentime < time1,
                                                               self.objects.columns.currentime > time2, 
                                                               self.objects.columns.type.in_(tuple_)
@@ -282,7 +282,7 @@ class Sql:
 
         millis_back = int(round(time.time() * 1000)) - hours*60*60*1000
         try:
-            query = sql.delete(self.objects).when( self.objects.currentime < millis_back )
+            query = sql.delete(self.objects).where( self.objects.currentime < millis_back )
             ResultProxy = self.getConn().execute(query)
             print(" delete_frames_later_then was {0} with params: {1}".format(ResultProxy.is_insert ,hours))
         except Exception as e: print(" e: {}".format( e))
