@@ -223,7 +223,7 @@ def initialize_video_streams(url=None, videos=[]):
             #camright.append(prod.args.get('cam_right' + str(i), None))
             #camleft.append(prod.args.get('cam_left' + str(i), None))
             #CameraMove(camright[i], camleft[i])
-            params = { 'cam': i, 'url': arg } #, 'os': comp_node()}
+            params = { 'cam': i, 'url': arg ,'os': comp_node()}
 
             try:
                 videos.append(params)                
@@ -480,7 +480,7 @@ def urls():
             if video["id"] == cam_id:
                 video["url"] = updated_url
             try:
-                params = {'id': cam_id, 'url': updated_url,  'os': os.uname()[1]}
+                params = {'id': cam_id, 'url': updated_url,  'os': comp_node()}
                 db.update_urls(params)
             except:
                 return None, 500
