@@ -153,9 +153,10 @@ class Sql:
         #cur.execute("SELECT type, currentime as x0, currentime + 30000 as x, y as y FROM statistic filter type IN" +str+ " AND cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY type,currentime ASC", #DeSC
         #    (cam, time2, time1 ))
 
-        query = sql.select([self.statistic]).filter(sql.and_(self.statistic.columns.cam == cam, 
-                                                              self.statistic.columns.type.in_(tuple_),
-                                                              self.statistic.columns.currentime.between(time2,time1)
+        query = sql.select([self.statistic]).when(sql.and_(self.statistic.columns.cam == cam, 
+                                                              self.statistic.columns.currentime.between(time2,time1),
+                                                              self.statistic.columns.type.in_(tuple_)
+                                                              
                                                              )
                                                     ).order_by(text("currentime asc"))
         ResultProxy = self.getConn().execute(query)
@@ -190,7 +191,7 @@ class Sql:
 
 
     def insert_frame(self, hashcode, date, time, type, numpy_array, x_dim, y_dim, cam):
-        if y_dim <25 or x_dim <25 or x_dim/y_dim > 4.7 or y_dim/x_dim > 4.7: return
+        if y_dim <45 or x_dim <45 or x_dim/y_dim > 4.7 or y_dim/x_dim > 4.7: return
         #cur.execute("UPDATE objects SET currentime="+self.P+" filter hashcode="+self.P, (time, str(hashcode)))
         #print("cam= {}, x_dim={}, y_dim={}".format(cam, x_dim, y_dim))
         buffer = cv2.imencode('.jpg', numpy_array)[1]
@@ -224,7 +225,7 @@ class Sql:
 
 
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects filter cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
-        query = sql.select([self.objects]).filter(sql.and_(self.objects.columns.cam == cam,                                                           
+        query = sql.select([self.objects]).when(sql.and_(self.objects.columns.cam == cam,                                                           
                                                               self.objects.columns.currentime.between(time2,time1)
                                                              )
                                                 ).order_by(text("currentime desc"))
@@ -256,9 +257,10 @@ class Sql:
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects filter cam="+self.P+" AND  type IN " +str+ " AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC LIMIT "+self.P+" OFFSET "+self.P+"", 
         #    (cam, time2, time1,n_rows,offset,))
         #fetched_rows = cur.fetchall()
-        query = sql.select([self.objects]).filter(sql.and_(self.objects.columns.cam == cam, 
-                                                              self.objects.columns.type.in_(tuple_),
-                                                              self.objects.columns.currentime.between(time2,time1)
+        query = sql.select([self.objects]).when(sql.and_(self.objects.columns.cam == cam,
+                                                              self.objects.columns.currentime.between(time2,time1), 
+                                                              self.objects.columns.type.in_(tuple_)
+                                                              
                                                          )
                                                 ).order_by(text("currentime desc")).limit(self.limit).offset(offset)
         ResultProxy = self.getConn().execute(query)
@@ -277,7 +279,7 @@ class Sql:
 
         millis_back = int(round(time.time() * 1000)) - hours*60*60*1000
         try:
-            query = sql.delete(self.objects).filter( self.objects.currentime < millis_back )
+            query = sql.delete(self.objects).when( self.objects.currentime < millis_back )
             ResultProxy = self.getConn().execute(query)
             print(" delete_frames_later_then was {0} with params: {1}".format(ResultProxy.is_insert ,hours))
         except Exception as e: print(" e: {}".format( e))
