@@ -106,9 +106,9 @@ class Sql:
     def update_urls(self, params):
         try:
             if params['id'] is not None:
-                query = sql.update(self.urls).where(self.urls.c.id == params['id']).values(cam=params['cam'], os=params['os'], url=params['url'])
+                query = sql.update(self.urls).filter(self.urls.c.id == params['id']).values(cam=params['cam'], os=params['os'], url=params['url'])
             else:    
-                query = sql.update(self.urls).where(self.urls.c.url == params['url']).values(cam=params['cam'], os=params['os'])
+                query = sql.update(self.urls).filter(self.urls.c.url == params['url']).values(cam=params['cam'], os=params['os'])
             ResultProxy = self.getConn().execute(query, params)
             print(" update_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
         except Exception as e:
@@ -150,10 +150,10 @@ class Sql:
         print(time2,time1, obj)
         tuple_ =  obj.split(',')
         #print(str)
-        #cur.execute("SELECT type, currentime as x0, currentime + 30000 as x, y as y FROM statistic WHERE type IN" +str+ " AND cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY type,currentime ASC", #DeSC
+        #cur.execute("SELECT type, currentime as x0, currentime + 30000 as x, y as y FROM statistic filter type IN" +str+ " AND cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY type,currentime ASC", #DeSC
         #    (cam, time2, time1 ))
 
-        query = sql.select([self.statistic]).where(sql.and_(self.statistic.columns.cam == cam, 
+        query = sql.select([self.statistic]).filter(sql.and_(self.statistic.columns.cam == cam, 
                                                               self.statistic.columns.type.in_(tuple_),
                                                               self.statistic.columns.currentime.between(time2,time1)
                                                              )
@@ -191,7 +191,7 @@ class Sql:
 
     def insert_frame(self, hashcode, date, time, type, numpy_array, x_dim, y_dim, cam):
         if y_dim <25 or x_dim <25 or x_dim/y_dim > 4.7 or y_dim/x_dim > 4.7: return
-        #cur.execute("UPDATE objects SET currentime="+self.P+" WHERE hashcode="+self.P, (time, str(hashcode)))
+        #cur.execute("UPDATE objects SET currentime="+self.P+" filter hashcode="+self.P, (time, str(hashcode)))
         #print("cam= {}, x_dim={}, y_dim={}".format(cam, x_dim, y_dim))
         buffer = cv2.imencode('.jpg', numpy_array)[1]
         jpg_as_base64='data:image/jpeg;base64,'+ base64.b64encode(buffer).decode('utf-8')
@@ -223,8 +223,8 @@ class Sql:
             time1=a
 
 
-        #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects WHERE cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
-        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam,                                                           
+        #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects filter cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
+        query = sql.select([self.objects]).filter(sql.and_(self.objects.columns.cam == cam,                                                           
                                                               self.objects.columns.currentime.between(time2,time1)
                                                              )
                                                 ).order_by(text("currentime desc"))
@@ -253,10 +253,10 @@ class Sql:
         print(time2,time1, obj)
         tuple_ =  obj.split(',')
         
-        #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects where cam="+self.P+" AND  type IN " +str+ " AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC LIMIT "+self.P+" OFFSET "+self.P+"", 
+        #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects filter cam="+self.P+" AND  type IN " +str+ " AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC LIMIT "+self.P+" OFFSET "+self.P+"", 
         #    (cam, time2, time1,n_rows,offset,))
         #fetched_rows = cur.fetchall()
-        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam, 
+        query = sql.select([self.objects]).filter(sql.and_(self.objects.columns.cam == cam, 
                                                               self.objects.columns.type.in_(tuple_),
                                                               self.objects.columns.currentime.between(time2,time1)
                                                          )
@@ -273,11 +273,11 @@ class Sql:
         Delete all records from objects table which are later then 'hours' back
         """
         # predicate : '-70 minutes' , '-1 seconds ', '-2 hour'
-        #cur.execute("DELETE from objects WHERE currentime < strftime('"+self.P+"','now'," + predicate+ ")")
+        #cur.execute("DELETE from objects filter currentime < strftime('"+self.P+"','now'," + predicate+ ")")
 
         millis_back = int(round(time.time() * 1000)) - hours*60*60*1000
         try:
-            query = sql.delete(self.objects).where( self.objects.currentime < millis_back )
+            query = sql.delete(self.objects).filter( self.objects.currentime < millis_back )
             ResultProxy = self.getConn().execute(query)
             print(" delete_frames_later_then was {0} with params: {1}".format(ResultProxy.is_insert ,hours))
         except Exception as e: print(" e: {}".format( e))
