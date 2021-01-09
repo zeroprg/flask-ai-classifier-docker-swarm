@@ -11,7 +11,6 @@ import requests
 import urllib.request
 import urllib.error
 import cv2
-import socket
 
 
 from project.config import  ProductionConfig as prod
@@ -35,7 +34,7 @@ def comp_node():
     if os.name == 'nt':
         return  platform.node()
     else:
-        return socket.gethostname()
+        return  os.uname()[1]
 
 DELETE_FILES_LATER = 8 #   (8hours)
 ENCODING = "utf-8"
