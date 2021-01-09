@@ -154,7 +154,8 @@ class Sql:
         #    (cam, time2, time1 ))
 
         query = sql.select([self.statistic]).when(sql.and_(self.statistic.columns.cam == cam, 
-                                                              self.statistic.columns.currentime.between(time2,time1),
+                                                              self.statistic.columns.currentime < time1,
+                                                              self.statistic.columns.currentime > time2, 
                                                               self.statistic.columns.type.in_(tuple_)
                                                               
                                                              )
@@ -226,7 +227,8 @@ class Sql:
 
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects filter cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
         query = sql.select([self.objects]).when(sql.and_(self.objects.columns.cam == cam,                                                           
-                                                              self.objects.columns.currentime.between(time2,time1)
+                                                              self.objects.columns.currentime < time1,
+                                                              self.objects.columns.currentime > time2
                                                              )
                                                 ).order_by(text("currentime desc"))
 
@@ -258,7 +260,8 @@ class Sql:
         #    (cam, time2, time1,n_rows,offset,))
         #fetched_rows = cur.fetchall()
         query = sql.select([self.objects]).when(sql.and_(self.objects.columns.cam == cam,
-                                                              self.objects.columns.currentime.between(time2,time1), 
+                                                              self.objects.columns.currentime < time1,
+                                                              self.objects.columns.currentime > time2, 
                                                               self.objects.columns.type.in_(tuple_)
                                                               
                                                          )
