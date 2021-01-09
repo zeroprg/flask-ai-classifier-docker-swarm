@@ -15,13 +15,13 @@ const ObjectOfInterest = (props) => {
     //const [selected_obj_of_interest, setObjectOfInterest]  = useState([props.object_of_interest[0]])
  
     const [data, setData]   = useState(null);
-    const [counter, setCounter]   = useState(PAGINATOR);
+    const [counter, setCounter]  = useState(PAGINATOR);
+    const [timerange, setTimerange] = useState({start:0,end:0});
 
-    const {cam} = props;
 
-    async function fetchImageData(objectOfInterest,timerange) {
-        const DEFAULT_QUERY =  global.config.API + "moreimgs?start=" + timerange.start + 
-        "&cam=" + cam + "&end=" + timerange.end + "&object_of_interest=" + objectOfInterest
+    async function fetchImageData(cam, objectOfInterest, timerange) {
+        const DEFAULT_QUERY =  global.config.API + "moreimgs?hour_back1=" + timerange.start + 
+        "&cam=" + cam + "&hour_back2=" + timerange.end + "&object_of_interest=" + objectOfInterest
 
         fetch(DEFAULT_QUERY)
             .then(response => {
@@ -37,16 +37,17 @@ const ObjectOfInterest = (props) => {
             })
             .then(json => { 
                 setData(json)
+                setTimerange(timerange)
                 setCounter( json.length - 1 );
              });
     }
 
 
-    useEffect(() => { 
-        fetchImageData(props.object_of_interest, props.timerange);
-        },
-        [props.cam, props.object_of_interest, props.timerange]);
-     
+      useEffect(() => { 
+            if(timerange.start !== props.timerange.start || timerange.end !== props.timerange.end ) 
+                fetchImageData(props.cam, props.object_of_interest, props.timerange);
+            },
+        [props.object_of_interest, props.timerange]);  
     
         
     function removeClass(classname, event){
@@ -104,10 +105,9 @@ const ObjectOfInterest = (props) => {
         return "loading...";
     }
     
-  
-    return (
+    if ( timerange.start === props.timerange.start && timerange.end === props.timerange.end )
+    return (       
       <span>
-
         <div id="navigation" className="text-center">
             <button data-testid="button-restart" className="small" onClick = {(e) =>seek(0,e)}>Restart ({data.length - 1})</button>
             <button data-testid="button-prev" className="small outlined" onClick = {(e) =>seek(+PAGINATOR, e)}>Prev ({counter + PAGINATOR })</button>
@@ -123,5 +123,6 @@ const ObjectOfInterest = (props) => {
         </div>                        
        </span>
     );
+    else return ('.. Loading');
   }
 export default ObjectOfInterest

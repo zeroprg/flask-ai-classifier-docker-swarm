@@ -8,8 +8,6 @@ import Plotter from './plotter';
 
  const ObjectOfInterestPlot = (props) => {
 
-      const DEFAULT_QUERY =  global.config.API + "moreparams?cam=" + props.cam +"&hour_back1=" +
-            props.timerange.start + "&hour_back2="  + props.timerange.end + "&object_of_interest="
       const BASIC_COLOR = parseInt('0x008B8B', 16) //#12939A'
    
       const [timerange, setTimerange] = useState(props.timerange);
@@ -25,8 +23,9 @@ import Plotter from './plotter';
       });
       const classes = useStyles();
  
-    async function fetchStatisticData(objectOfInterest) {
-      
+    async function fetchStatisticData(objectOfInterest) {      
+      const DEFAULT_QUERY =  global.config.API + "moreparams?cam=" + props.cam +"&hour_back1=" +
+            props.timerange.start + "&hour_back2="  + props.timerange.end + "&object_of_interest="
       fetch(DEFAULT_QUERY + objectOfInterest)
           .then(response => {
               // make sure to check for errors
@@ -55,7 +54,7 @@ import Plotter from './plotter';
 
 
     useEffect(() => {
-      const interval = setInterval(() => setTime(new Date().getTime()), 600000);
+      const interval = setInterval(() => setTime(new Date().getTime()), 6000000);
       return () => {
         clearInterval(interval);
       };
@@ -64,7 +63,7 @@ import Plotter from './plotter';
     useEffect(() => { 
       setColor(BASIC_COLOR)   
       fetchAll();
-      },[props.cam, selected_obj_of_interest, timerange, time]);
+      },[selected_obj_of_interest, timerange, time]);
 
 
       

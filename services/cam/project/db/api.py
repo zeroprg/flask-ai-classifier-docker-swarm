@@ -34,7 +34,7 @@ class Sql:
         :return: Connection object or None
         """
         self.engine = None
-        self.limit = 500
+        self.limit = 200
         metadata = sql.MetaData()
 
         if(  SQLALCHEMY_DATABASE_URI is None or SQLALCHEMY_DATABASE_URI == ''):
@@ -142,7 +142,7 @@ class Sql:
         now = time.time()
         time2 = int((now - time2*3600000)*1000)
         time1 = int((now - time1*3600000)*1000)
-        if time2 > time1:  # swap them 
+        if time2 < time1:  # swap them 
             a=time2
             time2=time1 
             time1=a
@@ -155,7 +155,8 @@ class Sql:
 
         query = sql.select([self.statistic]).where(sql.and_(self.statistic.columns.cam == cam, 
                                                               self.statistic.columns.type.in_(tuple_),
-                                                              self.statistic.columns.currentime.between(time2, time1)
+                                                              self.statistic.columns.currentime > time1,
+                                                              self.statistic.columns.currentime < time2
                                                              )
                                                     ).order_by(text("currentime asc"))
         ResultProxy = self.getConn().execute(query)
@@ -214,9 +215,15 @@ class Sql:
         :param cam, time1, time2 in epoch seconds
         :return:
         """
+        if time2 < time1:  # swap them 
+            a=time2
+            time2=time1 
+            time1=a
+
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects WHERE cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
-        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam, 
-                                                              self.objects.columns.currentime.between(time1, time2)
+        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam,                                                           
+                                                              self.statistic.columns.currentime > time1,
+                                                              self.statistic.columns.currentime < time2
                                                              )
                                                 ).order_by(text("currentime desc"))
 
@@ -226,7 +233,7 @@ class Sql:
 
         return rows
 
-    def select_last_frames(self, cam, time1, time2, obj,  offset=0, n_rows=50):
+    def select_last_frames(self, cam, time1, time2, obj,  offset=0, n_rows=self.limit):
         """
         Query last n rows of frames b
         :param conn: the Connection object
@@ -236,7 +243,7 @@ class Sql:
         now = time.time()
         time2 = int((now - time2*3600000)*1000)
         time1 = int((now - time1*3600000)*1000)
-        if time2 > time1:  # swap them 
+        if time2 < time1:  # swap them 
             a=time2
             time2=time1 
             time1=a
@@ -249,7 +256,8 @@ class Sql:
         #fetched_rows = cur.fetchall()
         query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam, 
                                                               self.objects.columns.type.in_(tuple_),
-                                                              self.objects.columns.currentime.between(time2, time1)
+                                                              self.statistic.columns.currentime > time1,
+                                                              self.statistic.columns.currentime < time2
                                                          )
                                                 ).order_by(text("currentime desc")).limit(n_rows).offset(offset)
         ResultProxy = self.getConn().execute(query)
