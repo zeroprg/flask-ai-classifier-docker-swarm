@@ -105,7 +105,7 @@ const ObjectOfInterest = (props) => {
         return "loading...";
     }
     
-    if ( timerange.start === props.timerange.start && timerange.end === props.timerange.end )
+    //if ( timerange.start === props.timerange.start && timerange.end === props.timerange.end )
     return (       
       <span>
         <div id="navigation" className="text-center">
@@ -123,6 +123,6 @@ const ObjectOfInterest = (props) => {
         </div>                        
        </span>
     );
-    else return ('.. Loading');
+   // else return ('.. Loading');
   }
 export default ObjectOfInterest
