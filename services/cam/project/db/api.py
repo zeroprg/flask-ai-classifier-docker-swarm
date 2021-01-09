@@ -225,7 +225,7 @@ class Sql:
 
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects WHERE cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
         query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam,                                                           
-                                                              self.statistic.columns.currentime.between(time2,time1)
+                                                              self.objects.columns.currentime.between(time2,time1)
                                                              )
                                                 ).order_by(text("currentime desc"))
 
@@ -258,9 +258,9 @@ class Sql:
         #fetched_rows = cur.fetchall()
         query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam, 
                                                               self.objects.columns.type.in_(tuple_),
-                                                              self.statistic.columns.currentime.between(time2,time1)
+                                                              self.objects.columns.currentime.between(time2,time1)
                                                          )
-                                                ).order_by(text("currentime desc")).limit(self.limit) #.offset(offset)
+                                                ).order_by(text("currentime desc")).limit(self.limit).offset(offset)
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
