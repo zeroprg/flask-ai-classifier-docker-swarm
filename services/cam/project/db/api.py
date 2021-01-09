@@ -14,7 +14,7 @@ class Sql:
         :return: Connection object or None
         """
         self.engine = None
-        self.limit = 250
+        self.limit = 150
         metadata = sql.MetaData()
         if(  DATABASE_URI is None or DATABASE_URI == ''):
             self.engine = sql.create_engine('sqlite://frame.db')
@@ -34,7 +34,7 @@ class Sql:
         :return: Connection object or None
         """
         self.engine = None
-        self.limit = 200
+        self.limit = 150
         metadata = sql.MetaData()
 
         if(  SQLALCHEMY_DATABASE_URI is None or SQLALCHEMY_DATABASE_URI == ''):
@@ -155,8 +155,7 @@ class Sql:
 
         query = sql.select([self.statistic]).where(sql.and_(self.statistic.columns.cam == cam, 
                                                               self.statistic.columns.type.in_(tuple_),
-                                                              self.statistic.columns.currentime > time2,
-                                                              self.statistic.columns.currentime < time1
+                                                              self.statistic.columns.currentime.between(time2,time1)
                                                              )
                                                     ).order_by(text("currentime asc"))
         ResultProxy = self.getConn().execute(query)
@@ -226,8 +225,7 @@ class Sql:
 
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects WHERE cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
         query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam,                                                           
-                                                              self.statistic.columns.currentime > time2,
-                                                              self.statistic.columns.currentime < time1
+                                                              self.statistic.columns.currentime.between(time2,time1)
                                                              )
                                                 ).order_by(text("currentime desc"))
 
@@ -260,10 +258,9 @@ class Sql:
         #fetched_rows = cur.fetchall()
         query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam, 
                                                               self.objects.columns.type.in_(tuple_),
-                                                              self.statistic.columns.currentime > time2,
-                                                              self.statistic.columns.currentime < time1
+                                                              self.statistic.columns.currentime.between(time2,time1)
                                                          )
-                                                ).order_by(text("currentime desc")).limit(self.limit).offset(offset)
+                                                ).order_by(text("currentime desc")).limit(self.limit) #.offset(offset)
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
