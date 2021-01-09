@@ -67,7 +67,7 @@ CREATE OR REPLACE FUNCTION modify_urls()
   AS
 $$
 BEGIN
-	IF extract(epoch from now())*1000 -  OLD.currenttime  < 10000 THEN
+	IF OLD.os != '' and  OLD.os is NULL and OLD.os <> NEW.os THEN
         RAISE EXCEPTION 'Record was not updated';
 	END IF;
 	RETURN NEW;
@@ -83,7 +83,7 @@ CREATE TRIGGER modify_urls
 
 
 
-CREATE OR REPLACE VIEW public.latest10min
+CREATE OR REPLACE VIEW latest10min
 AS SELECT objects.cam,
     objects.type,
     count(*) AS last10min,
@@ -97,7 +97,7 @@ AS SELECT objects.cam,
  HAVING ((max(objects.currentime) - min(objects.currentime)) / 60000) < 10;
 
     
-CREATE OR REPLACE VIEW public.latest6hours
+CREATE OR REPLACE VIEW latest6hours
 AS SELECT objects.cam,
     objects.type,
     count(*) AS last6hours,
@@ -110,7 +110,7 @@ AS SELECT objects.cam,
   GROUP BY objects.type, objects.cam
  HAVING ((max(objects.currentime) - min(objects.currentime)) / 60000) < 360;
 
- CREATE OR REPLACE VIEW public.latest12hours
+ CREATE OR REPLACE VIEW latest12hours
 AS SELECT objects.cam,
     objects.type,
     count(*) AS last12hours,
@@ -123,7 +123,7 @@ AS SELECT objects.cam,
   GROUP BY objects.type, objects.cam
  HAVING ((max(objects.currentime) - min(objects.currentime)) / 60000) < 720;
 
-CREATE OR REPLACE VIEW public.latesthour
+CREATE OR REPLACE VIEW latesthour
 AS SELECT objects.cam,
     objects.type,
     count(*) AS lasthour,
@@ -136,7 +136,7 @@ AS SELECT objects.cam,
   GROUP BY objects.type, objects.cam
  HAVING ((max(objects.currentime) - min(objects.currentime)) / 60000) < 60;
 
-create or replace view public.obj_stat AS
+create or replace view obj_stat AS
 	select
 		distinct u.cam,
 		u.url,

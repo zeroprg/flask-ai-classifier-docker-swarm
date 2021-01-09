@@ -67,3 +67,4 @@ CLASSIFIER_SERVER = http://192.168.0.167/classify
 
 #Database configuration (Postgres)
 IP_ADDRESS=192.168.0.167
+MAXIMUM_VIDEO_STREAMS = 17

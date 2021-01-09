@@ -14,6 +14,7 @@ class ProductionConfig:
     """Production configuration"""
     PORT = os.environ.get("PORT")
     PORT = 3020
+    MAXIMUM_VIDEO_STREAMS =  os.environ.get("MAXIMUM_VIDEO_STREAMS")
     DB_USERNAME = os.environ.get("DB_USERNAME")
     DB_PASSWORD = os.environ.get("DB_PASSWORD")
     DB_PORT = os.environ.get("DB_PORT")
@@ -38,3 +39,5 @@ class ProductionConfig:
 
     if CLASSIFIER_SERVER is None or CLASSIFIER_SERVER =='' : CLASSIFIER_SERVER =  args["CLASSIFIER_SERVER"]
     if CONFIDENCE is None or CONFIDENCE =='' : CONFIDENCE =  args["confidence"]
+    if MAXIMUM_VIDEO_STREAMS is None : MAXIMUM_VIDEO_STREAMS = args["MAXIMUM_VIDEO_STREAMS"] 
+    MAXIMUM_VIDEO_STREAMS = int(MAXIMUM_VIDEO_STREAMS)

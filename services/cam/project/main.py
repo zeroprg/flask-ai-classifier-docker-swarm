@@ -11,7 +11,7 @@ import requests
 import urllib.request
 import urllib.error
 import cv2
-
+import socket
 
 
 from project.config import  ProductionConfig as prod
@@ -35,7 +35,7 @@ def comp_node():
     if os.name == 'nt':
         return  platform.node()
     else:
-        return os.uname()[1]
+        return socket.gethostname()
 
 DELETE_FILES_LATER = 8 #   (8hours)
 ENCODING = "utf-8"
@@ -235,7 +235,9 @@ def initialize_video_streams(url=None, videos=[]):
                 logger.info(arg)
     videos_ = db.select_all_urls()
     """ Update all videos as mine , start greeding algorithm here ..."""
+    i = 1
     for video in videos_:
+        
         params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node()}
         try:
             logger.debug("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
@@ -243,6 +245,7 @@ def initialize_video_streams(url=None, videos=[]):
         except Exception as e:
             logger.info("Exception {}".format(e))
         else:
+          
             params['videos_length'] = len(imagesQueue)
             """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
             #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)
@@ -254,7 +257,8 @@ def initialize_video_streams(url=None, videos=[]):
             #p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
             #p_deny_service.daemon=False
             #p_deny_service.start()
-            
+            if i == prod.MAXIMUM_VIDEO_STREAMS: break
+            i += 1    
             
     videos = db.select_all_urls()            
 
