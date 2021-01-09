@@ -13,7 +13,7 @@ import Plotter from './plotter';
       const [timerange, setTimerange] = useState(props.timerange);
       const [data, setData]  = useState({})
       const [color, setColor] = useState(BASIC_COLOR)
-      const [selected_obj_of_interest, setObjectOfInterest]  = useState([props.object_of_interest[0]])
+      const [selected_obj_of_interest, setObjectOfInterest]  = useState(props.object_of_interest)
       const [time, setTime] = useState( new Date().getTime());
    
       const useStyles = makeStyles({

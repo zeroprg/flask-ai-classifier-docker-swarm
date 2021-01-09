@@ -14,7 +14,7 @@ class Sql:
         :return: Connection object or None
         """
         self.engine = None
-        self.limit = 50
+        self.limit = 250
         metadata = sql.MetaData()
         if(  DATABASE_URI is None or DATABASE_URI == ''):
             self.engine = sql.create_engine('sqlite://frame.db')
@@ -233,7 +233,7 @@ class Sql:
 
         return rows
 
-    def select_last_frames(self, cam, time1, time2, obj,  offset=0, n_rows=self.limit):
+    def select_last_frames(self, cam, time1, time2, obj,  offset=0):
         """
         Query last n rows of frames b
         :param conn: the Connection object
@@ -259,7 +259,7 @@ class Sql:
                                                               self.statistic.columns.currentime > time1,
                                                               self.statistic.columns.currentime < time2
                                                          )
-                                                ).order_by(text("currentime desc")).limit(n_rows).offset(offset)
+                                                ).order_by(text("currentime desc")).limit(self.limit).offset(offset)
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
