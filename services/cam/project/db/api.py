@@ -14,7 +14,7 @@ class Sql:
         :return: Connection object or None
         """
         self.engine = None
-        self.limit = 150
+        self.limit = 100
         metadata = sql.MetaData()
         if(  DATABASE_URI is None or DATABASE_URI == ''):
             self.engine = sql.create_engine('sqlite://frame.db')
@@ -34,7 +34,7 @@ class Sql:
         :return: Connection object or None
         """
         self.engine = None
-        self.limit = 150
+        self.limit = 100
         metadata = sql.MetaData()
 
         if(  SQLALCHEMY_DATABASE_URI is None or SQLALCHEMY_DATABASE_URI == ''):
