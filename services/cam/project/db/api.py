@@ -113,7 +113,7 @@ class Sql:
             print(" update_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
         except Exception as e:
             print(" e: {}".format( e))
-
+            raise e
 
 
 # ####################  Statistic operations ######################################## #
@@ -246,8 +246,8 @@ class Sql:
         :return:
         """
         now = time.time()
-        time2 = int((now - time2*3600000)*1000)
-        time1 = int((now - time1*3600000)*1000)
+        time2 = int((now - time2*3600)*1000)
+        time1 = int((now - time1*3600)*1000)
         if time2 > time1:  # swap them 
             a=time2
             time2=time1 

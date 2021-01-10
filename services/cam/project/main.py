@@ -11,7 +11,7 @@ import requests
 import urllib.request
 import urllib.error
 import cv2
-
+import uuid
 
 from project.config import  ProductionConfig as prod
 from project.classifier import Detection
@@ -28,15 +28,17 @@ console = logging.StreamHandler()
 logger.addHandler(console)
 logger.debug('DEBUG mode')
 
+comp_uuid = uuid.uuid4()
 
 def comp_node():
+    return comp_uuid
     # if its windows
-    if os.name == 'nt':
-        return  platform.node()
-    else:
-        return  os.uname()[1]
+#    if os.name == 'nt':
+#        return  platform.node()
+#    else:
+#        return  os.uname()[1]
 
-DELETE_FILES_LATER = 8 #   (8hours)
+DELETE_FILES_LATER = 7*24 #   ( 7 days )
 ENCODING = "utf-8"
 IMAGES_BUFFER = 150
 #  --------------------  constanst and definitions -------------------------
@@ -217,6 +219,7 @@ def initialize_video_streams(url=None, videos=[]):
     else:
         arg = prod.args.get('video_file' + str(i), None)
     logger.info('Video urls:')
+    """ Insertion """
     while arg is not None:
         if not (i, arg) in videos:
             #camright.append(prod.args.get('cam_right' + str(i), None))
@@ -235,6 +238,7 @@ def initialize_video_streams(url=None, videos=[]):
     videos_ = db.select_all_urls()
     """ Update all videos as mine , start greeding algorithm here ..."""
     i = 1
+    """ Updation """
     for video in videos_:
         
         params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node()}
@@ -243,8 +247,7 @@ def initialize_video_streams(url=None, videos=[]):
             db.update_urls(params)            
         except Exception as e:
             logger.info("Exception {}".format(e))
-        else:
-          
+        else:          
             params['videos_length'] = len(imagesQueue)
             """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
             #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)

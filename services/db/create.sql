@@ -67,7 +67,7 @@ CREATE OR REPLACE FUNCTION modify_urls()
   AS
 $$
 BEGIN
-	IF OLD.os != '' and  OLD.os is NULL and OLD.os <> NEW.os THEN
+	IF OLD.os != '' and  OLD.os IS NOT NULL and OLD.os <> NEW.os THEN
         RAISE EXCEPTION 'Record was not updated';
 	END IF;
 	RETURN NEW;

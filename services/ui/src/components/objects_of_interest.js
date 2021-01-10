@@ -16,6 +16,7 @@ const ObjectOfInterest = (props) => {
  
     const [data, setData]   = useState(null);
     const [counter, setCounter]  = useState(PAGINATOR);
+    const [object_of_interest, setObjectOfInterest] =  useState([])
     const [timerange, setTimerange] = useState({start:0,end:0});
 
 
@@ -38,14 +39,16 @@ const ObjectOfInterest = (props) => {
             .then(json => { 
                 setData(json)
                 setTimerange(timerange)
+                setObjectOfInterest(objectOfInterest)
                 setCounter( json.length - 1 );
              });
     }
 
 
       useEffect(() => { 
-            if(timerange.start !== props.timerange.start || timerange.end !== props.timerange.end ) 
-                fetchImageData(props.cam, props.object_of_interest, props.timerange);
+            if(JSON.stringify(object_of_interest)!=JSON.stringify(props.object_of_interest) ||
+                timerange.start !== props.timerange.start || timerange.end !== props.timerange.end ) 
+                    fetchImageData(props.cam, props.object_of_interest, props.timerange);
             },
         [props.object_of_interest, props.timerange]);  
     
