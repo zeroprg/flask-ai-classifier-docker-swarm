@@ -40,7 +40,7 @@ def comp_node():
 
 DELETE_FILES_LATER = 7*24*3600000 #   ( 7 days in miliseconds)
 ENCODING = "utf-8"
-IMAGES_BUFFER = 15
+IMAGES_BUFFER = 200
 #  --------------------  constanst and definitions -------------------------
 deny_service_url = '/deny_service'
 
@@ -248,7 +248,7 @@ def initialize_video_streams(url=None, videos=[]):
                 logger.info(arg)
     videos_ = db.select_all_urls()
     """ Update all videos as mine , start greeding algorithm here ..."""
-    i = 1
+    i = 0
     """ Updation """
     for video in videos_:
         
@@ -270,7 +270,7 @@ def initialize_video_streams(url=None, videos=[]):
             #p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
             #p_deny_service.daemon=False
             #p_deny_service.start()
-            if i == prod.MAXIMUM_VIDEO_STREAMS: break
+            if i > prod.MAXIMUM_VIDEO_STREAMS: break
             i += 1    
             
     videos = db.select_all_urls()            
