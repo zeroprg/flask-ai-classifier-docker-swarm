@@ -78,7 +78,7 @@ class Sql:
         except Exception as e:
             print(" e: {}".format( e))
 
-# ####################  Serive utility operations ######################################## #
+# ####################  Service utility operations ######################################## #
     def delete_old_images_older_then(self, DAYS_IN_MILLSEC):
         now = time.time()*1000
         _time = int(now - DAYS_IN_MILLSEC)
@@ -104,7 +104,7 @@ class Sql:
             else:    
                 raise Exception('No value defined for parameter os')
             ResultProxy = self.getConn().execute(query,params)
-            print(" urls {0} was updated  with params: {1}".format(ResultProxy.is_insert ,os))
+            print(" urls was updated  with os: {}".format(ResultProxy.last_updated_params() ))
         except Exception as e:
             print(" e: {}".format( e))
             raise e
@@ -256,9 +256,9 @@ class Sql:
 
 
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects filter cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
-        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam,                                                           
-                                                              self.objects.columns.currentime < time1,
-                                                              self.objects.columns.currentime > time2
+        query = sql.select([self.objects]).where(sql.and_(    self.objects.columns.currentime > time2,                                                       
+                                                              self.objects.columns.currentime < time1,                                                              
+                                                              self.objects.columns.cam == cam
                                                              )
                                                 ).order_by(text("currentime desc"))
 
@@ -289,9 +289,9 @@ class Sql:
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects filter cam="+self.P+" AND  type IN " +str+ " AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC LIMIT "+self.P+" OFFSET "+self.P+"", 
         #    (cam, time2, time1,n_rows,offset,))
         #fetched_rows = cur.fetchall()
-        query = sql.select([self.objects]).where(sql.and_(self.objects.columns.cam == cam,
+        query = sql.select([self.objects]).where(sql.and_(    self.objects.columns.currentime > time2,                                                       
                                                               self.objects.columns.currentime < time1,
-                                                              self.objects.columns.currentime > time2, 
+                                                              self.objects.columns.cam == cam,
                                                               self.objects.columns.type.in_(tuple_)
                                                               
                                                          )
