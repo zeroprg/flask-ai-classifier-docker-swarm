@@ -38,9 +38,9 @@ def comp_node():
 #    else:
 #        return  os.uname()[1]
 
-DELETE_FILES_LATER = 7*24 #   ( 7 days )
+DELETE_FILES_LATER = 7*24*3600000 #   ( 7 days in miliseconds)
 ENCODING = "utf-8"
-IMAGES_BUFFER = 150
+IMAGES_BUFFER = 15
 #  --------------------  constanst and definitions -------------------------
 deny_service_url = '/deny_service'
 
@@ -145,6 +145,15 @@ vs = None
 fps = None
 p_get_frame = None
 
+"""Delete old images later then DELETE_FILES_LATER milliseconds"""  
+def clean_up_service():
+  threading.Timer(3600*24, clean_up_service).start()
+  db.delete_frames_later_then(DELETE_FILES_LATER)
+
+""" Lock urls record for every 101 seconds """
+def lock_urls_for_os():
+  threading.Timer(101, lock_urls_for_os).start()      
+  db.update_url_by_os(comp_node())
 
 def start_one_stream_processes(video, prod=prod, detectors=detectors, imagesQueue=imagesQueue):
     #print(imagesQueue)
@@ -171,6 +180,8 @@ def start():
     # and initialize the FPS counter
     logger.info("[INFO] starting video stream...")
     initialize_video_streams()
+    clean_up_service()
+    lock_urls_for_os()
   
  
 #@sleep(1)

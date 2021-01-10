@@ -52,7 +52,7 @@ CREATE TABLE urls (
 	url varchar NOT NULL,
 	cam int2 NULL DEFAULT nextval(url_cam_seq),
 	email varchar NULL,
-	os varchar(30) NULL,
+	os varchar(36) NULL,
 	currenttime int8 NOT NULL DEFAULT currentime_gen(),
 	CONSTRAINT urls_pkey PRIMARY KEY (id),
 	CONSTRAINT urls_un UNIQUE (url)
@@ -67,8 +67,8 @@ CREATE OR REPLACE FUNCTION modify_urls()
   AS
 $$
 BEGIN
-	IF OLD.os != '' and  OLD.os IS NOT NULL and OLD.os <> NEW.os THEN
-        RAISE EXCEPTION 'Record was not updated';
+	if EXTRACT(EPOCH FROM NOW()) - old.currenttime/1000 < 100  THEN
+        RAISE EXCEPTION 'Record was not updated due to lock by another computer';
 	END IF;
 	RETURN NEW;
 END;

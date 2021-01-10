@@ -78,7 +78,37 @@ class Sql:
         except Exception as e:
             print(" e: {}".format( e))
 
+# ####################  Serive utility operations ######################################## #
+    def delete_old_images_older_then(self, DAYS_IN_MILLSEC):
+        now = time.time()*1000
+        _time = int(now - DAYS_IN_MILLSEC)
+        try:
+            if DAYS_IN_MILLSEC is not None:
+                query = sql.delete(self.objects).where(self.objects.c.currentime < _time)
+            else:    
+                raise Exception('No value defined for parameter DAYS_IN_MILLSEC')
+            ResultProxy = self.getConn().execute(query)
+            print(" objects were deleted for date later then {}".format(DAYS_IN_MILLSEC/3600000/24))
+        except Exception as e:
+            print(" e: {}".format( e))
+            raise e
+
+
 # ####################  Urls operations ######################################## #
+    def update_url_by_os(self, os):
+        _time = int(time.time()*1000)
+        params = {'os': os, 'currenttime': _time}
+        try:
+            if os is not None:
+                query = sql.update(self.urls).where(self.urls.c.os == str(os)).values(currenttime=_time)
+            else:    
+                raise Exception('No value defined for parameter os')
+            ResultProxy = self.getConn().execute(query,params)
+            print(" urls {0} was updated  with params: {1}".format(ResultProxy.is_insert ,os))
+        except Exception as e:
+            print(" e: {}".format( e))
+            raise e
+
 
 
     def select_all_urls(self):
@@ -86,7 +116,7 @@ class Sql:
         Query all rows in the urls table
         :return:
         """
-        query = sql.select([self.urls]).order_by(text("cam asc"))
+        query = sql.select([self.urls]).order_by(text("currenttime asc"))
         ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
