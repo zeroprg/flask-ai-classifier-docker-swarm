@@ -87,11 +87,10 @@ class Sql:
                 query = sql.delete(self.objects).where(self.objects.c.currentime < _time)
             else:    
                 raise Exception('No value defined for parameter DAYS_IN_MILLSEC')
-            ResultProxy = self.getConn().execute(query)
-            print(" objects were deleted for date later then {}".format(DAYS_IN_MILLSEC/3600000/24))
+            self.getConn().execute(query)
+            print(" objects were deleted for date later then {} days".format(DAYS_IN_MILLSEC/3600000/24))
         except Exception as e:
             print(" e: {}".format( e))
-            raise e
 
 
 # ####################  Urls operations ######################################## #
@@ -104,11 +103,9 @@ class Sql:
             else:    
                 raise Exception('No value defined for parameter os')
             ResultProxy = self.getConn().execute(query,params)
-            print(" urls was updated  with os: {}".format(ResultProxy.last_updated_params() ))
+            print(" urls was updated  with params: {}".format(ResultProxy.last_updated_params() ))
         except Exception as e:
             print(" e: {}".format( e))
-            raise e
-
 
 
     def select_all_urls(self):
