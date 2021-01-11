@@ -1,6 +1,6 @@
  --create database streamer;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
----drop  table  objects;
+--drop  table  objects;
 
 CREATE TABLE objects (
 	hashcode int8 NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE statistic (
 	cam uuid NULL
 );
 
---drop  table  urls;
+--- drop  table  urls;
 
 CREATE OR REPLACE FUNCTION currentime_gen()
   RETURNS int8 
@@ -47,10 +47,11 @@ $$;
 
 CREATE SEQUENCE url_cam_seq;
 
+
 CREATE TABLE urls (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	url varchar NOT NULL,
-	cam int2 NULL DEFAULT nextval(url_cam_seq),
+	cam int2  NULL DEFAULT nextval('url_cam_seq'),
 	email varchar NULL,
 	os varchar(36) NULL,
 	currenttime int8 NOT NULL DEFAULT currentime_gen(),
@@ -67,8 +68,8 @@ CREATE OR REPLACE FUNCTION modify_urls()
   AS
 $$
 BEGIN
-	if EXTRACT(EPOCH FROM NOW()) - old.currenttime/1000 < 100  THEN
-        RAISE EXCEPTION 'Record was not updated due to lock by another computer';
+	if  OLD.os is NOT NULL AND OLD.os != '' AND EXTRACT(EPOCH FROM NOW()) - old.currenttime/1000 < 4  THEN
+        RAISE EXCEPTION 'Record was not updated due to lock by another less then 4 sec. ago';
 	END IF;
 	RETURN NEW;
 END;
@@ -110,7 +111,7 @@ AS SELECT objects.cam,
   GROUP BY objects.type, objects.cam
  HAVING ((max(objects.currentime) - min(objects.currentime)) / 60000) < 360;
 
- CREATE OR REPLACE VIEW latest12hours
+CREATE OR REPLACE VIEW latest12hours
 AS SELECT objects.cam,
     objects.type,
     count(*) AS last12hours,

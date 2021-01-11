@@ -15,7 +15,7 @@ import json
 from project.objCountByTimer import ObjCountByTimer
 from multiprocessing import Process
 from multiprocessing import Queue
-
+import logging
 import cv2
 
 
@@ -37,6 +37,10 @@ piCameraResolution = (640, 480)  # (1024,768) #(640,480)  #(1920,1080) #(1080,72
 piCameraRate = 16
 NUMBER_OF_THREADS = 1
 
+logger = logging.getLogger('logger')
+
+logger.setLevel(logging.INFO)
+
 class Detection:
     def __init__(self, classify_server, confidence, model,  output_queue, video):
         self.confidence = confidence
@@ -53,6 +57,7 @@ class Detection:
                                   ,output_queue))
             p_get_frame.daemon = True
             p_get_frame.start()
+            logger.info("-------- Process was just started for video: {} --------".format(video))
             time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
         
 
@@ -111,6 +116,7 @@ def call_classifier(classify_server, frame, cam, confidence, model):
     parameters = {'cam': cam, 'confidence': confidence, 'model': model}
     data = {'params': parameters, 'array': base64.b64encode(data).decode('utf-8')}
     jsonResponse = None
+   # logger.info("------------ call_classifier just called for cam: {} -------".format(cam))
     try:
         response = requests.post(url=classify_server,
                             json=data)
@@ -125,6 +131,7 @@ def call_classifier(classify_server, frame, cam, confidence, model):
         print('HTTP error occurred: {0}'.format(http_err))
     except Exception as err:
         print('Other error occurred: {0}')#.format(err))
+    #logger.debug("call_classifier jsonResponse for cam: {} {}".format(cam,jsonResponse ))   
     return jsonResponse
 
 def compress_nparr(nparr):
