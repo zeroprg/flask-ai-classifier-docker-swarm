@@ -94,6 +94,13 @@ class Sql:
 
 
 # ####################  Urls operations ######################################## #
+    def select_urls_by_os(self, os):
+        query = sql.select([self.urls]).where(self.urls.c.os == str(os)).order_by(text("currenttime asc"))
+        ResultProxy = self.getConn().execute(query)
+        cursor = ResultProxy.fetchall()
+        rows = [dict(r) for r in cursor]
+        return rows
+
     def update_url_by_os(self, os):
         _time = int(time.time()*1000)
         params = {'os': os, 'currenttime': _time}
