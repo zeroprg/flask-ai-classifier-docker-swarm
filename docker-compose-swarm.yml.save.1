@@ -1,0 +1,192 @@
+version: '3.5'
+
+services:
+
+  cam:
+    hostname: 'cam'
+    image: zeroprg/flask-docker-swarm_cam:latest
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: 
+          - node.role == worker
+          - node.labels.type != cam
+    ports:
+      - 3020:3020 
+    environment:
+      - CLASSIFIER_SERVER=http://192.168.0.167/classify
+      - PORT=3020
+      - MAXIMUM_VIDEO_STREAMS=20
+      - FLASK_ENV=production
+      - APP_SETTINGS=/home/app/web/config.txt
+      - IP_ADDRESS=192.168.0.167
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      - db
+      - web
+    networks:
+      - app
+
+
+  web:
+    image: zeroprg/flask-docker-swarm_web:latest
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == worker]
+    ports:
+      - 4000:4000
+    environment:
+      - FLASK_ENV=production
+      - APP_SETTINGS=/home/app/web/config.txt
+      - DB_USER=postgres
+      - IP_ADDRESS=192.168.0.167
+      - DB_PASSWORD=postgres
+    depends_on:
+      - db
+    networks:
+      - app
+    healthcheck:
+      test: curl --fail http://localhost:4000/ping || exit 1
+      interval: 20s
+      timeout: 5s
+      retries: 5
+
+  db:
+    hostname: 'primary'
+    image: zeroprg/flask-docker-swarm_db:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: 
+          - node.role == er
+    volumes:
+       - data-volume:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+    environment:
+       - PGHOST=/tmp
+       - POSTGRES_USER=postgres
+       - POSTGRES_PASSWORD=postgres
+       - POSTGRES_DB=streamer
+       - PGDATA=/var/lib/postgresql/data
+       - MAX_CONNECTIONS=50
+       - MAX_WAL_SENDERS=5
+
+       - PG_MODE=primary
+    networks:
+      - app
+
+  db_replica:
+    hostname: 'db_replica'
+    image: zeroprg/flask-docker-swarm_db:latest
+    deploy:
+      replicas: 0
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == worker
+          - node.labels.type != primary
+          - node.labels.type != db_replica
+
+    volumes:     
+       - pg-replica-vol:/var/lib/postgresql/data
+    ports:
+      - "5432"
+    environment:
+      - PGHOST=/tmp
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=streamer
+      - PGDATA=/var/lib/postgresql/data
+      - MAX_CONNECTIONS=50
+      - MAX_WAL_SENDERS=5
+      - PG_MODE=replica
+      - PG_PRIMARY_HOST=primary
+      - PG_PRIMARY_PORT=5432
+    depends_on:
+      - db
+    networks:
+      - app
+
+
+  ui:
+    hostname: 'ui'
+    image: zeroprg/flask-ai-classifier-docker-swarm_ui:latest
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: 
+         - node.labels.type != ui
+         - node.role == worker
+    ports:
+      - 5000:5000
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - cam
+    networks:
+      - app
+ 
+
+
+  nginx:
+    image: zeroprg/flask-docker-swarm_nginx:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: 
+          - node.role == manager
+    ports:
+      - 80:80
+    depends_on:
+      - cam
+      - web 
+    networks:
+      - app
+
+
+  visualizer:
+    image: alexellis2/visualizer-arm
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: 
+          - node.role == manager
+    ports:
+      - 8080:8080
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    networks:
+      - app
+
+
+networks:
+  app:
+    driver: overlay
+
+volumes:
+#  pg-primary-vol:
+  pg-replica-vol:
+  data-volume:
+    driver: local
+
+
