@@ -11,11 +11,11 @@ import requests
 import urllib.request
 import urllib.error
 import cv2
-import uuid
+
 
 from project.config import  ProductionConfig as prod
 from project.classifier import Detection
-from project import db
+from project import db, detectors, imagesQueue, comp_node
 import platform 
 from project.sleep_decorator import sleep
 
@@ -28,10 +28,11 @@ console = logging.StreamHandler()
 logger.addHandler(console)
 logger.debug('DEBUG mode')
 
-comp_uuid = uuid.uuid4()
 
-def comp_node():
-    return comp_uuid
+
+
+
+
     # if its windows
 #    if os.name == 'nt':
 #        return  platform.node()
@@ -121,31 +122,11 @@ def fetchImagesFromQueueToVideo(filename, imagesQueue):
     # out.release()
 
 
-def destroy():
-    # stop the timer and display FPS information
-    fps.stop()
-    logger.debug("[INFO] elapsed time: {:.2f}".format(fps.elapsed()))
-    logger.debug("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
-
-    # do a bit of cleanup
-    #cv2.destroyAllWindows()
-    vs.stop()
-    #conn.close()
 
 
 
-""" 'Global' variables """
 
-args = {}
-imagesQueue = {}
-detectors = {}
-videos = []
-vs = None
-
-fps = None
-p_get_frame = None
-
-"""Delete old images later then DELETE_FILES_LATER milliseconds"""  
+"""Delete old images later then DELETE_FILES_LATER milliseconds every 24 hours"""  
 def clean_up_service():
   threading.Timer(3600*24, clean_up_service).start()
   db.delete_frames_later_then(DELETE_FILES_LATER)
@@ -322,6 +303,13 @@ def serve_static(filename):
     root_dir = os.path.dirname(os.getcwd())
     return send_from_directory(os.path.join(root_dir, 'static', 'js'), filename)
 
+@main_blueprint.route('/health')
+@cross_origin(origin='http://localhost:{}'.format(port))
+def health():
+    ret = {'os': comp_node(), 'totalDetectors': len(detectors), 'totalStreams': len(imagesQueue),'imagesQueue': imagesQueue,'detectors': detectors}
+    logger.info(ret)
+    return Response(json.dumps(ret,default=str, indent = 4), mimetype='text/plain', status=200)
+
 
 @main_blueprint.route(deny_service_url, methods=['POST'])
 @cross_origin(origin='http://localhost:{}'.format(port))
@@ -444,11 +432,13 @@ def ping_video_url(url):
     """ Ping url """
     try:
         vs = cv2.VideoCapture(url)
-        flag, frame = vs.read()
-        ret = flag
+        flag, _ = vs.read()
+
     except Exception as e:
-        ret = False
+        
         logger.info("Exception in ping url: {}".format(e))
+    finally:    
+        vs.stop()
         
     return flag
 
