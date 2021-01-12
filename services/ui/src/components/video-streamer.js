@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { Tabs, Tab } from 'react-bootstrap';
+import { Tabs,Tab } from 'react-bootstrap';
+
 import SelectObj from './obj_select';
 
 import ObjectOfInterestPlot from './obj_plot'
 import ObjectOfInterest from './objects_of_interest'
 import Video from './video';
+
+
 
 class VideoStreamer extends Component {
     
@@ -50,14 +53,15 @@ class VideoStreamer extends Component {
 
                 <div className="row">
                   <div className="col-sm-12">                           
-                    <Tabs  defaultActiveKey="founded_objects" id="uncontrolled-tab">
-                        <Tab eventKey="founded_objects" title="Founded Objects" className="tabcontent">
+                        <Tabs defaultActiveKey="founded_objects" id="uncontrolled-tab">
+                            <Tab eventKey="founded_objects" title="Founded Objects" className="tabcontent" >
                             <ObjectOfInterest object_of_interest={this.state.object_of_interest}
                                 timerange={this.state.timerange}
                                 cam={camera.id}
-                            />    
-                        </Tab>
-    {/*                 <Tab eventKey="events" title="Events Notify" className="tabcontent">
+                            />  
+                            </Tab>  
+                        
+                     <Tab eventKey="events" title="Events Notify" className="tabcontent">
                         <h3>Events notifyer</h3>
                             <p>Specify Events which will triger eMail or SMS/Voice notify.</p>
                             <select name="objects">
@@ -86,7 +90,7 @@ class VideoStreamer extends Component {
                             :
                             <input type="text" placeholder="" min="0"  max="100" />
                         </Tab> 
-                */}       
+                       
                     </Tabs>
                     </div>  {/*<div className="col-sm-6">*/}
                 </div> {/* className row */}

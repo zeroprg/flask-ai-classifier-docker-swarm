@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
 const ObjectOfInterest = (props) => {
-    
+    const loadStyle = {
+   
+        height: '150px'
+    }
+    const tabcontentStyle = {
+        width: window.innerWidth-20
+    }
     const PAGINATOR = 300
 
     const popup_image = (event) =>{
@@ -104,27 +110,32 @@ const ObjectOfInterest = (props) => {
     
 
 
-    if (!data) {
-        return "loading...";
-    }
+    if ( !data || data.length == 0 ) {
+       return  ( 
+                 <div style={tabcontentStyle}> 
+                 <img src={'img/big_loading.gif'} style={loadStyle}/>
+                 </div> )
+     }
     
     //if ( timerange.start === props.timerange.start && timerange.end === props.timerange.end )
     return (       
-      <span>
+       <React.Fragment>
+          
         <div id="navigation" className="text-center">
             <button data-testid="button-restart" className="small" onClick = {(e) =>seek(0,e)}>Restart ({data.length - 1})</button>
             <button data-testid="button-prev" className="small outlined" onClick = {(e) =>seek(+PAGINATOR, e)}>Prev ({counter + PAGINATOR })</button>
             <button data-testid="button-next" className="small" onClick = {(e) =>seek(-PAGINATOR, e)}>Next ({counter - PAGINATOR })</button>
         </div>
 
-        <div id={'Objectsfilter'+ props.cam } className="tabcontent" style={{display:'block'}}>
+        <div id={'Objectsfilter'+ props.cam } style={{display:'block'}}>
           <div id={'cam'+ props.cam} className="images_row">
            {data.map(data =>
             <img key={data.hashcode} id={data.hashcode} className={'img_thumb'} src={data.frame}  alt={data.currentime} onClick={popup_image.bind(this)} />
            )} 
         </div> 
-        </div>                        
-       </span>
+        </div> 
+        </React.Fragment>                        
+       
     );
    // else return ('.. Loading');
   }

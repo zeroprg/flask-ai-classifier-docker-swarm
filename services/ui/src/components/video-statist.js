@@ -16,7 +16,7 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
     
     const menu = (showStatistic) => (<Menu> 
         <Item title="Twitter!"> <i className = {"fa fa-twitter"}/></Item>
-        <Item title="Facebook!"  component="a"
+    {/*    <Item title="Facebook!"  component="a"
               componentProps={{
                     href: "https://facebook.com",
                     target: "_blank",
@@ -29,6 +29,7 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
         
          <i className={"fa fa-facebook"}/>
         </Item>
+        */}
         <Item title={showStatistic?"Show statistic":"back to Video"} component="a" 
               componentProps={{ onClick: (e) => {     
                   e.preventDefault();                                  

@@ -65,7 +65,7 @@ function getStyles(name, objectName, theme) {
 
     return (
         <div>
-        {this.state.isLoading? <p className="loading"> ... Loading </p>:''} 
+        {this.state.isLoading? <img src={'img/fancybox_loading.gif'}></img>:''} 
         <h3>Welcome to our chat  </h3>
         <div>
         <Messages message={this.state.messageToSent}/> 

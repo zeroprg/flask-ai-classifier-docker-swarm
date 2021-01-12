@@ -32,7 +32,7 @@ class InputURL extends Component {
     render() {
         return (
             <div>
-                {this.state.isLoading? <p className="loading"> ... Loading </p>:''} 
+                {this.state.isLoading? <img src={'img/fancybox_loading.gif'}></img>:''} 
                 <h3>Enter IP Camera url at this box </h3>
                 <h3><b>Warning:</b> "By specifying IP Address or camera URL bellow you will share your link with all other subscribers. To make this link private your have to subscribe to payable version"</h3>
                     <form id="myform" className="form-horizontal" onSubmit={this.handleSubmit}>
