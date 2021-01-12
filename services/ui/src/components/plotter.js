@@ -57,7 +57,7 @@ class Plotter extends Component {
             );
          else 
             return (
-                <div className="loading"> ... Loading </div>
+                <img src={'img/fancybox_loading.gif'}></img>
               );
         
         }  
