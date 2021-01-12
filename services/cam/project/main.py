@@ -160,7 +160,7 @@ def lock_urls_for_os():
             imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
             detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
                     imagesQueue[params['id']], params)
-            logger.info("p_classifiers for cam:" + video['id'] + " started")    
+            logger.info("p_classifiers for cam:" + params['id'] + "re-started")    
 
 
 def start_one_stream_processes(video, prod=prod, detectors=detectors, imagesQueue=imagesQueue):
