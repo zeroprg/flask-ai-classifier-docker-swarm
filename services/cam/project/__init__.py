@@ -8,12 +8,22 @@ from flask import Flask
 # Read all production configuration fro config.txt file
 from project.config import ProductionConfig as prod
 from project.db.api import Sql
-
+import uuid
 #from flask import g
 
+""" 'Global' variables """
+args = {}
+imagesQueue = {}
+detectors = {}
+videos = []
+vs = None
 
+fps = None
+p_get_frame = None
+comp_uuid = str(uuid.uuid4())
 db = Sql(SQLALCHEMY_DATABASE_URI = prod.SQLALCHEMY_DATABASE_URI)
-
+def comp_node():
+    return comp_uuid
 # instantiate the extensions
 #migrate = Migrate()
 
