@@ -135,13 +135,22 @@ def clean_up_service():
 def lock_urls_for_os():
   threading.Timer(101, lock_urls_for_os).start()      
   db.update_url_by_os(comp_node())
-  videos_ = db.select_urls_by_os(comp_node())
+  videos_ = db.select_all_urls()
   for params in videos_:
-        if params['id'] not in imagesQueue:
-            imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-            detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
+        """ grab the first video which was not processed for last 10 min. and from this node """
+        if params['id'] not in imagesQueue and params['currenttime'] + 600000 > time.time()*1000:
+           
+            params['os'] = comp_node()
+            logger.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
+            try:
+                db.update_urls(params)
+            except:
+                pass
+            else:
+                imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+                detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
                     imagesQueue[params['id']], params)
-            logger.info("p_classifiers for cam:" + params['id'] + "re-started")    
+            break
 
 
 def start_one_stream_processes(video, prod=prod, detectors=detectors, imagesQueue=imagesQueue):
@@ -150,7 +159,8 @@ def start_one_stream_processes(video, prod=prod, detectors=detectors, imagesQueu
     detectors[video['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
             imagesQueue[video['id']],video)
 
-    logger.info("p_classifiers for cam:" + video['id'] + " started")
+    
+    logger.info("p_classifiers for cam: {} started by {} ".format(video['id'], comp_node() ))
 
   #  p = Process(target=get_frame, args=(imagesQueue[cam], cam))
   #  p.daemon = True
@@ -254,7 +264,8 @@ def initialize_video_streams(url=None, videos=[]):
             imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
             detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
                 imagesQueue[params['id']], params)
-            logger.info("p_classifiers for cam:" + video['id'] + " started")    
+            logger.info("p_classifiers for cam: {} started by {} ".format(video['id'], comp_node() ))
+            
             #url = 'http://{}:{}{}'.format(IP_ADDRESS,port,deny_service_url)
             #p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
             #p_deny_service.daemon=False
