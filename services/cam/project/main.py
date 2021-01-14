@@ -256,10 +256,11 @@ def initialize_video_streams(url=None, videos=[]):
         params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node()}
         try:
             logger.debug("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
-            db.update_urls(params)            
+            if video['id'] not in imagesQueue and video['currenttime'] + 60000 > time.time()*1000:
+                db.update_urls(params)            
         except Exception as e:
             logger.info("Exception {}".format(e))
-        else:          
+        else:            
             params['videos_length'] = len(imagesQueue)
             """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
             #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)
