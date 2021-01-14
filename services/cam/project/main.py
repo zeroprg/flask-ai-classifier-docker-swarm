@@ -136,9 +136,10 @@ def lock_urls_for_os():
   threading.Timer(101, lock_urls_for_os).start()      
   db.update_url_by_os(comp_node())
   videos_ = db.select_all_urls()
+
   for params in videos_:
         """ grab the first video which was not processed for last 10 min. and from this node """
-        if params['id'] not in imagesQueue and params['currenttime'] + 600000 > time.time()*1000:
+        if params['id'] not in imagesQueue and params['currenttime'] + 60000 > time.time()*1000:
            
             params['os'] = comp_node()
             logger.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
@@ -150,7 +151,8 @@ def lock_urls_for_os():
                 imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
                 detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
                     imagesQueue[params['id']], params)
-            break
+                i = len(imagesQueue)    
+                if i == prod.MAXIMUM_VIDEO_STREAMS: break
 
 
 def start_one_stream_processes(video, prod=prod, detectors=detectors, imagesQueue=imagesQueue):
@@ -247,17 +249,18 @@ def initialize_video_streams(url=None, videos=[]):
                 logger.info(arg)
     videos_ = db.select_all_urls()
     """ Update all videos as mine , start greeding algorithm here ..."""
-    i = 0
+
     """ Updation """
     for video in videos_:
         
         params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node()}
         try:
             logger.debug("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
-            db.update_urls(params)            
+            if video['id'] not in imagesQueue and video['currenttime'] + 60000 > time.time()*1000:
+                db.update_urls(params)            
         except Exception as e:
             logger.info("Exception {}".format(e))
-        else:          
+        else:            
             params['videos_length'] = len(imagesQueue)
             """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
             #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)
@@ -270,8 +273,9 @@ def initialize_video_streams(url=None, videos=[]):
             #p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
             #p_deny_service.daemon=False
             #p_deny_service.start()
-            if i > prod.MAXIMUM_VIDEO_STREAMS: break
-            i += 1    
+            i = len(imagesQueue)
+            if i == prod.MAXIMUM_VIDEO_STREAMS: break
+                
             
     videos = db.select_all_urls()            
 
