@@ -136,9 +136,10 @@ def lock_urls_for_os():
   threading.Timer(101, lock_urls_for_os).start()      
   db.update_url_by_os(comp_node())
   videos_ = db.select_all_urls()
+  i=0
   for params in videos_:
         """ grab the first video which was not processed for last 10 min. and from this node """
-        if params['id'] not in imagesQueue and params['currenttime'] + 600000 > time.time()*1000:
+        if params['id'] not in imagesQueue and params['currenttime'] + 60000 > time.time()*1000:
            
             params['os'] = comp_node()
             logger.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
@@ -150,7 +151,8 @@ def lock_urls_for_os():
                 imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
                 detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
                     imagesQueue[params['id']], params)
-            break
+                i +=1    
+                if i == MAXIMUM_VIDEO_STREAMS: break
 
 
 def start_one_stream_processes(video, prod=prod, detectors=detectors, imagesQueue=imagesQueue):
