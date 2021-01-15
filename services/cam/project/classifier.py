@@ -42,7 +42,7 @@ logger = logging.getLogger('logger')
 logger.setLevel(logging.INFO)
 
 class Detection:
-    def __init__(self, classify_server, confidence, model,  output_queue, video):
+    def __init__(self, classify_server, confidence, model, video):
         self.confidence = confidence
         self.model = model
         self.video_url = video['url'] + '?' if '?' not in  video['url'] else '&' + 'stream=full&needlength'
@@ -50,18 +50,19 @@ class Detection:
         self.topic_label = 'no data'
         self.net = self.video_s = None
         self.cam = video['id']
+        self.classify_server = classify_server
 
         for i in range(NUMBER_OF_THREADS):
-            p_get_frame = Process(target=self.classify,
-                                  args=(classify_server
-                                  ,output_queue))
-            p_get_frame.daemon = True
+            p_get_frame = Process(target=self.classify)
+
+                                  #,output_queue))
+            p_get_frame.daemon = False
             p_get_frame.start()
             logger.info("-------- Process was just started for video: {} --------".format(video))
             time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
         
 
-    def classify(self,classify_server, output_queue):
+    def classify(self):#, output_queue):
         if self.video_s is None:
             self.video_s = self.init_video_stream()
         while True:
@@ -71,7 +72,7 @@ class Detection:
             except:
                 print('Exception during reading stream by URL:{0}'.format(self.video_url))
                 return
-            result = call_classifier(classify_server, frame, self.cam, self.confidence, self.model)
+            result = call_classifier(self.classify_server, frame, self.cam, self.confidence, self.model)
             if(result is  not None ):
                # print("cam {0} result: {1}".format(cam, result))
                 if 'rectangles' in result : 
@@ -83,7 +84,7 @@ class Detection:
                         cv2.rectangle(frame, (x,y), (rec.get('endX') + 25, rec.get('endY') + 25), (255, 0, 0), 1)
                         cv2.putText(frame, rec.get('text') , (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
                 cv2.putText(frame, result.get('topic_label', 'None')  , (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                output_queue.put(frame)
+                #output_queue.put(frame)
                 #output_queue.put_nowait(frame)
 
 

@@ -139,7 +139,7 @@ def lock_urls_for_os():
 
   for params in videos_:
         """ grab the first video which was not processed for last 10 min. and from this node """
-        if params['id'] not in imagesQueue and params['currenttime'] + 60000 > time.time()*1000:
+        if params['id'] not in detectors and params['currenttime'] + 60000 > time.time()*1000:
            
             params['os'] = comp_node()
             logger.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
@@ -148,18 +148,18 @@ def lock_urls_for_os():
             except:
                 pass
             else:
-                imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+                #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
                 detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                    imagesQueue[params['id']], params)
-                i = len(imagesQueue)    
+                     params)
+                i = len(detectors)    
                 if i == prod.MAXIMUM_VIDEO_STREAMS: break
 
 
-def start_one_stream_processes(video, prod=prod, detectors=detectors, imagesQueue=imagesQueue):
+def start_one_stream_processes(video, prod=prod, detectors=detectors):
     #print(imagesQueue)
     #if imagesQueue.get(video['id'], None) is not None :
     detectors[video['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-            imagesQueue[video['id']],video)
+            video)
 
     
     logger.info("p_classifiers for cam: {} started by {} ".format(video['id'], comp_node() ))
@@ -186,7 +186,7 @@ def start():
   
  
 #@sleep(1)
-def deny_service_call(url, params=None, imagesQueue=imagesQueue, detectors=detectors, prod = prod, IMAGES_BUFFER=IMAGES_BUFFER):  
+def deny_service_call(url, params=None, detectors=detectors, prod = prod, IMAGES_BUFFER=IMAGES_BUFFER):  
     time.sleep(20)
 
     try:
@@ -195,13 +195,13 @@ def deny_service_call(url, params=None, imagesQueue=imagesQueue, detectors=detec
         #r.raise_for_status()
         if r.status_code == 412 :
             """ Servicing this video was denied other nodes didn't grab this video """       
-            imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+            #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
             detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                imagesQueue[params['id']], params)
+                params)
            
 
-            logger.info("Adding a new imagesQueue with {}".format(params['id']))
-            logger.info(imagesQueue)       
+            logger.info("Adding a new detector with {}".format(params['id']))
+            #logger.info(imagesQueue)       
         else: # code 200 Ok  successefully deny this service on another node
             """ get this service to myself """          
             try:
@@ -256,24 +256,24 @@ def initialize_video_streams(url=None, videos=[]):
         params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node()}
         try:
             logger.debug("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
-            if video['id'] not in imagesQueue and video['currenttime'] + 60000 > time.time()*1000:
+            if video['id'] not in detectors and video['currenttime'] + 60000 > time.time()*1000:
                 db.update_urls(params)            
         except Exception as e:
             logger.info("Exception {}".format(e))
         else:            
-            params['videos_length'] = len(imagesQueue)
+            params['videos_length'] = len(detectors)
             """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
             #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)
-            imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+            #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
             detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                imagesQueue[params['id']], params)
+                params)
             logger.info("p_classifiers for cam: {} started by {} ".format(video['id'], comp_node() ))
             
             #url = 'http://{}:{}{}'.format(IP_ADDRESS,port,deny_service_url)
             #p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
             #p_deny_service.daemon=False
             #p_deny_service.start()
-            i = len(imagesQueue)
+            i = len(detectors)
             if i == prod.MAXIMUM_VIDEO_STREAMS: break
                 
             
@@ -321,7 +321,7 @@ def serve_static(filename):
 @main_blueprint.route('/health')
 @cross_origin(origin='http://localhost:{}'.format(port))
 def health():
-    ret = {'os': comp_node(), 'totalDetectors': len(detectors), 'totalStreams': len(imagesQueue),'imagesQueue': imagesQueue,'detectors': detectors}
+    ret = {'os': comp_node(), 'totalDetectors': len(detectors), 'detectors': detectors}
     logger.info(ret)
     return Response(json.dumps(ret,default=str, indent = 4), mimetype='text/plain', status=200)
 
@@ -337,10 +337,10 @@ def deny_service():
         return Response({"message":msg} , mimetype='text/plain', status=412)    
     """ if request come rom different node  """ 
     """ Griddy algorithm started here  if  list of videos too big and my list too small """
-    if len(imagesQueue) > int(params['videos_length']) :
+    if len(detectors) > int(params['videos_length']) :
             """ delete this video service """
             if detectors.get(params['id'], None) is not None: del detectors[params['id']]
-            if imagesQueue.get(params['id'], None) is not None: del imagesQueue[params['id']]
+            #if imagesQueue.get(params['id'], None) is not None: del imagesQueue[params['id']]
            #  logger.info("------------------- !!!!!!!! Was updated !!!!!!!!!!!! --------------------")
             msg = "Video with id:{} successfully deleted on node: {}".format(params['id'],params['os'])
             return Response({"message":msg}, mimetype='text/plain', status=200)
@@ -481,9 +481,9 @@ def urls():
             else:
                 
                 params['os'] = comp_node()
-                imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+                #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
                 detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                    imagesQueue[params['id']], params)
+                    params)
                 return Response('{"message":"URL added successfully"}', mimetype='text/plain',status=200)
         else:
             return Response('{"message":"URL has no video"}', mimetype='text/plain',status=400)
