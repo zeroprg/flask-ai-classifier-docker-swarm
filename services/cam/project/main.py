@@ -134,7 +134,7 @@ def clean_up_service():
 """ Lock urls record for every 101 seconds """
 def lock_urls_for_os():
   threading.Timer(101, lock_urls_for_os).start()      
-  db.update_url_by_os(comp_node())
+  #db.update_url_by_os(comp_node())
   videos_ = db.select_all_urls()
 
   for params in videos_:
@@ -145,8 +145,8 @@ def lock_urls_for_os():
             logger.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
             try:
                 db.update_urls(params)
-            except:
-                pass
+            except Exception as e:
+                logger.info("Exception {}".format(e))
             else:
                 #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
                 detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
@@ -253,10 +253,10 @@ def initialize_video_streams(url=None, videos=[]):
     """ Updation """
     for video in videos_:
         
-        params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node()}
+        params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node(), 'currenttime':time.time()*1000 }
         try:
             logger.debug("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
-            if video['id'] not in detectors and video['currenttime'] + 60000 > time.time()*1000:
+            if params['id'] not in detectors: #and video['currenttime'] > time.time()*1000 - 60000:
                 db.update_urls(params)            
         except Exception as e:
             logger.info("Exception {}".format(e))

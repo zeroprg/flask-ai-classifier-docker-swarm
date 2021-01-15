@@ -110,10 +110,11 @@ class Sql:
             else:    
                 raise Exception('No value defined for parameter os')
             ResultProxy = self.getConn().execute(query,params)
-            print(" urls was updated  with params: {}".format(ResultProxy.last_updated_params() ))
+
         except Exception as e:
             print(" e: {}".format( e))
-
+        else:
+            print(" urls was updated  with params: {}".format(ResultProxy.last_updated_params() ))
 
     def select_all_urls(self):
         """
