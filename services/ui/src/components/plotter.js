@@ -1,12 +1,8 @@
-import { map } from 'd3';
 import React, { Component } from 'react';
-import { XYPlot, XAxis, YAxis, VerticalGridLines,  HorizontalGridLines,  VerticalBarSeries, DiscreteColorLegend, VerticalRectSeries} from 'react-vis';
+import { XYPlot, XAxis, YAxis, VerticalGridLines,  HorizontalGridLines,  DiscreteColorLegend, VerticalRectSeries} from 'react-vis';
 
 class Plotter extends Component {
-    constructor(props){
-        super(props)
-        
-    }
+
     componentDidMount() {        
         window.addEventListener("resize", this.resize.bind(this));
         this.resize();
@@ -14,8 +10,7 @@ class Plotter extends Component {
     
     resize() {
         this.setState({width: window.innerWidth*0.6 });
-    }
-    
+    }    
 
 
     componentWillUnmount() {

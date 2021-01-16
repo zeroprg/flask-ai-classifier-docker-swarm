@@ -6,7 +6,8 @@ const ObjectOfInterest = (props) => {
         height: '150px'
     }
     const tabcontentStyle = {
-        width: window.innerWidth-20
+        width: window.innerWidth-20,
+        textAlign: 'center'
     }
     const PAGINATOR = 300
 
@@ -24,12 +25,12 @@ const ObjectOfInterest = (props) => {
     const [counter, setCounter]  = useState(PAGINATOR);
     const [object_of_interest, setObjectOfInterest] =  useState([])
     const [timerange, setTimerange] = useState({start:0,end:0});
-
+    const [loading,setLoading]  = useState(true);
 
     async function fetchImageData(cam, objectOfInterest, timerange) {
         const DEFAULT_QUERY =  global.config.API + "moreimgs?hour_back1=" + timerange.start + 
         "&cam=" + cam + "&hour_back2=" + timerange.end + "&object_of_interest=" + objectOfInterest
-
+        setLoading( true )
         fetch(DEFAULT_QUERY)
             .then(response => {
                 // make sure to check for errors
@@ -43,6 +44,7 @@ const ObjectOfInterest = (props) => {
                 }
             })
             .then(json => { 
+                setLoading( false )
                 setData(json)
                 setTimerange(timerange)
                 setObjectOfInterest(objectOfInterest)
@@ -52,7 +54,7 @@ const ObjectOfInterest = (props) => {
 
 
       useEffect(() => { 
-            if(JSON.stringify(object_of_interest)!=JSON.stringify(props.object_of_interest) ||
+            if(JSON.stringify(object_of_interest)!==JSON.stringify(props.object_of_interest) ||
                 timerange.start !== props.timerange.start || timerange.end !== props.timerange.end ) 
                     fetchImageData(props.cam, props.object_of_interest, props.timerange);
             },
@@ -110,11 +112,14 @@ const ObjectOfInterest = (props) => {
     
 
 
-    if ( !data || data.length == 0 ) {
+    if ( loading ) {
        return  ( 
                  <div style={tabcontentStyle}> 
                  <img src={'img/big_loading.gif'} style={loadStyle}/>
                  </div> )
+     }
+     if(  !data || data.length === 0 ) {
+         return ( <div style={tabcontentStyle}><h1> No Data </h1></div>)
      }
     
     //if ( timerange.start === props.timerange.start && timerange.end === props.timerange.end )

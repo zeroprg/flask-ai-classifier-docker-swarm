@@ -15,7 +15,7 @@ import cv2
 
 from project.config import  ProductionConfig as prod
 from project.classifier import Detection
-from project import db, detectors, imagesQueue, comp_node
+from project import db, detectors, imagesQueue, comp_node, videos
 import platform 
 from project.sleep_decorator import sleep
 
@@ -448,12 +448,10 @@ def ping_video_url(url):
     try:
         vs = cv2.VideoCapture(url)
         flag, _ = vs.read()
-
-    except Exception as e:
-        
+    except Exception as e:        
         logger.info("Exception in ping url: {}".format(e))
-    finally:    
-        vs.stop()
+ 
+    
         
     return flag
 
