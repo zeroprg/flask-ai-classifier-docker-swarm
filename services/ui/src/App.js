@@ -125,9 +125,11 @@ class App extends Component {
                     <div className="col-md-12">
                        
                         <h1 className="animated fadeInDown">AI processed video streams from public cameras.</h1>
+
                         <h3> This is free smart cloud storage  for cameras video streams works on ODROID ARM based computers   (100% python , no php  for more information check 
                         <a href="//aicameras.ca" target="_blank" rel="noopener noreferrer"> http://aicameras.ca</a> ), bellow public available video-streams: </h3>
                        {/*The way to reference child component ref={(cd) => this.child = cd} */}
+
                         <InputURL updateparams={this.updateparams.bind(this)}
                                   addURL={this.addNewURL.bind(this)}/> 
                                
@@ -159,13 +161,7 @@ class App extends Component {
                                     calculate occupancy number on video screen
                                 </p>
                             </li>
-                            <li>
-                                <h1>Store Objects of interest:</h1>
-                                <p>
-                                    Any object of interest can be saved
-                                    Trial version has only 1Gb storage to store statistic data, images and video
-                                </p>
-                            </li>
+
                             <li>
                                 <h1>Check Objects behaviour :</h1>
                                 <p>
