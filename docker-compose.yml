@@ -2,47 +2,47 @@ version: '3.5'
 
 services:
 
-  cam:
-    build:
-      context: ./services/cam
-      dockerfile: Dockerfile 
-    image: zeroprg/flask-docker-swarm_cam:latest
-    ports:
-      - 3020:3020
-    environment:
-      - PORT=3020
-      - CLASSIFIER_SERVER=http://192.168.0.167/classify
-      - FLASK_ENV=production
-      - APP_SETTINGS=/home/app/web/config.txt
-      - IP_ADDRESS=192.168.0.167
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-    depends_on:
-      - db
-      - web
-    networks:
-      - app
+#  cam:
+#    build:
+#      context: ./services/cam
+#      dockerfile: Dockerfile 
+#    image: zeroprg/flask-docker-swarm_cam:latest
+#    ports:
+#      - 3020:3020
+#    environment:
+#      - PORT=3020
+#      - CLASSIFIER_SERVER=http://192.168.0.167/classify
+#      - FLASK_ENV=production
+#      - APP_SETTINGS=/home/app/web/config.txt
+#      - IP_ADDRESS=192.168.0.167
+#      - DB_USER=postgres
+#      - DB_PASSWORD=postgres
+#    depends_on:
+#      - db
+#      - web
+#    networks:
+#      - app
 
 
-  web:
-    build:
-      context: ./services/web
-      dockerfile: Dockerfile
-    image: zeroprg/flask-docker-swarm_web:latest
-    #command: gunicorn --bind 0.0.0.0:4000 manage:app
-    ports:
-      - 4000:4000
-    environment:
-      - FLASK_ENV=production
-      - APP_SETTINGS=/home/app/web/config.txt
-      - DB_USER=postgres
-      - IP_ADDRESS=192.168.0.167
-      - DB_PASSWORD=postgres
-      - SECRET_CODE=myprecious
-    depends_on:
-      - db
-    networks:
-      - app
+#  web:
+#    build:
+#      context: ./services/web
+#      dockerfile: Dockerfile
+#    image: zeroprg/flask-docker-swarm_web:latest
+#    #command: gunicorn --bind 0.0.0.0:4000 manage:app
+#    ports:
+#      - 4000:4000
+#    environment:
+#      - FLASK_ENV=production
+#      - APP_SETTINGS=/home/app/web/config.txt
+#      - DB_USER=postgres
+#      - IP_ADDRESS=192.168.0.167
+#      - DB_PASSWORD=postgres
+#      - SECRET_CODE=myprecious
+#    depends_on:
+#      - db
+#    networks:
+#      - app
 
   db:
     build:
@@ -67,20 +67,20 @@ services:
 
 
 
-  nginx:
-    build:
-      context: ./services/nginx
-      dockerfile: Dockerfile
-    image: zeroprg/flask-docker-swarm_nginx:latest
+#  nginx:
+#    build:
+#      context: ./services/nginx
+#      dockerfile: Dockerfile
+#    image: zeroprg/flask-docker-swarm_nginx:latest
 
-    restart: always
-    ports:
-      - 80:80
-    depends_on:
-      - web
-      - cam  
-    networks:
-      - app
+#    restart: always
+#    ports:
+#      - 80:80
+#    depends_on:
+#      - web
+#      - cam  
+#    networks:
+#      - app
 
 
 networks:
