@@ -471,7 +471,7 @@ def urls():
             try:
                 
                 params = { 'url': add_url }
-                params = db.insert_urls(params)
+                db.insert_urls(params)
             except Exception as e:
                 logger.debug("Exception during saving url:{} : {}".format(add_url,e))
                 msg = "URL already exist it was already  added successfully"
