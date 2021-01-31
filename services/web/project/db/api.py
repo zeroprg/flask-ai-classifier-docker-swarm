@@ -15,6 +15,7 @@ class Sql:
         """
         
         self.engine = None
+        self.limit = 70
         metadata = sql.MetaData()
         
         if(  DATABASE_URI is None or DATABASE_URI == ''):
@@ -36,6 +37,7 @@ class Sql:
         :return: Connection object or None
         """
         self.engine = None
+        self.limit = 70
         metadata = sql.MetaData()
 
         if(  SQLALCHEMY_DATABASE_URI is None or SQLALCHEMY_DATABASE_URI == ''):
@@ -66,7 +68,7 @@ class Sql:
         """
         #cur = conn.cursor()
         #cur.execute("SELECT hashcode, currentdate, currentime, type, x_dim, y_dim FROM objects  ORDER BY currentime DESC ")
-        query = sql.select([self.objects]).limit(50).all()
+        query = sql.select([self.objects]).limit(self.limit).all()
         ResultProxy = self.getConn().execute(query)
         rows = ResultProxy.fetchall()
         #for row in rows:
@@ -143,40 +145,51 @@ class Sql:
         jpg_as_base64='data:image/jpeg;base64,'+ base64.b64encode(buffer).decode('utf-8')
 
 
-        
+        conn = self.getConn()
         try:
             #cur.execute("INSERT INTO objects (hashcode, currentdate, currentime, type, frame, x_dim, y_dim, cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")", 
             #(str(hashcode), date, time, type, str(jpg_as_base64), int(x_dim), int(y_dim), int(cam)))
             values = {'hashcode': hashcode, 'currentdate': date, 'currentime': time, 'type': type, 'frame':str(jpg_as_base64),
                       'width': int(x_dim),'height': int(y_dim), 'x_dim': int(startX), 'y_dim': int(startY) , 'cam':cam}     
             query = sql.insert(self.objects)
-            ResultProxy = self.getConn().execute(query, values)
+            ResultProxy = conn.execute(query, values)
             #print(" insert_frame was {0} with params: {1}".format(ResultProxy.is_insert ,values))
         except Exception as e: print(" e: {}".format( e))
+        finally:
+            conn.close()
 
 
     def select_frame_by_time(self, cam, time1, time2):
-        """
+     """
         Query frames by time
         :param conn: the Connection object
         :param cam, time1, time2 in epoch seconds
         :return:
-        """    
-        #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects WHERE cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
-        
-        query = sql.select([self.objects]).where(sql.and_(self.objects.c.cam == cam, 
-                                                          self.objects.c.currentime.between(time1, time2)
-                                                         )
-                                                ).order_by(text("currentime desc"))
-                                                                                    
-        ResultProxy = self.getConn().execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor] 
-#        rows = [ {'cam':v['çam'] , 'hashcode':v['hashcode'],  'currentdate':v['currentdate'], 'currentime':v['currentime'], 'type': v['type'], 'frame': v['frame'], 'lastdate': v['lastdate'], 'lasttime': v['lasttime']  } for v in ResultProxy ]
+        """
+        now = time.time()
+        time2 = int((now - time2*3600)*1000)
+        time1 = int((now - time1*3600)*1000)
+        if time2 > time1:  # swap them 
+            a=time2
+            time2=time1 
+            time1=a
 
+
+        #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects filter cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC", (cam,time1,time2,))
+        query = sql.select([self.objects]).where(sql.and_(    self.objects.columns.currentime > time2,                                                       
+                                                              self.objects.columns.currentime < time1,                                                              
+                                                              self.objects.columns.cam == cam
+                                                             )
+                                                ).order_by(text("currentime desc"))
+        conn = self.getConn()
+        ResultProxy = conn.execute(query)
+        cursor = ResultProxy.fetchall()
+        rows = [dict(r) for r in cursor]
+        conn.close()
         return rows
 
     def select_last_frames(self, cam, time1, time2, obj,  offset=0, n_rows=50):
+        def select_last_frames(self, cam, time1, time2, obj,  offset=0):
         """
         Query last n rows of frames b
         :param conn: the Connection object
@@ -184,8 +197,8 @@ class Sql:
         :return:
         """
         now = time.time()
-        time2 = int((now - time2*3600000)*1000)
-        time1 = int((now - time1*3600000)*1000)
+        time2 = int((now - time2*3600)*1000)
+        time1 = int((now - time1*3600)*1000)
         if time2 > time1:  # swap them 
             a=time2
             time2=time1 
@@ -194,39 +207,41 @@ class Sql:
         print(time2,time1, obj)
         tuple_ =  obj.split(',')
         
-        #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects where cam="+self.P+" AND  type IN " +str+ " AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC LIMIT "+self.P+" OFFSET "+self.P+"", 
+        #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects filter cam="+self.P+" AND  type IN " +str+ " AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC LIMIT "+self.P+" OFFSET "+self.P+"", 
         #    (cam, time2, time1,n_rows,offset,))
         #fetched_rows = cur.fetchall()
-        query = sql.select([self.objects]).where(sql.and_(self.objects.c.cam == cam, 
-                                                          self.objects.c.type.in_(tuple_),
-                                                          self.objects.c.currentime.between(time2, time1)
+        query = sql.select([self.objects]).where(sql.and_(    self.objects.columns.currentime > time2,                                                       
+                                                              self.objects.columns.currentime < time1,
+                                                              self.objects.columns.cam == cam,
+                                                              self.objects.columns.type.in_(tuple_)
+                                                              
                                                          )
-                                                ).order_by(text("currentime desc")).limit(n_rows).offset(offset)
-                                     
-        ResultProxy = self.getConn().execute(query)
+                                                ).order_by(text("currentime desc")).limit(self.limit).offset(offset)
+        conn = self.getConn()                                            
+        ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor] 
-
-        #cursor = ResultProxy.fetchall()
-        #rows = [ {'cam':v['çam'] , 'hashcode':v['hashcode'],  'currentdate':v['currentdate'], 'currentime':v['currentime'], 'type': v['type'], 'frame': v['frame'], 'lastdate': v['lastdate'], 'lasttime': v['lasttime']  } for v in cursor ]
-        #print(rows[0])
+        conn.close()
+        rows = [dict(r) for r in cursor]
         return rows
 
 
 
     def delete_frames_later_then(self, hours):
-        """
+       """
         Delete all records from objects table which are later then 'hours' back
         """
         # predicate : '-70 minutes' , '-1 seconds ', '-2 hour'
-        #cur.execute("DELETE from objects WHERE currentime < strftime('"+self.P+"','now'," + predicate+ ")")
+        #cur.execute("DELETE from objects filter currentime < strftime('"+self.P+"','now'," + predicate+ ")")
 
         millis_back = int(round(time.time() * 1000)) - hours*60*60*1000
+        conn = self.getConn()
         try:
             query = sql.delete(self.objects).where( self.objects.currentime < millis_back )
-            ResultProxy = self.getConn().execute(query)
+            ResultProxy = conn.execute(query)
             print(" delete_frames_later_then was {0} with params: {1}".format(ResultProxy.is_insert ,hours))
         except Exception as e: print(" e: {}".format( e))
+        finally:
+            conn.close()
     
 def main():
     database = "framedata.db"
