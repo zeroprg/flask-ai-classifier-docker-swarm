@@ -160,12 +160,12 @@ class Sql:
 
 
     def select_frame_by_time(self, cam, time1, time2):
-     """
+        """
         Query frames by time
         :param conn: the Connection object
         :param cam, time1, time2 in epoch seconds
         :return:
-     """
+        """
         now = time.time()
         time2 = int((now - time2*3600)*1000)
         time1 = int((now - time1*3600)*1000)
@@ -188,12 +188,12 @@ class Sql:
         conn.close()
         return rows
 
-    def select_last_frames(self, cam, time1, time2, obj,  offset=0, n_rows=50):
-        def select_last_frames(self, cam, time1, time2, obj,  offset=0):
+ 
+    def select_last_frames(self, cam, time1, time2, obj,  offset=0):
         """
         Query last n rows of frames b
         :param conn: the Connection object
-        :param n_rows number of rows restrict value of request
+        :param self.limit number of rows restrict value of request
         :return:
         """
         now = time.time()
@@ -227,7 +227,7 @@ class Sql:
 
 
     def delete_frames_later_then(self, hours):
-       """
+        """
         Delete all records from objects table which are later then 'hours' back
         """
         # predicate : '-70 minutes' , '-1 seconds ', '-2 hour'
