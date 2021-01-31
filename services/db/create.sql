@@ -68,7 +68,7 @@ CREATE OR REPLACE FUNCTION modify_urls()
   AS
 $$
 BEGIN
-	if old.os is not null and old.os != new.os AND EXTRACT(EPOCH FROM NOW()) - old.currenttime/1000 < 120 THEN
+	if old.os is not null and old.os != new.os AND EXTRACT(EPOCH FROM NOW()) - old.currentime/1000 < 120 THEN
         RAISE EXCEPTION 'Record was not updated due to lock by another less then 120 sec. ago';
 	END IF;
 	RETURN NEW;

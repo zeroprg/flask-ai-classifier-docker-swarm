@@ -139,7 +139,7 @@ def lock_urls_for_os():
 
   for params in videos_:
         """ grab the first video which was not processed for last 10 min. and from this node """
-        if params['id'] not in detectors and params['currenttime'] + 60000 > time.time()*1000:
+        if params['id'] not in detectors and params['currentime'] + 60000 > time.time()*1000:
            
             params['os'] = comp_node()
             logger.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
@@ -253,10 +253,10 @@ def initialize_video_streams(url=None, videos=[]):
     """ Updation """
     for video in videos_:
         
-        params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node(), 'currenttime':time.time()*1000 }
+        params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node(), 'currentime':time.time()*1000 }
         try:
             logger.debug("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
-            if params['id'] not in detectors: #and video['currenttime'] > time.time()*1000 - 60000:
+            if params['id'] not in detectors: #and video['currentime'] > time.time()*1000 - 60000:
                 db.update_urls(params)            
         except Exception as e:
             logger.info("Exception {}".format(e))
