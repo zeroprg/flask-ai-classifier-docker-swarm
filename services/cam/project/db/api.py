@@ -103,7 +103,7 @@ class Sql:
 
 # ####################  Urls operations ######################################## #
     def select_urls_by_os(self, os):
-        query = sql.select([self.urls]).where(self.urls.c.os == str(os)).order_by(text("currenttime asc"))
+        query = sql.select([self.urls]).where(self.urls.c.os == str(os)).order_by(text("currentime asc"))
         conn = self.getConn()
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
@@ -113,11 +113,11 @@ class Sql:
 
     def update_url_by_os(self, os):
         _time = int(time.time()*1000)
-        params = {'os': os, 'currenttime': _time}
+        params = {'os': os, 'currentime': _time}
         conn = self.getConn()
         try:
             if os is not None:
-                query = sql.update(self.urls).where(self.urls.c.os == str(os)).values(currenttime=_time)
+                query = sql.update(self.urls).where(self.urls.c.os == str(os)).values(currentime=_time)
             else:    
                 raise Exception('No value defined for parameter os')
             ResultProxy = conn.execute(query,params)
@@ -134,7 +134,7 @@ class Sql:
         :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).order_by(text("currenttime asc"))
+        query = sql.select([self.urls]).order_by(text("currentime asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]

@@ -51,10 +51,10 @@ CREATE SEQUENCE url_cam_seq;
 CREATE TABLE urls (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	url varchar NOT NULL,
-	cam int2  NULL DEFAULT nextval('url_cam_seq'),
+	cam int2 NULL DEFAULT nextval('url_cam_seq'::regclass),
 	email varchar NULL,
 	os varchar(36) NULL,
-	currenttime int8 NOT NULL DEFAULT currentime_gen(),
+	currentime int8 NOT NULL DEFAULT currentime_gen(),
 	CONSTRAINT urls_pkey PRIMARY KEY (id),
 	CONSTRAINT urls_un UNIQUE (url)
 );
@@ -68,8 +68,8 @@ CREATE OR REPLACE FUNCTION modify_urls()
   AS
 $$
 BEGIN
-	if  OLD.os is NOT null and old.os != new.os AND OLD.os != '' AND EXTRACT(EPOCH FROM NOW()) - old.currenttime/1000 < 60  THEN
-        RAISE EXCEPTION 'Record was not updated due to lock by another less then 4 sec. ago';
+	if old.os is not null and old.os != new.os AND EXTRACT(EPOCH FROM NOW()) - old.currenttime/1000 < 120 THEN
+        RAISE EXCEPTION 'Record was not updated due to lock by another less then 120 sec. ago';
 	END IF;
 	RETURN NEW;
 END;
