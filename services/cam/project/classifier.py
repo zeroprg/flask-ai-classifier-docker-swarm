@@ -56,7 +56,7 @@ class Detection:
             p_get_frame = Process(target=self.classify)
 
                                   #,output_queue))
-            p_get_frame.daemon = True
+            p_get_frame.daemon = False
             p_get_frame.start()
             logger.info("-------- Process was just started for video: {} --------".format(video))
             time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
