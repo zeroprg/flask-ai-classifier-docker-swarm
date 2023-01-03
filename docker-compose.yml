@@ -11,10 +11,10 @@ services:
 #      - 3020:3020
 #    environment:
 #      - PORT=3020
-#      - CLASSIFIER_SERVER=http://192.168.0.167/classify
+#      - CLASSIFIER_SERVER=http://192.168.1.101/classify
 #      - FLASK_ENV=production
 #      - APP_SETTINGS=/home/app/web/config.txt
-#      - IP_ADDRESS=192.168.0.167
+#      - DB_IP_ADDRESS=192.168.1.100
 #      - DB_USER=postgres
 #      - DB_PASSWORD=postgres
 #    depends_on:
@@ -36,7 +36,7 @@ services:
 #      - FLASK_ENV=production
 #      - APP_SETTINGS=/home/app/web/config.txt
 #      - DB_USER=postgres
-#      - IP_ADDRESS=192.168.0.167
+#      - IP_ADDRESS=192.168.1.101
 #      - DB_PASSWORD=postgres
 #      - SECRET_CODE=myprecious
 #    depends_on:
