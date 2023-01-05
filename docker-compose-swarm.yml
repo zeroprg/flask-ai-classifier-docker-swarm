@@ -13,7 +13,7 @@ services:
     ports:
       - 3020:3020
     environment:
-      - CLASSIFIER_SERVER=http://192.168.1.101/classify
+      - CLASSIFIER_SERVER=http://192.168.1.101:4000/classify
       - PORT=3020
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
