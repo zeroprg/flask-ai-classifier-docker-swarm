@@ -45,11 +45,15 @@ video_file3=http://145.53.212.190:8001/mjpg/video.mjpg
 #cam_left1=curl 'http://z**o:V*st*!@192.168.1.101:81/decoder_control.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&command=4&onestep=2&_=35282579520910.657573406191367'
 
 
-
+#initial model to recognise objects
+# ------------ YOLO ----------------
 #prototxt=yolo-coco/yolov3-tiny.cfg
-prototxt=MobileNetSSD_deploy.prototxt.txt
+#prototxt=YOLO/yolov4-tiny.cfg
 #model=yolo-coco/yolov3-tiny.weights
-model=MobileNetSSD_deploy.caffemodel
+#model=YOLO/yolov4-tiny.weights
+# ------------ MobileNetSSD ---------
+prototxt=models/caffemodel/MobileNetSSD/MobileNetSSD_deploy.prototxt.txt
+model=models/caffemodel/MobileNetSSD/MobileNetSSD_deploy.caffemodel
 
 confidence=0.15
 
