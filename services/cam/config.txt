@@ -63,8 +63,8 @@ model=MobileNetSSD_deploy.caffemodel
 confidence=0.3
 
 #server for object classifications
-CLASSIFIER_SERVER = http://192.168.0.167/classify
+CLASSIFIER_SERVER = http://192.168.1.101/classify
 
 #Database configuration (Postgres)
-IP_ADDRESS=192.168.0.167
+DB_IP_ADDRESS=192.168.1.100
 MAXIMUM_VIDEO_STREAMS = 17

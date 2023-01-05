@@ -19,13 +19,6 @@ import logging
 import cv2
 
 
-# initialize the list of class labels MobileNet SSD was trained to
-# detect, then generate a set of bounding box colors for each class
-CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
-           "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
-           "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
-           "sofa", "train", "tvmonitor"]
-LOOKED1 = {"person": [], "car": []}
 
 subject_of_interes = ["person", "car"]
 DNN_TARGET_MYRIAD = False
@@ -117,7 +110,7 @@ def call_classifier(classify_server, frame, cam, confidence, model):
     parameters = {'cam': cam, 'confidence': confidence, 'model': model}
     data = {'params': parameters, 'array': base64.b64encode(data).decode('utf-8')}
     jsonResponse = None
-   # logger.info("------------ call_classifier just called for cam: {} -------".format(cam))
+    logger.debug("------------ call_classifier just called for cam: {} -------".format(cam))
     try:
         response = requests.post(url=classify_server,
                             json=data)
@@ -129,11 +122,12 @@ def call_classifier(classify_server, frame, cam, confidence, model):
         #print(jsonResponse)
 
     except HTTPError as http_err:
-        print('HTTP error occurred: {0}'.format(http_err))
+        print('HTTP error occurred when connected to {0}: {1}'.format(classify_server, http_err))
     except Exception as err:
-        print('Other error occurred: {0}')#.format(err))
-    #logger.debug("call_classifier jsonResponse for cam: {} {}".format(cam,jsonResponse ))   
+        print('Connection to {0} failed: {1}'.format(classify_server,err))
+    logger.debug("call_classifier jsonResponse for cam: {} {}".format(cam,jsonResponse ))   
     return jsonResponse
+
 
 def compress_nparr(nparr):
     """

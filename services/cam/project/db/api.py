@@ -1,10 +1,9 @@
 import cv2
 import base64
 import time
-import sqlite3
 import sqlalchemy as sql
 from sqlalchemy import text
-import psycopg2
+# import psycopg2
 
 class Sql:
     def __init__ (self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
@@ -16,12 +15,8 @@ class Sql:
         self.engine = None
         self.limit = 70
         metadata = sql.MetaData()
-        if(  DATABASE_URI is None or DATABASE_URI == ''):
-            self.engine = sql.create_engine('sqlite://frame.db')
-            conn = engine.connect()
-            conn.execute("PRAGMA journal_mode=WAL")
-        else:
-            self.engine = sql.create_engine('postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME))
+
+        self.engine = sql.create_engine('postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME))
 
         self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
         self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
