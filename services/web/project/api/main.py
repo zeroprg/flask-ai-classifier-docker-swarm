@@ -83,14 +83,11 @@ def classify():
     net = get_net()
     data = request.get_json()
     params = data['params']
-    LOG.info("cam: {0} , confidence: {1} ".format(params['cam'], params['confidence']))
+    LOG.debug("cam: {0} , confidence: {1} ".format(params['cam'], params['confidence']))
     base64_data = str(data['array'])
-    if (base64_data is None ):
-	    return jsonify(
-        	{"status": "failed", "message": "np array is NoneType"}
-	    )
+    if (base64_data is None ): return jsonify({"status": "failed", "message": "np array is NoneType"})
     frame =  from_base64(base64_data)
-    LOG.info("Hit /classify route: ", params)
+    LOG.debug("Hit /classify route: ", params)
     post_array = classify_frame(net, frame, params)
     return Response(json.dumps(post_array, default=int), mimetype='text/plain')
 
