@@ -52,8 +52,8 @@ video_file3=http://145.53.212.190:8001/mjpg/video.mjpg
 #model=yolo-coco/yolov3-tiny.weights
 #model=YOLO/yolov4-tiny.weights
 # ------------ MobileNetSSD ---------
-prototxt=models/caffemodel/MobileNetSSD/MobileNetSSD_deploy.prototxt
-model=models/caffemodel/MobileNetSSD/MobileNetSSD_deploy.caffemodel
+prototxt=./models/caffemodel/MobileNetSSD/MobileNetSSD_deploy.prototxt
+model=./models/caffemodel/MobileNetSSD/MobileNetSSD_deploy.caffemodel
 
 confidence=0.15
 
