@@ -115,7 +115,8 @@ def call_classifier(classify_server, frame, cam, confidence, model):
     parameters = {'cam': cam, 'confidence': confidence , 'model': model} 
     data = {'params': parameters, 'array': data_encode}
     jsonEncoded = json.dumps(data, cls=NumpyArrayEncoder)
-    logger.info(jsonEncoded)
+    logger.debug(jsonEncoded)
+    print(jsonEncoded)
     jsonResponse = None
     
     logger.debug("------------ call_classifier just called for cam: {} -------".format(cam))
