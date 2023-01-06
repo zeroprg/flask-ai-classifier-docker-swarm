@@ -22,33 +22,6 @@ LOG = logging.getLogger("classifier-api.error")
 main_blueprint = Blueprint("main", __name__)
 
 
-def get_net():
-    if 'net' not in g:
-        g.net = classify_init()
-    return g.net
-
-def classify_init():
-# Read configuration parameters
-    if net is not None: return net
-        
-    classifyer = 'CaffeModel'
-    if classifyer == 'CaffeModel':
-        proto = prod.args['prototxt']
-        model = prod.args['model']
-        net = cv2.dnn.readNetFromCaffe(proto, model)
-    elif classifyer == 'YOLO':
-            proto = prod.args['prototxt']
-            model = prod.args['model']
-            net = cv2.dnn.readNetFromCaffe(proto, model)
-    # specify the target device as the Myriad processor on the NCS
-    if "DNN_TARGET_MYRIAD" in prod.args:
-        net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
-    else:
-        net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
-    return net
-    
-
-
 
 @main_blueprint.route("/ping", methods=["GET"])
 def ping_pong():
@@ -82,7 +55,6 @@ def from_base64(base64_data):
 
 @main_blueprint.route('/classify', methods=['POST'])
 def classify():
-    net = get_net()
     data = request.get_json()
     params = data['params']
     LOG.debug("cam: {0} , confidence: {1} ".format(params['cam'], params['confidence']))
