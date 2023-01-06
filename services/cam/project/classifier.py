@@ -108,8 +108,10 @@ class Detection:
 def call_classifier(classify_server, frame, cam, confidence, model):
     _,data = cv2.imencode('.jpg', frame) # frame.tolist() #  , _ , _ = compress_nparr(frame)
     parameters = {'cam': cam, 'confidence': confidence, 'model': model}
-    data = {'params': parameters, 'array': base64.b64encode(data).decode('utf-8')}
+    data = {'params': parameters, 'array': base64.b64encode(data)}
     jsonResponse = None
+   
+    
     logger.debug("------------ call_classifier just called for cam: {} -------".format(cam))
     try:
         response = requests.post(url=classify_server,
@@ -127,6 +129,8 @@ def call_classifier(classify_server, frame, cam, confidence, model):
         print('Connection to {0} failed: {1}'.format(classify_server,err))
     logger.debug("call_classifier jsonResponse for cam: {} {}".format(cam,jsonResponse ))   
     return jsonResponse
+
+
 
 
 def compress_nparr(nparr):
