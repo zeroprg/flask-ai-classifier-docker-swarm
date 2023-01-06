@@ -57,7 +57,7 @@ def from_base64(base64_data):
 def classify():
     data = request.get_json()
     params = data['params']
-    LOG.debug("cam: {0} , confidence: {1} ".format(params['cam'], params['confidence']))
+    LOG.info("cam: {0} , confidence: {1} data: {2}".format(params['cam'], params['confidence'], data))
     #base64_data = str(data['array'])    
     #if (base64_data is None ): return jsonify({"status": "failed", "message": "image frame is NoneType"})
     decodedArrays = json.loads(str(data['array']))
