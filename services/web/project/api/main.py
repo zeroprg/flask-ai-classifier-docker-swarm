@@ -20,6 +20,7 @@ SECRET_CODE = "secret" #open("/run/secrets/secret_code", "r").read().strip()
 LOG = logging.getLogger("classifier-api.error")
 
 main_blueprint = Blueprint("main", __name__)
+net = None
 
 def get_net():
     if 'net' not in g:
@@ -28,7 +29,8 @@ def get_net():
 
 def classify_init():
 # Read configuration parameters
-    net = None
+    if net is not None: return net
+        
     classifyer = 'CaffeModel'
     if classifyer == 'CaffeModel':
         proto = prod.args['prototxt']
