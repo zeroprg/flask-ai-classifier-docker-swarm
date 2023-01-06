@@ -20,7 +20,7 @@ SECRET_CODE = "secret" #open("/run/secrets/secret_code", "r").read().strip()
 LOG = logging.getLogger("classifier-api.error")
 
 main_blueprint = Blueprint("main", __name__)
-net = None
+
 
 def get_net():
     if 'net' not in g:
