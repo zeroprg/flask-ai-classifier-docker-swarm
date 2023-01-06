@@ -111,19 +111,17 @@ def call_classifier(classify_server, frame, cam, confidence, model):
     
     # Converting the image into numpy array
     data_encode = np.array(data)
-    data_encode_zip = compress_nparr(data_encode)
-    encodedNumpyData = json.dumps(data_encode_zip, cls=NumpyArrayEncoder)  # use dump() to write array into file
-
-    
-    parameters = {'cam': cam, 'confidence': confidence, 'model': model}
-    data = {'params': parameters, 'array': encodedNumpyData}
+    #data_encode_zip = compress_nparr(data_encode)    
+    parameters = {'cam': cam, 'confidence': confidence , 'model': model} 
+    data = {'params': parameters, 'array': data_encode}
+    jsonEncoded = json.dumps(data, cls=NumpyArrayEncoder)
+    logger.info(jsonEncoded)
     jsonResponse = None
-   
     
     logger.debug("------------ call_classifier just called for cam: {} -------".format(cam))
     try:
         response = requests.post(url=classify_server,
-                            json=data)
+                            json=jsonEncoded)
                             #headers={'Content-Type': 'text/json'})
         response.raise_for_status()
         # access JSOn content
