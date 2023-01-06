@@ -17,7 +17,8 @@ from multiprocessing import Process
 from multiprocessing import Queue
 import logging
 import cv2
-
+import json
+from json import JSONEncoder
 
 
 subject_of_interes = ["person", "car"]
@@ -107,8 +108,15 @@ class Detection:
 
 def call_classifier(classify_server, frame, cam, confidence, model):
     _,data = cv2.imencode('.jpg', frame) # frame.tolist() #  , _ , _ = compress_nparr(frame)
+    
+    # Converting the image into numpy array
+    data_encode = np.array(data)
+    data_encode_zip = compress_nparr(data_encode)
+    encodedNumpyData = json.dumps(data_encode_zip, cls=NumpyArrayEncoder)  # use dump() to write array into file
+
+    
     parameters = {'cam': cam, 'confidence': confidence, 'model': model}
-    data = {'params': parameters, 'array': base64.b64encode(data)}
+    data = {'params': parameters, 'array': encodedNumpyData}
     jsonResponse = None
    
     
@@ -152,3 +160,9 @@ def uncompress_nparr(bytestring):
     #resp, _, _ = compress_nparr(data10)
     #return Response(response=resp, status=200,
     #                mimetype="application/octet_stream")
+
+class NumpyArrayEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return JSONEncoder.default(self, obj)
