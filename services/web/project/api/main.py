@@ -14,7 +14,7 @@ from project.api.classifyer import classify_frame
 from project.config import  ProductionConfig as prod
 import project.api.tools.config_file
 
-from project import db
+from project import db, net
 
 SECRET_CODE = "secret" #open("/run/secrets/secret_code", "r").read().strip()
 LOG = logging.getLogger("classifier-api.error")
