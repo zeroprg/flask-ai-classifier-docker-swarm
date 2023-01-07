@@ -55,16 +55,15 @@ def from_base64(base64_data):
 
 @main_blueprint.route('/classify', methods=['POST'])
 def classify():
-
-    params = request.json['params']
+    data = request.get_json()
+    params = data['params']
+    im_b64 = data['image']
+    LOG.info("cam: {0} , confidence: {1} data: {2}".format(params['cam'], params['confidence'], im_b64))
     # get the base64 encoded string
-    im_b64 = request.json['image']
-    LOG.info("cam: {0} , confidence: {1} data: {2}".format(params['cam'],params['confidence'], im_b64))
     # convert it into bytes  
     img_bytes = base64.b64decode(im_b64.encode('utf-8'))
-
     # convert bytes data to PIL Image object
-    frame = Image.open(io.BytesIO(img_bytes))
+    img = Image.open(io.BytesIO(img_bytes))
     
     #base64_data = str(data['array'])    
     #if (base64_data is None ): return jsonify({"status": "failed", "message": "image frame is NoneType"})
@@ -73,7 +72,7 @@ def classify():
     #frame = Image.fromarray(np.asarray(decodedArrays))    
     #frame =  from_base64(base64_data)
     LOG.debug("Hit /classify route: ", params)
-    post_array = classify_frame(net, frame, params)
+    post_array = classify_frame(net, img, params)
     return Response(json.dumps(post_array, default=int), mimetype='text/plain')
 
 def uncompress_nparr(bytestring):
