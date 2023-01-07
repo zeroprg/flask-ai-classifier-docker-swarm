@@ -107,28 +107,25 @@ class Detection:
 
 
 def call_classifier(classify_server, frame, cam, confidence, model):
-    _,data = cv2.imencode('.jpg', frame) # frame.tolist() #  , _ , _ = compress_nparr(frame)
-    
-    # Converting the image into numpy array
-    data_encode = np.array(data)
-    #data_encode_zip = compress_nparr(data_encode)    
+    _,im_bytes = cv2.imencode('.jpg', frame) # frame.tolist() #  , _ , _ = compress_nparr(frame)
+   
     parameters = {'cam': cam, 'confidence': confidence , 'model': model} 
-    data = {'params': parameters, 'array': data_encode}
-    jsonEncoded = json.dumps(data, cls=NumpyArrayEncoder)
-    logger.debug(jsonEncoded)
-    print(jsonEncoded)
+   
+    im_b64 = base64.b64encode(im_bytes).decode("utf8")
+    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}  
+    payload = json.dumps({"image": im_b64, "parameters": parameters})
+
     jsonResponse = None
     
     logger.debug("------------ call_classifier just called for cam: {} -------".format(cam))
     try:
         response = requests.post(url=classify_server,
-                            json=jsonEncoded)
-                            #headers={'Content-Type': 'text/json'})
+                            data=payload, headers=headers)                            
         response.raise_for_status()
         # access JSOn content
         jsonResponse = response.json()
-        #print("Entire JSON response")
-        #print(jsonResponse)
+        logger.debug("Entire JSON response")
+        logger.debug(jsonResponse)
 
     except HTTPError as http_err:
         print('HTTP error occurred when connected to {0}: {1}'.format(classify_server, http_err))
