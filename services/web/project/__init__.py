@@ -19,8 +19,10 @@ def classify_init():
     
     proto = prod.args['prototxt']
     model = prod.args['model']
-    
-    net = cv2.dnn.readNetFromCaffe(proto, model)
+    if(model.find('caffe')>0): 
+        net = cv2.dnn.readNetFromCaffe(proto, model)
+    else:
+        net = cv2.dnn.readNet(proto, model)    
     # specify the target device as the Myriad processor on the NCS
     if "DNN_TARGET_MYRIAD" in prod.args:
         net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
