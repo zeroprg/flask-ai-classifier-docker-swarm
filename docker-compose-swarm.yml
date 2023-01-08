@@ -136,22 +136,22 @@ services:
 
 
 
-#  nginx:
-#    image: zeroprg/flask-docker-swarm_nginx:latest
-#    deploy:
-#      replicas: 1
-#      restart_policy:
-#        condition: on-failure
-#      placement:
-#        constraints:
-#          - node.role == manager
-#    ports:
-#      - 80:80
-#    depends_on:
-#      - cam
-#      - web
-#    networks:
-#      - flask
+  nginx:
+    image: zeroprg/flask-docker-swarm_nginx:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+    ports:
+      - 80:80
+    depends_on:
+      - cam
+      - web
+    networks:
+      - flask
 
 
   visualizer:
