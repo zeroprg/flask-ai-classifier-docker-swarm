@@ -3,7 +3,7 @@ video_file0=http://93.170.4.146:85/webcapture.jpg?command=snap&channel=1?1672970
 #initial model to recognise objects
 # ------------ YOLO ----------------
 #prototxt=yolo-coco/yolov3-tiny.cfg
-prototxt=YOLO/yolov4-tiny.cfg
+prototxt=./models/YOLO/yolov4-tiny.cfg
 #model=./models/YOLO/yolov3-tiny.weights
 model=./models/YOLO/yolov4-tiny.weights
 # ------------ MobileNetSSD ---------
