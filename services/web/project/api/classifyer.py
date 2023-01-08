@@ -29,8 +29,8 @@ subject_of_interes = ["person", "car", "bus" , "bicycle", "dog", "horse", "motor
 DNN_TARGET_MYRIAD = False
 
 HASH_DELTA = 7  # how many bits difference between 2 hashcodes
-DIMENSION_X = 416
-DIMENSION_Y = 416
+DIMENSION_X = 300
+DIMENSION_Y = 300
 piCameraResolution = (640, 480)  # (1024,768) #(640,480)  #(1920,1080) #(1080,720) # (1296,972)
 piCameraRate = 16
 NUMBER_OF_THREADS = 1
@@ -52,29 +52,31 @@ def classify_frame(net, frame, params):
     #_frame = cv2.resize(frame, (DIMENSION_X, DIMENSION_Y))
     # _frame = imutils.resize(frame,DIMENSION_X)
     blob = cv2.dnn.blobFromImage(frame, 0.007843,
-                                    (DIMENSION_X, DIMENSION_Y), (127.5, 127.5, 127.5), True, crop=False)
+                                    (DIMENSION_X, DIMENSION_Y), (127.5, 127.5, 127.5), True)
     # set the blob as input to our deep learning object
     # detector and obtain the detections
+        # loop over the detections
+    (fH, fW) = frame.shape[:2]
+ 
     net.setInput(blob)
     params = None
     detections = net.forward()
-    # loop over the detections
-    (fH, fW) = frame.shape[:2]
+
     # logger.debug(detections)
     if detections is not None:
         # loop over the detections
-        for i in np.arange(0, detections.shape[1]):
+        for i in np.arange(0, detections.shape[2]):
             # extract the confidence (i.e., probability) associated
             # with the prediction
             # filter out weak detections by ensuring the `confidence`
             # is greater than the minimum confidence
-            if detections[i, 2] < confidence:
+            if detections[0, 0, i, 2] < confidence:
                 continue
 
             # otherwise, extract the index of the class label from
             # the `detections`, then compute the (x, y)-coordinates
             # of the bounding box for the object
-            idx = int(detections[i, 1])
+            idx = int(detections[0, 0, i, 1])
             if idx > len(CLASSES) - 1:
                 continue
             key = CLASSES[idx]
@@ -82,7 +84,7 @@ def classify_frame(net, frame, params):
             if key not in LOOKED1:
                 continue
             dims = np.array([fW, fH, fW, fH])
-            box = detections[ i, 3:7] * dims
+            box = detections[0, 0, i, 3:7] * dims
             (startX, startY, endX, endY) = box.astype("int")
 
             # draw the prediction on the frame
@@ -102,7 +104,7 @@ def classify_frame(net, frame, params):
 
             if key not in LOOKED1:
                 continue
-            probability = detections[ i, 2] 
+            probability = detections[0, 0, i, 2] 
             label1 = "{}: {:.2f}%".format(key, int(probability * 100))
             # Draw rectangles
 

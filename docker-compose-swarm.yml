@@ -13,8 +13,7 @@ services:
     ports:
       - 3020:3020
     environment:
-      - CLASSIFIER_SERVER=http://192.168.1.101:4000/classify
-      - PORT=3020
+      - CLASSIFIER_SERVER=http://192.168.1.63:4000/classify
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_IP_ADDRESS=192.168.1.100
@@ -136,22 +135,22 @@ services:
 
 
 
-  nginx:
-    image: zeroprg/flask-docker-swarm_nginx:latest
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - node.role == manager
-    ports:
-      - 80:80
-    depends_on:
-      - cam
-      - web
-    networks:
-      - flask
+#  nginx:
+#    image: zeroprg/flask-docker-swarm_nginx:latest
+#    deploy:
+#      replicas: 1
+#      restart_policy:
+#        condition: on-failure
+#      placement:
+#        constraints:
+#          - node.role == manager
+#    ports:
+#      - 80:80
+#    depends_on:
+#      - cam
+#      - web
+#    networks:
+#      - flask
 
 
   visualizer:
