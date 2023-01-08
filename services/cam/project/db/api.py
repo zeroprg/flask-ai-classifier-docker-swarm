@@ -165,6 +165,18 @@ class Sql:
         finally:
             conn.close() 
 
+    def delete_urls(self, params):
+        conn = self.getConn()
+        try:
+            query = sql.delete(self.urls).where(self.urls.c.id == params['id'])
+            ResultProxy = conn.execute(query, params)
+            print(" delete_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
+        except Exception as e:
+            print(" e: {}".format( e))
+            raise e
+        finally:
+            conn.close() 
+
 
 # ####################  Statistic operations ######################################## #
 

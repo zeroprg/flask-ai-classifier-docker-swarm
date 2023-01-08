@@ -63,8 +63,11 @@ model=MobileNetSSD_deploy.caffemodel
 confidence=0.3
 
 #server for object classifications
-CLASSIFIER_SERVER = http://192.168.1.101/classify
+CLASSIFIER_SERVER = http://192.168.1.63:4000/classify
 
 #Database configuration (Postgres)
 DB_IP_ADDRESS=192.168.1.100
+DB_USERNAME=odroid
+DB_PASSWORD=vist2508
+DB_NAME=streamer
 MAXIMUM_VIDEO_STREAMS = 17

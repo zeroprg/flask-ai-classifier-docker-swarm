@@ -33,7 +33,7 @@ NUMBER_OF_THREADS = 1
 
 logger = logging.getLogger('logger')
 
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 class Detection:
     def __init__(self, classify_server, confidence, model, video):
@@ -45,6 +45,7 @@ class Detection:
         self.net = self.video_s = None
         self.cam = video['id']
         self.classify_server = classify_server
+        self.errors = 0
 
         for i in range(NUMBER_OF_THREADS):
             p_get_frame = Process(target=self.classify)
@@ -56,7 +57,7 @@ class Detection:
             time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
         
 
-    def classify(self):#, output_queue):
+    def classify(self):
         if self.video_s is None:
             self.video_s = self.init_video_stream()
         while True:
@@ -89,7 +90,12 @@ class Detection:
 
         else:
             # grab the frame from the threaded video stream
-            video_s = cv2.VideoCapture(self.video_url)
+            try:
+                video_s = cv2.VideoCapture(self.video_url)
+            except HTTPError as http_err:
+                self.errors += 1              
+                print('HTTP error occurred when connected to {0}: {1}'.format(self.video_url, http_err))                    
+            
         return video_s
 
     def read_video_stream(self, video_s):
@@ -113,10 +119,8 @@ def call_classifier(classify_server, frame, cam, confidence, model):
    
     im_b64 = base64.b64encode(im_bytes).decode("utf8")
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}  
-    payload = json.dumps({"image": im_b64, "parameters": parameters})
-
+    payload = json.dumps({'image': im_b64, 'parameters': parameters}, indent=2)
     jsonResponse = None
-    
     logger.debug("------------ call_classifier just called for cam: {} -------".format(cam))
     try:
         response = requests.post(url=classify_server,

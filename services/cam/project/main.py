@@ -267,6 +267,8 @@ def initialize_video_streams(url=None, videos=[]):
             #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
             detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
                 params)
+            if detectors[params['id']].errors > 0:
+                db.delete_urls(params)
             logger.info("p_classifiers for cam: {} started by {} ".format(video['id'], comp_node() ))
             
             #url = 'http://{}:{}{}'.format(IP_ADDRESS,port,deny_service_url)

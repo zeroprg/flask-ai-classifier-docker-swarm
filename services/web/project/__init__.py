@@ -13,8 +13,24 @@ from flask import Flask
 from project.config import ProductionConfig as prod
 from project.db.api import Sql
 
+
+def classify_init():
+# Read configuration parameters
+    
+    proto = prod.args['prototxt']
+    model = prod.args['model']
+    
+    net = cv2.dnn.readNetFromCaffe(proto, model)
+    # specify the target device as the Myriad processor on the NCS
+    if "DNN_TARGET_MYRIAD" in prod.args:
+        net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
+    else:
+        net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+    return net
+    
+
 db = Sql(SQLALCHEMY_DATABASE_URI = prod.SQLALCHEMY_DATABASE_URI)
-net = None
+net = classify_init()
 # instantiate the extensions
 #migrate = Migrate()
 
@@ -34,22 +50,6 @@ def create_app(script_info=None):
 
     app.register_blueprint(main_blueprint)
     # shell context for flask cli   
-    app.shell_context_processor({"app": app , "db": db})    
+    app.shell_context_processor({"app": app , "db": db})
+    
     return app
-
-
-def classify_init():
-# Read configuration parameters
-    if net is not None: return net       
-
-    proto = prod.args['prototxt']
-    model = prod.args['model']
-    
-    net = cv2.dnn.readNetFromCaffe(proto, model)
-    # specify the target device as the Myriad processor on the NCS
-    if "DNN_TARGET_MYRIAD" in prod.args:
-        net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
-    else:
-        net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
-    return net
-    

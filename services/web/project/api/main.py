@@ -56,14 +56,17 @@ def from_base64(base64_data):
 @main_blueprint.route('/classify', methods=['POST'])
 def classify():
     data = request.get_json()
-    params = data['params']
+    params = data['parameters']
     im_b64 = data['image']
     LOG.info("cam: {0} , confidence: {1} data: {2}".format(params['cam'], params['confidence'], im_b64))
     # get the base64 encoded string
     # convert it into bytes  
-    img_bytes = base64.b64decode(im_b64.encode('utf-8'))
+    #img_bytes = base64.b64decode(im_b64.encode('utf8'))
+    
     # convert bytes data to PIL Image object
-    img = Image.open(io.BytesIO(img_bytes))
+    #img = Image.open(io.BytesIO(img_bytes))
+    img = from_base64(im_b64)
+  
     
     #base64_data = str(data['array'])    
     #if (base64_data is None ): return jsonify({"status": "failed", "message": "image frame is NoneType"})
@@ -72,6 +75,7 @@ def classify():
     #frame = Image.fromarray(np.asarray(decodedArrays))    
     #frame =  from_base64(base64_data)
     LOG.debug("Hit /classify route: ", params)
+
     post_array = classify_frame(net, img, params)
     return Response(json.dumps(post_array, default=int), mimetype='text/plain')
 
