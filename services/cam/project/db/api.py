@@ -32,12 +32,7 @@ class Sql:
         self.limit = 70
         metadata = sql.MetaData()
 
-        if(  SQLALCHEMY_DATABASE_URI is None or SQLALCHEMY_DATABASE_URI == ''):
-            self.engine = sql.create_engine('sqlite://frame.db')
-            conn = self.engine.connect()
-            conn.execute("PRAGMA journal_mode=WAL")
-        else:
-            self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI)
+        self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI)
 
         self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
         self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
