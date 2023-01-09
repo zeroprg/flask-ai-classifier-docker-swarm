@@ -51,32 +51,6 @@ class Sql:
     def getConn(self):
         return self.engine.connect()
 
-# ####################  Obj_stat operations ######################################## #
-
-
-    def select_all_obj_stat(self):
-        """
-        Query all rows in the urls table
-        :return:
-        """
-        query = sql.select([self.obj_stat]).limit(self.limit).all()
-        conn = self.getConn()
-        ResultProxy = conn.execute(query)
-        rows = ResultProxy.fetchall()
-        conn.close()
-        return rows
-
-    def insert_obj_stat(self, params):
-        conn = self.getConn()
-        try:
-            values = {'cam_uuid': params['cam_uuid'],'type': params['type'], 'last_10min':params['last_10min'], 'last_hour': params['last_hour'], 'last_day': params['last_day'] }
-            query = sql.insert(self.obj_stat)            
-            ResultProxy = conn.execute(query, values)
-            print(" insert_obj_stat was {0} with params: {1}".format(ResultProxy.is_insert ,params))
-        except Exception as e:
-            print(" e: {}".format( e))
-        finally:
-            conn.close()
 
 # ####################  Service utility operations ######################################## #
     def delete_old_images_older_then(self, DAYS_IN_MILLSEC):
