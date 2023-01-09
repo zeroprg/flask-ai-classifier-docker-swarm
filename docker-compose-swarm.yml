@@ -80,8 +80,8 @@ services:
 #       - MAX_CONNECTIONS=60
 #       - MAX_WAL_SENDERS=5
 #       - PG_MODE=primary
-    networks:
-      - flask
+#    networks:
+#      - flask
 
 #  db_replica:
 #    image: arm32v7/postgres

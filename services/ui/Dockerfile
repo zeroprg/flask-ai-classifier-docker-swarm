@@ -1,13 +1,20 @@
-# Stage 1
-FROM arm32v7/node:latest as react-build
+FROM arm32v7/node:latest
+
+
+# set working directory
 WORKDIR /app
 COPY . ./
-RUN yarn
-RUN yarn build
+# create node_modules
+RUN npm install
+RUN npm install -g serve
+RUN npm install -g pm2
 
-# Stage 2 - the production environment
-FROM arm32v7/nginx:latest
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=react-build /app/build /usr/share/nginx/html
-EXPOSE 5000
-CMD ["nginx", "-g", "daemon off;"]
+# add `/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
+RUN npm run build
+
+
+
+# start app
+CMD ["pm2" ,  "serve", "build", "5000", "--spa"]
+
