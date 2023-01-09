@@ -36,7 +36,7 @@ logger = logging.getLogger('logger')
 logger.setLevel(logging.DEBUG)
 
 class Detection:
-    def __init__(self, classify_server, confidence, model, video):
+    def __init__(self, classify_server, confidence, model, video, queue):
         self.confidence = confidence
         self.model = model
         self.video_url = video['url'] + '?' if '?' not in  video['url'] else '&' + 'stream=full&needlength'
@@ -46,6 +46,7 @@ class Detection:
         self.cam = video['id']
         self.classify_server = classify_server
         self.errors = 0
+        self.output_queue = queue
 
         for i in range(NUMBER_OF_THREADS):
             p_get_frame = Process(target=self.classify)
@@ -69,19 +70,19 @@ class Detection:
                 return
             result = call_classifier(self.classify_server, frame, self.cam, self.confidence, self.model)
             if(result is not None and 'rectangles' in result and len(result['rectangles'])>0):
-                logger.info("result: {}".format(result))
-            """           if 'rectangles' in result : 
-                                 # Draw rectangles
+                logger.debug("result: {}".format(result))
 
-                                for rec in result['rectangles']:
-                                    x = rec.get('startX') - 25
-                                    y = rec.get('startY') - 25
-                                    cv2.rectangle(frame, (x,y), (rec.get('endX') + 25, rec.get('endY') + 25), (255, 0, 0), 1)
-                                    cv2.putText(frame, rec.get('text') , (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                            cv2.putText(frame, result.get('topic_label', 'None')  , (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                            #output_queue.put(frame)
-                            #output_queue.put_nowait(frame)
-            """
+                    # Draw rectangles
+
+                for rec in result['rectangles']:
+                    x = rec.get('startX') - 25
+                    y = rec.get('startY') - 25
+                    cv2.rectangle(frame, (x,y), (rec.get('endX') + 25, rec.get('endY') + 25), (255, 0, 0), 1)
+                    cv2.putText(frame, rec.get('text') , (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+                    cv2.putText(frame, result.get('topic_label', 'None')  , (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+            self.output_queue.put(frame)
+            #output_queue.put_nowait(frame)
+            
 
     def init_video_stream(self):
         if 'picam' == self.video_url:
