@@ -42,7 +42,6 @@ class Sql:
         self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
         self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
         self.urls = sql.Table('urls', metadata, autoload=True, autoload_with=self.engine)
-        self.obj_stat = sql.Table('obj_stat', metadata, autoload=True, autoload_with=self.engine)
 
 
         #conn = self.engine.connect()
