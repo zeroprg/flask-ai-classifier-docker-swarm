@@ -148,9 +148,9 @@ def lock_urls_for_os():
             except Exception as e:
                 logger.info("Exception {}".format(e))
             else:
-                #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+                imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
                 detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                     params)
+                     params, imagesQueue[params['id']])
                 i = len(detectors)    
                 if i == prod.MAXIMUM_VIDEO_STREAMS: break
 
@@ -264,9 +264,9 @@ def initialize_video_streams(url=None, videos=[]):
             params['videos_length'] = len(detectors)
             """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
             #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)
-            #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+            imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
             detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                params)
+                params, imagesQueue[params['id']])
             if detectors[params['id']].errors > 0:
                 db.delete_urls(params)
             logger.info("p_classifiers for cam: {} started by {} ".format(video['id'], comp_node() ))
@@ -481,9 +481,9 @@ def urls():
             else:
                 
                 params['os'] = comp_node()
-                #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+                imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
                 detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                    params)
+                    params, imagesQueue[params['id']])
                 return Response('{"message":"URL added successfully"}', mimetype='text/plain',status=200)
         else:
             return Response('{"message":"URL has no video"}', mimetype='text/plain',status=400)
