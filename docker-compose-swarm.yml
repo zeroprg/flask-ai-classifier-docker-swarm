@@ -120,9 +120,9 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
-#      placement:
-#        constraints:
-#         - node.role == worker
+      placement:
+        constraints:
+         - node.role == worker
     ports:
       - 5000:5000
     environment:
