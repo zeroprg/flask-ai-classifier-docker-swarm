@@ -157,6 +157,7 @@ def lock_urls_for_os():
                     detectors[params['id']] = detection
                 else:
                     db.delete_urls(params)
+                    logger.info("Url {} has been deleted".format(params['url']))
                     
                 i = len(detectors)    
                 if i == prod.MAXIMUM_VIDEO_STREAMS: break

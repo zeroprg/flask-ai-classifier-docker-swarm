@@ -3,6 +3,7 @@
  git pull
  cd services/cam && sh build.sh
  cd - && cd services/web && sh build.sh && cd ../..
+ cd services/ui && sh build.sh && cd ../..
  sudo docker service rm flask_cam flask_ui flask_web flask_visualizer
  sudo docker network rm flask
  sudo docker network create flask

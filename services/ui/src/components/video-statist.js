@@ -13,9 +13,11 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
         setShowVideo(!showvideo)
         //setClass(showvideo? "fa fa-bar-chart" : "fa fa-play")
     );
+
+    const item_style = {fontSize: 10};
     
     const menu = (showStatistic) => (<Menu> 
-        <Item title="Twitter!"> <i className = {"fa fa-twitter"} style={"font-size:10px"}/></Item>
+        <Item title="Twitter!"> <i className = {"fa fa-twitter"} style={item_style} /></Item>
     {/*    <Item title="Facebook!"  component="a"
               componentProps={{
                     href: "https://facebook.com",
@@ -34,7 +36,7 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
               componentProps={{ onClick: (e) => {     
                   e.preventDefault();                                  
                   videoClickHandler();} }}> 
-          <i className= {showStatistic?"fa fa-bar-chart":"fa fa-play"}  style={"font-size:10px"}/>
+          <i className ={showStatistic ?"fa fa-bar-chart":"fa fa-play"}  style={item_style}/>
         </Item>
     </Menu>
     );
