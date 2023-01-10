@@ -1,20 +1,14 @@
-FROM arm32v7/node:latest
+FROM arm32v7/nginx:latest
 
+#COPY ./nginx.conf /etc/nginx/nginx.conf
 
-# set working directory
-WORKDIR /app
-COPY . ./
-# create node_modules
-RUN npm install
-RUN npm install -g serve
-RUN npm install -g pm2
+## Remove default nginx index page
+RUN rm -rf /usr/share/nginx/html/*
 
-# add `/app/node_modules/.bin` to $PATH
-ENV PATH /app/node_modules/.bin:$PATH
-RUN npm run build
+# Copy from the stage 1
+COPY ./build /usr/share/nginx/html
 
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-
-# start app
-CMD ["pm2" ,  "serve", "build", "5000", "--spa"]
-
+EXPOSE 5000 80
+CMD ["nginx", "-g", "daemon off;"]
