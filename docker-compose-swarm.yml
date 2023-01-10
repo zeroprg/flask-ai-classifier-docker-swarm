@@ -137,23 +137,6 @@ services:
 
 
 
-#  nginx:
-#    image: zeroprg/flask-docker-swarm_nginx:latest
-#    deploy:
-#      replicas: 1
-#      restart_policy:
-#        condition: on-failure
-#      placement:
-#        constraints:
-#          - node.role == manager
-#    ports:
-#      - 80:80
-#    depends_on:
-#      - cam
-#      - web
-#    networks:
-#      - flask
-
 
   visualizer:
     image: alexellis2/visualizer-arm
@@ -178,7 +161,7 @@ services:
 networks:
   flask:
     driver: overlay
-    external: true
+    external: false
 
 volumes:
 #  pg-primary-vol:
