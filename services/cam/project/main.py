@@ -149,8 +149,15 @@ def lock_urls_for_os():
                 logger.info("Exception {}".format(e))
             else:
                 imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-                detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                     params, imagesQueue[params['id']])
+                 
+                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params, imagesQueue[params['id']])
+                
+                #if video stream not active remove it 
+                if( detection.errors == 0 ):
+                    detectors[params['id']] = detection
+                else:
+                    db.delete_urls(params)
+                    
                 i = len(detectors)    
                 if i == prod.MAXIMUM_VIDEO_STREAMS: break
 
@@ -158,8 +165,14 @@ def lock_urls_for_os():
 def start_one_stream_processes(video, prod=prod, detectors=detectors):
     #print(imagesQueue)
     #if imagesQueue.get(video['id'], None) is not None :
-    detectors[video['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-            video)
+    detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
+            video, imagesQueue[video['id']])
+    #if video stream not active remove it 
+    if( detection.errors == 0 ):
+        detectors[video['id']] = detection
+    else:
+        db.delete_urls(video)
+    
 
     
     logger.info("p_classifiers for cam: {} started by {} ".format(video['id'], comp_node() ))
@@ -196,8 +209,14 @@ def deny_service_call(url, params=None, detectors=detectors, prod = prod, IMAGES
         if r.status_code == 412 :
             """ Servicing this video was denied other nodes didn't grab this video """       
             #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-            detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                params)
+            detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
+                params, imagesQueue[params['id']])
+            
+            #if video stream not active remove it 
+            if( detection.errors == 0 ):
+                detectors[params['id']] = detection
+            else:
+                db.delete_urls(params)
            
 
             logger.info("Adding a new detector with {}".format(params['id']))
@@ -265,10 +284,18 @@ def initialize_video_streams(url=None, videos=[]):
             """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
             #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)
             imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-            detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                params, imagesQueue[params['id']])
-            if detectors[params['id']].errors > 0:
+            
+            detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params, imagesQueue[params['id']])
+            
+            #if video stream not active remove it 
+            if( detection.errors == 0 ):
+                detectors[params['id']] = detection
+            else:
                 db.delete_urls(params)
+                
+    
+                
+                
             logger.info("p_classifiers for cam: {} started by {} ".format(video['id'], comp_node() ))
             
             #url = 'http://{}:{}{}'.format(IP_ADDRESS,port,deny_service_url)
@@ -482,8 +509,15 @@ def urls():
                 
                 params['os'] = comp_node()
                 imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-                detectors[params['id']] = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                    params, imagesQueue[params['id']])
+                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params, imagesQueue[params['id']])
+                
+                #if video stream not active remove it 
+                if( detection.errors == 0 ):
+                    detectors[params['id']] = detection
+                else:
+                    db.delete_urls(params)
+                
+                
                 return Response('{"message":"URL added successfully"}', mimetype='text/plain',status=200)
         else:
             return Response('{"message":"URL has no video"}', mimetype='text/plain',status=400)

@@ -95,8 +95,9 @@ class Detection:
             try:
                 video_s = cv2.VideoCapture(self.video_url)
             except Exception as ex:
-                self.errors += 1              
-                print('Error occurred when connected to {0}: {1}'.format(self.video_url, ex))                    
+                self.errors += 1                    
+                print('Error occurred when connected to {0}: {1}'.format(self.video_url, ex))
+                                
             
         return video_s
 
