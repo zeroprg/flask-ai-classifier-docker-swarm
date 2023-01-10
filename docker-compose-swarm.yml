@@ -124,9 +124,12 @@ services:
         constraints:
          - node.role == worker
     ports:
-      - 80:80
+      - 5000:5000
     environment:
       - CHOKIDAR_USEPOLLING=true
+    volumes: 
+      - ./app.log:/var/log/nginx/app.log
+
     depends_on:
       - cam
     networks:
