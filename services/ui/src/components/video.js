@@ -40,7 +40,7 @@ const Video = ({camera, showBoxesAroundObjects}) => {
 //                <label class="custom-control-label" htmlFor={"checked"+ camera.id}> Show catched objects for {camera.url}</label>
 
     return(<span>
-           <div className="custom-control custom-checkbox" style={{paddingTop:100}} >
+           <div style={{paddingTop:100}} >
                
             </div>
             <img id={'stream'+camera.cam}  className={classes.root}

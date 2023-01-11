@@ -1,5 +1,5 @@
 import React ,{ useEffect, useState} from 'react';
-import { Menu, Item } from "react-gooey-nav";
+
 import VideoStreamer from './video-streamer';
 import Video from './video';
 import Media from 'react-media';
@@ -14,44 +14,29 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
         //setClass(showvideo? "fa fa-bar-chart" : "fa fa-play")
     );
 
-    const item_style = {fontSize: 10};
-    
-    const menu = (showStatistic) => (<Menu> 
-        <Item title="Twitter!"> <i className = {"fa fa-twitter"} style={item_style} /></Item>
-    {/*    <Item title="Facebook!"  component="a"
-              componentProps={{
-                    href: "https://facebook.com",
-                    target: "_blank",
-                    rel: "noopener",
-                    onClick: (e) => {   
-                   // console.log("Facebook button clicked");
-                    e.preventDefault();
-                    }
-                }}>
-        
-         <i className={"fa fa-facebook"}/>
-        </Item>
-        */}
-        <Item title={showStatistic?"Show statistic":"back to Video"} component="a" 
-              componentProps={{ onClick: (e) => {     
-                  e.preventDefault();                                  
-                  videoClickHandler();} }}> 
-          <i className ={showStatistic ?"fa fa-bar-chart":"fa fa-play"}  style={item_style}/>
-        </Item>
-    </Menu>
+    const menu = () => (
+        <nav className="menu">
+            <input type="checkbox" href="#" className="menu-open" name="menu-open" id="menu-open"/>
+            <label className="menu-open-button" htmlFor="menu-open">
+                <span className="hamburger hamburger-1"></span>
+                <span className="hamburger hamburger-2"></span>
+                <span className="hamburger hamburger-3"></span>
+            </label>            
+            <a href="#" className="menu-item"> <i className="fa fa-bar-chart"></i> </a>    
+        </nav>
     );
     const showVideoSection = (showvideo, classname, camera) => (
         showvideo ?
             <div key={`cam${camera.cam}`} className={classname}>
-                {menu(showvideo)}
+                {menu()}
                 <Video camera={camera} />
             </div>
             :
             <VideoStreamer key={camera.url}
                 camera={camera}
-                timerange={timerange} 
+                timerange={timerange}
                 object_of_interest={object_of_interest}
-                child= {menu(showvideo)}/>
+                />
     );
 
     return (
@@ -67,7 +52,7 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
                                                 showVideoSection(showvideo, "col-sm-12", camera)}
                                         {matches.medium &&
                                                 showVideoSection(showvideo, "col-sm-6", camera)}
-                                        {matches.large &&                                   
+                                        {matches.large &&
                                                 showVideoSection(showvideo, "col-sm-4", camera)}
                                     </Fragment>
 
@@ -75,6 +60,7 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
                         }}
         </Media>
     
+
     );
 }
 
