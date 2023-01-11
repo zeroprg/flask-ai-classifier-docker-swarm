@@ -8,8 +8,8 @@ services:
       replicas: 3
       restart_policy:
         condition: on-failure
-      #placement:
-      #  constraints: [node.role == worker]
+      placement:
+        constraints: [node.role == worker]
     ports:
       - 3020:3020
     environment:
@@ -29,11 +29,11 @@ services:
   web:
     image: zeroprg/flask-docker-swarm_web:latest
     deploy:
-      replicas: 2
+      replicas: 1
       restart_policy:
         condition: on-failure
-      #placement:
-      #  constraints: [node.role == manager]
+      placement:
+        constraints: [node.role == manager]
     ports:
       - 4000:4000
     environment:
@@ -120,9 +120,9 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
-#      placement:
-#        constraints:
-#         - node.role == worker
+      placement:
+        constraints:
+         - node.role == worker
     ports:
       - 80:80
     environment:
@@ -146,7 +146,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.role == manager
+          - node.role == worker
     ports:
       - 8080:8080
     volumes:
