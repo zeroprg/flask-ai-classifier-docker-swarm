@@ -7,6 +7,7 @@ import { Fragment } from 'react';
 
 const VideoStat  = ({camera, timerange, object_of_interest}) => {
     const [showvideo, setShowVideo] = useState(true);
+    const [isShown, setIsShown] = useState(false);
     const [current, setClass] = useState("fa fa-bar-chart");
 
     const videoClickHandler = () => (
@@ -14,29 +15,42 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
         //setClass(showvideo? "fa fa-bar-chart" : "fa fa-play")
     );
 
-    const menu = () => (
+    const menu = (isShown) => (
+        isShown ?
         <nav className="menu">
             <input type="checkbox" href="#" className="menu-open" name="menu-open" id="menu-open"/>
-            <label className="menu-open-button" htmlFor="menu-open">
+            <label className="menu-open-button" htmlFor="menu-open" >
                 <span className="hamburger hamburger-1"></span>
                 <span className="hamburger hamburger-2"></span>
                 <span className="hamburger hamburger-3"></span>
             </label>            
-            <a href="#" className="menu-item"> <i className="fa fa-bar-chart"></i> </a>    
+            <span  className="menu-item" onClick={()=>{videoClickHandler();}}> <i className="fa fa-bar-chart"></i></span>
+            <span  className="menu-item" onClick={()=>{setShowVideo(true);}}> <i className="fa fa-play"></i></span>    
         </nav>
+        :<span/>
     );
     const showVideoSection = (showvideo, classname, camera) => (
         showvideo ?
-            <div key={`cam${camera.cam}`} className={classname}>
-                {menu()}
-                <Video camera={camera} />
-            </div>
-            :
-            <VideoStreamer key={camera.url}
-                camera={camera}
-                timerange={timerange}
-                object_of_interest={object_of_interest}
+            <div key={`cam${camera.cam}`} className={classname}
+                onMouseEnter={() => setIsShown(true)}
+                onMouseLeave={() => setIsShown(false)}>
+                {menu(isShown)}
+                <Video camera={camera}
+                                
                 />
+            </div>
+            :   
+            <React.Fragment
+                onMouseEnter={() => setIsShown(true)}
+                onMouseLeave={() => setIsShown(false)}>
+                {menu(isShown)}
+            >
+            <VideoStreamer key={camera.url}
+                    camera={camera}
+                    timerange={timerange}
+                    object_of_interest={object_of_interest}              
+            />
+           </React.Fragment>            
     );
 
     return (

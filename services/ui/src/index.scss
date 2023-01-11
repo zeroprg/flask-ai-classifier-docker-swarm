@@ -1,6 +1,6 @@
 //vars
-$fg:#00bcd4;
-$bg:#673ab7;
+$fg:#07ff7f;
+$bg:#07010c;
 $pi:3.14;
 
 //config
@@ -32,8 +32,8 @@ h1{
 %ball{
   background:$fg;
   border-radius:100%;
-  width:15px;
-  height:15px;
+  width:80px;
+  height:80px;
   margin-left:-40px;
   position:absolute;
   top:20px;
@@ -86,7 +86,7 @@ $hamburger-spacing:8px;
 }
 .menu{
   @extend %goo;
-  $width:450px;
+  $width:650px;
   $height:150px;
   position:absolute;
   left:50%;
@@ -135,8 +135,8 @@ $hamburger-spacing:8px;
   @for $i from 1 through $menu-items{
 
     &:nth-child(#{$i+2}){
-      transition-duration:90ms+(100ms*$i);
-      transform:translate3d(110px*$i,0,0);
+      transition-duration:90ms+(80ms*$i);
+      transform:translate3d((80px*$i),0,0);
     }
   }
 }
