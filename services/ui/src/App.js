@@ -127,7 +127,7 @@ class App extends Component {
                         <h1 className="animated fadeInDown">AI processed video streams from public cameras.</h1>
 
                         <h3> This is free smart cloud storage  for cameras video streams works on ODROID ARM based computers   (100% python , no php  for more information check 
-                        <a href="//aicameras.ca" target="_blank" rel="noopener noreferrer"> http://aicams.info</a> ), bellow public available video-streams: </h3>
+                        <a href="//aicams.info" target="_blank" rel="noopener noreferrer"> http://aicams.info</a> ), bellow public available video-streams: </h3>
                        {/*The way to reference child component ref={(cd) => this.child = cd} */}
 
                         <InputURL updateparams={this.updateparams.bind(this)}
@@ -167,7 +167,7 @@ class App extends Component {
                                 <p>
                                 Check if object of interest behave accordingly. 
                     Check if object of interest was found  notify immediatly by eMail, SMS or voice call
-                    You can buy full source code version of our cloud solution plus hardware (ARM computer) from our store : <a href="//aicameras.ca" target="_blank">http://aicameras.ca</a>.                                </p>
+                    You can buy full source code version of our cloud solution plus hardware (ARM computer) from our store : <a href="//aicams.info" target="_blank">http://aicams.info</a>.                                </p>
                             </li>
                         </ul>
                     </div>
