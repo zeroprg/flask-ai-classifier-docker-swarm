@@ -54,7 +54,7 @@ class InputURL extends Component {
                             
                             <div className="form-group">
                                 <div className="col-sm-offset-2 col-sm-10">
-                                    <input type="submit" value="Submit" className="btn-primary a-btn - slide - text"/>
+                                    <input type="submit" value="Submit" className="btn btn-primary a-btn - slide - text"/>                                    
                                 </div>
                             </div>
                             <FormControl component="fieldset">

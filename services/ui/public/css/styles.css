@@ -479,7 +479,7 @@ Buttons
     font-size: 16px;
 }
 .use-btn:hover, .use-btn:focus {
-    background-color: #73d0da;
+    background-color: #07ff7f;
     color: #fff;
     text-decoration: none;
 }
@@ -1072,7 +1072,7 @@ a.btn {
     -webkit-transition-duration: 0.5s;
     -moz-transition-duration: 0.5s;
     -o-transition-duration: 0.5s;
-    background-color: #2fbfc4;
+    background-color: #07ff7f;
 }
 .fade {
     opacity: 1;
