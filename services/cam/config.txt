@@ -1,39 +1,11 @@
-video_file0=http://213.226.254.135:91/mjpg/video.mjpg 
-video_file1=http://110.54.126.130:50000/cgi-bin/camera?resolution=1200&amp;quality=1&amp 
-video_file2=http://145.53.212.190:8001/mjpg/video.mjpg 
-video_file3=http://192.168.0.101:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=16061678710320.35579881408547887 
-video_file4=http://78.27.189.141/mjpg/video.mjpg 
-video_file5=http://14.160.87.118:85/cgi-bin/camera?resolution=820&amp;quality=1&amp;Language=0&amp;1609741154
-video_file6=http://202.175.114.212/cgi-bin/camera?resolution=820&amp;quality=1&amp;Language=0&amp;1609741315
-video_file7=http://210.54.39.237:8888/shot.jpg?rnd=654321 
-video_file8=http://83.103.195.172:82/mjpg/video.mjpg 
-video_file9=http://84.92.94.35:81/mjpg/video.mjpg 
-video_file10=http://99.42.39.171:82/mjpg/video.mjpg 
-video_file11=http://82.207.41.104:8080/cam_1.cgi 
-video_file12=http://108.222.132.93:8082/out.jpg?q=30 
-video_file13=http://50.64.62.147:9000/mjpg/video.mjpg 
-video_file14=http://98.155.244.58/mjpg/video.mjpg 
-video_file15=http://119.197.80.97:83/SnapshotJPEG?Resolution=640x480 
-video_file16=http://210.139.19.134:82/cgi-bin/camera?resolution=640 
-video_file17=http://119.197.80.97:82/nphMotionJpeg?Resolution=640x480 
-video_file18=http://185.49.168.74:8001/mjpg/video.mjpg 
-video_file19=http://91.235.175.140:8081/mjpg/video.mjpg 
-video_file20=http://117.247.85.98:8001/mjpg/video.mjpg 
-video_file21=http://87.26.188.210:81/cgi-bin/faststream.jpg?stream=half 
-video_file22=http://158.58.130.148/mjpg/video.mjpg 
-video_file23=http://32.208.120.218/mjpg/video.mjpg 
 
-
-#Parking Lots:
-#video_file0=http://170.249.152.2:8080/cgi-bin/viewer/video.jpg?r=COUNTER
-#video_file1=http://159.255.189.4:8081/mjpg/video.mjpg
-#video_file0=http://213.226.254.135:91/mjpg/video.mjpg
+video_file0=http://210.54.39.237:8888/shot.jpg?rnd=654321 
+video_file2=http://98.155.244.58/mjpg/video.mjpg 
 
 #Hotel in Sochi
-video_file23=http://158.58.130.148/mjpg/video.mjpg
+video_file3=http://158.58.130.148/mjpg/video.mjpg
 
-#Park in Moscow
-#video_file0=http://95.215.176.83:8084/mjpg/video.mjpg
+
 
 #video_file0=picam
 #video_file1=http://192.168.0.100:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367
