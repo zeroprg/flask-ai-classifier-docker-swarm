@@ -8,6 +8,6 @@
     },
     // other global config variables you wish
     //API:    "//198.166.220.49:3020/", //"//localhost:5000/" 
-    API:    "//192.168.0.100:3020/", //"//localhost:5000/"
+    API:    "//localhost:3020/", //"//localhost:5000/"
 };
 
