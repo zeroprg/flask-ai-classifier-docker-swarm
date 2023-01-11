@@ -13,10 +13,10 @@ services:
     ports:
       - 3020:3020
     environment:
-      - CLASSIFIER_SERVER=http://192.168.1.63:4000/classify
+      - CLASSIFIER_SERVER=http://192.168.0.191:4000/classify
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
-      - DB_IP_ADDRESS=192.168.1.100
+      - DB_IP_ADDRESS=192.168.0.100
       - DB_USERNAME=odroid
       - DB_PASSWORD=vist2508
       - DB_NAME=streamer
@@ -40,7 +40,7 @@ services:
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_USERNAME=odroid
-      - DB_IP_ADDRESS=192.168.1.100
+      - DB_IP_ADDRESS=192.168.0.100
       - DB_PASSWORD=vist2508
       - DB_NAME=streamer
     depends_on:
