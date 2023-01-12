@@ -1,15 +1,15 @@
 #!/bin/sh
 
  git pull
- cd services/cam && sh build.sh
- cd - && cd services/web && sh build.sh && cd ../..
- cd services/ui && sh build.sh && cd ../..
- sudo docker service rm flask_cam flask_ui flask_web flask_visualizer
+  sudo docker service rm flask_cam flask_ui flask_web flask_visualizer
  sudo docker network rm flask
-
  # used to delete all images  --> sudo docker image prune -a
  sudo docker rmi $(sudo docker images -a --filter=dangling=true -q)
  sudo docker rmi -f zeroprg/flask-docker-swarm_web zeroprg/flask-docker-swarm_cam zeroprg/flask-docker-swarm_ui
+ cd services/cam && sh build.sh
+ cd - && cd services/web && sh build.sh && cd ../..
+ cd services/ui && sh build.sh && cd ../..
+
  sudo docker push zeroprg/flask-docker-swarm_cam:latest
  sudo docker push zeroprg/flask-docker-swarm_ui:latest
  sudo docker push zeroprg/flask-docker-swarm_web:latest
