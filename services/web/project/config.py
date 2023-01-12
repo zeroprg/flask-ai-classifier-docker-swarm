@@ -20,7 +20,7 @@ class ProductionConfig:
     DB_PORT = os.environ.get("DB_PORT")
     DB_NAME = os.environ.get("DB_NAME")
     CLASSIFIER_SERVER  = os.environ.get("CLASSIFIER_SERVER")
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DB_IP_ADDRESS")
+    DB_IP_ADDRESS = os.environ.get("DB_IP_ADDRESS")
     TRACK_MODIFICATIONS = False
     # read config file from app_settings
     args = configure(app_settings)
@@ -28,7 +28,7 @@ class ProductionConfig:
     if DB_PASSWORD is None or DB_PASSWORD =='' : DB_PASSWORD =  ( args["DB_PASSWORD"] if ("DB_PASSWORD" in args.keys()) else "postgres")
     if DB_PORT is None or DB_PORT =='' : DB_PORT =  (  args["DB_PORT"] if ("DB_PORT" in args.keys())  else "5432")
     if DB_NAME is None or DB_NAME =='' : DB_NAME =  (  args["DB_NAME"] if ("DB_NAME" in args.keys())  else "streamer")
-    if SQLALCHEMY_DATABASE_URI is None or SQLALCHEMY_DATABASE_URI=='': 
+    if DB_IP_ADDRESS is None or DB_IP_ADDRESS=='': 
             DB_IP_ADDRESS =  args["DB_IP_ADDRESS"] if ("DB_IP_ADDRESS" in  args.keys()) else "192.168.0.100"
-            SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DB_IP_ADDRESS, DB_PORT, DB_NAME)
+    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DB_IP_ADDRESS, DB_PORT, DB_NAME)        
     if CLASSIFIER_SERVER is None or CLASSIFIER_SERVER =='' : CLASSIFIER_SERVER =  args["CLASSIFIER_SERVER"]

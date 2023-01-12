@@ -52,7 +52,7 @@ camright = []
 IMG_PAGINATOR = 40
 SHOW_VIDEO = False
 port =  prod.PORT
-IP_ADDRESS = prod.IP_ADDRESS
+IP_ADDRESS = prod.DB_IP_ADDRESS
 
 
 class CameraMove:
