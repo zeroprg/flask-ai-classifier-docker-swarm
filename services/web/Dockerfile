@@ -57,5 +57,5 @@ RUN chown -R app:app $APP_HOME
 # Change to the app user
 USER app
 
-# run server
+# run server 
 CMD gunicorn -w 4 -b 0.0.0.0:4000 manage:app
