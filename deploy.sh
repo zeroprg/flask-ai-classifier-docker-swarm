@@ -7,8 +7,8 @@
  sudo docker rmi $(sudo docker images -a --filter=dangling=true -q)
  
  cd services/cam && sh build.sh
- cd - && cd services/web && sh build.sh && cd ../..
- cd services/ui && sudo sh build.sh && cd ../..
+ cd - && cd services/web && sh build.sh && 
+ cd - && cd services/ui  && sh build.sh && cd -
 
  sudo docker push zeroprg/flask-docker-swarm_cam:latest
  sudo docker push zeroprg/flask-docker-swarm_ui:latest
