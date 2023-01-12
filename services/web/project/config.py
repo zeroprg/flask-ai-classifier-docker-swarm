@@ -20,7 +20,7 @@ class ProductionConfig:
     DB_PORT = os.environ.get("DB_PORT")
     DB_NAME = os.environ.get("DB_NAME")
     CLASSIFIER_SERVER  = os.environ.get("CLASSIFIER_SERVER")
-    SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DB_IP_ADDRESS")
     TRACK_MODIFICATIONS = False
     # read config file from app_settings
     args = configure(app_settings)
