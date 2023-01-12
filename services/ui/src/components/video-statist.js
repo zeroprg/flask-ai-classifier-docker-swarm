@@ -24,8 +24,7 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
                 <span className="hamburger hamburger-2"></span>
                 <span className="hamburger hamburger-3"></span>
             </label>            
-            <span  className="menu-item" onClick={()=>{videoClickHandler();}}> <i className="fa fa-bar-chart"></i></span>
-            <span  className="menu-item" onClick={()=>{setShowVideo(true);}}> <i className="fa fa-play"></i></span>    
+            <span  className="menu-item" onClick={()=>{videoClickHandler();}}> <i className="fa fa-bar-chart"></i></span>            
         </nav>
         :<span/>
     );

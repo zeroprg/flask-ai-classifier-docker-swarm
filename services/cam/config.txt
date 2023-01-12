@@ -39,7 +39,6 @@ CLASSIFIER_SERVER = http://192.168.1.63:4000/classify
 
 #Database configuration (Postgres)
 DB_IP_ADDRESS=192.168.0.100
-DB_USERNAME=odroid
-DB_PASSWORD=vist2508
+
 DB_NAME=streamer
 MAXIMUM_VIDEO_STREAMS = 17

@@ -52,6 +52,6 @@ def create_app(script_info=None):
 
     app.register_blueprint(main_blueprint)
     # shell context for flask cli   
-    app.shell_context_processor({"app": app , "db": db})
+    app.shell_context_processor({"app": app , "db": db})   
     
     return app

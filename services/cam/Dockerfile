@@ -45,6 +45,7 @@ WORKDIR $APP_HOME
 COPY --from=builder /home/app/wheels /wheels
 COPY --from=builder /home/app/requirements.txt .
 RUN pip install --no-cache /wheels/*
+RUN pip install gunicorn
 
 
 # Copy in the Flask code
@@ -57,5 +58,5 @@ RUN chown -R app:app $APP_HOME
 USER app
 
 # run server
-#CMD gunicorn  -b 0.0.0.0:3020 manage:app
-CMD python3 manage.py run -h 0.0.0.0 -p 3020
+CMD gunicorn -w 4 -b 0.0.0.0:3020 manage:app
+#CMD python3 manage.py run -h 0.0.0.0 -p 3020
