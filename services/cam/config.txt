@@ -1,9 +1,9 @@
 
 video_file0=http://210.54.39.237:8888/shot.jpg?rnd=654321 
-video_file2=http://98.155.244.58/mjpg/video.mjpg 
+video_file1=http://98.155.244.58/mjpg/video.mjpg 
 
 #Hotel in Sochi
-video_file3=http://158.58.130.148/mjpg/video.mjpg
+video_file2=http://158.58.130.148/mjpg/video.mjpg
 
 
 
