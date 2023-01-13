@@ -1,9 +1,6 @@
-from multiprocessing import Process
-
 from flask.cli import FlaskGroup
 import logging
 
-import  sqlalchemy as sql
 from sqlalchemy import text
 
 from project import create_app, db
@@ -11,6 +8,7 @@ from project import create_app, db
 from project.main import  start
 
 app = create_app()
+start()
 cli = FlaskGroup(create_app=create_app)
 
 #@cli.command("recreate_db")
@@ -37,17 +35,10 @@ def seed_db():
     with db.engine.connect() as conn:
         conn.execute(text("select 'Hi everything fine, don.t worry'"))
         print("Total objects : {}".format(conn.execute("SELECT count(*) FROM OBJECTS" ).fetchall()))
-        print("Total statistic : {}".format(conn.execute("SELECT count(*) FROM STATISTIC" ).fetchall()))
-        metadata = sql.MetaData()
-        objects = sql.Table('objects', metadata, autoload=True, autoload_with=db.engine)
-
+        print("Total statistic : {}".format(conn.execute("SELECT count(*) FROM STATISTIC" ).fetchall()))        
     print("Database connection health was fine !!!")
 
-
-
 if __name__ == "__main__":
-
-    start()
     cli()
 
     

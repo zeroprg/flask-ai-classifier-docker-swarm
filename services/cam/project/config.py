@@ -13,7 +13,6 @@ if app_settings is None or app_settings =='' :app_settings = "./config.txt"
 class ProductionConfig:
     """Production configuration"""
     PORT = os.environ.get("PORT")
-    PORT = 3020
     MAXIMUM_VIDEO_STREAMS =  os.environ.get("MAXIMUM_VIDEO_STREAMS")
     DB_USERNAME = os.environ.get("DB_USERNAME")
     DB_PASSWORD = os.environ.get("DB_PASSWORD")
@@ -21,7 +20,7 @@ class ProductionConfig:
     DB_IP_ADDRESS = os.environ.get("DB_IP_ADDRESS")
     DB_NAME = os.environ.get("DB_NAME")
     CLASSIFIER_SERVER  = os.environ.get("CLASSIFIER_SERVER")
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DB_IP_ADDRESS")
+    DB_IP_ADDRESS = os.environ.get("DB_IP_ADDRESS")
     CONFIDENCE=os.environ.get("CONFIDENCE")
     TRACK_MODIFICATIONS = False
     # read config file from app_settings
