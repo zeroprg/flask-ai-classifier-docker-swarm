@@ -148,9 +148,9 @@ def lock_urls_for_os():
             except Exception as e:
                 logger.info("Exception {}".format(e))
             else:
-                imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+                #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
                  
-                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params, imagesQueue[params['id']])
+                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
                 
                 #if video stream not active remove it 
                 if( detection.errors == 0 ):
@@ -167,7 +167,7 @@ def start_one_stream_processes(video, prod=prod, detectors=detectors):
     #print(imagesQueue)
     #if imagesQueue.get(video['id'], None) is not None :
     detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-            video, imagesQueue[video['id']])
+            video)
     #if video stream not active remove it 
     if( detection.errors == 0 ):
         detectors[video['id']] = detection
@@ -211,7 +211,7 @@ def deny_service_call(url, params=None, detectors=detectors, prod = prod, IMAGES
             """ Servicing this video was denied other nodes didn't grab this video """       
             #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
             detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                params, imagesQueue[params['id']])
+                params)
             
             #if video stream not active remove it 
             if( detection.errors == 0 ):
@@ -284,9 +284,9 @@ def initialize_video_streams(url=None, videos=[]):
             params['videos_length'] = len(detectors)
             """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
             #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)
-            imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+            #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
             
-            detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params, imagesQueue[params['id']])
+            detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
             
             #if video stream not active remove it 
             if( detection.errors == 0 ):
@@ -509,8 +509,8 @@ def urls():
             else:
                 
                 params['os'] = comp_node()
-                imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params, imagesQueue[params['id']])
+                #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
+                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
                 
                 #if video stream not active remove it 
                 if( detection.errors == 0 ):
