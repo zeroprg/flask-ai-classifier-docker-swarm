@@ -57,6 +57,6 @@ RUN chown -R app:app $APP_HOME
 # Change to the app user
 USER app
 
-# run server
-CMD python3 videostreams.py && gunicorn -w 4 -b 0.0.0.0:3020 manage:app
+# run server and bounded programs
+CMD ["./run.sh"]
  
