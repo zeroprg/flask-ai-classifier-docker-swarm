@@ -30,11 +30,11 @@ services:
   web:
     image: zeroprg/flask-docker-swarm_web:latest
     deploy:
-      replicas: 1
+      replicas: 3
       restart_policy:
         condition: on-failure
-      placement:
-        constraints: [node.role == manager]
+      #placement:
+      #  constraints: [node.role == manager]
     ports:
       - 4000:4000
     environment:
