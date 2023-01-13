@@ -227,24 +227,28 @@ class Sql:
         return rows
 
 
-    def insert_frame(self, hashcode, date, time, type, numpy_array, x_dim, y_dim, cam):
-        if y_dim <45 or x_dim <45 or x_dim/y_dim > 4.7 or y_dim/x_dim > 4.7: return
-        #cur.execute("UPDATE objects SET currentime="+self.P+" filter hashcode="+self.P, (time, str(hashcode)))
+    def insert_frame(self, hashcode, date, time, type, numpy_array, startX, startY, x_dim, y_dim, cam):
+        
+        if y_dim <39 or x_dim <39 or x_dim/y_dim > 4.7 or y_dim/x_dim > 4.7: return
+        #cur.execute("UPDATE objects SET currentime="+self.P+" WHERE hashcode="+self.P, (time, str(hashcode)))
         #print("cam= {}, x_dim={}, y_dim={}".format(cam, x_dim, y_dim))
         buffer = cv2.imencode('.jpg', numpy_array)[1]
         jpg_as_base64='data:image/jpeg;base64,'+ base64.b64encode(buffer).decode('utf-8')
+
 
         conn = self.getConn()
         try:
             #cur.execute("INSERT INTO objects (hashcode, currentdate, currentime, type, frame, x_dim, y_dim, cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")", 
             #(str(hashcode), date, time, type, str(jpg_as_base64), int(x_dim), int(y_dim), int(cam)))
-            values = {'hashcode': hashcode, 'currentdate': date, 'currentime': time, 'type': type, 'frame':str(jpg_as_base64), 'x_dim': int(x_dim), 'y_dim': int(y_dim), 'cam':int(cam) }     
+            values = {'hashcode': hashcode, 'currentdate': date, 'currentime': time, 'type': type, 'frame':str(jpg_as_base64),
+                      'width': int(x_dim),'height': int(y_dim), 'x_dim': int(startX), 'y_dim': int(startY) , 'cam':cam}     
             query = sql.insert(self.objects)
             ResultProxy = conn.execute(query, values)
-            print(" insert_frame was {0} with params: {1}".format(ResultProxy.is_insert ,values))
+            #print(" insert_frame was {0} with params: {1}".format(ResultProxy.is_insert ,values))
         except Exception as e: print(" e: {}".format( e))
         finally:
             conn.close()
+
 
     def select_frame_by_time(self, cam, time1, time2):
         """

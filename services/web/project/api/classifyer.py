@@ -1,21 +1,17 @@
 import numpy as np
-from imutils.video import VideoStream
-import os
-import logging
-import argparse
-from flask import Flask, render_template, Response, request, redirect, jsonify, send_from_directory
-
-from project.db.api import Sql
-from project import db
-
 import cv2
 
 from PIL import Image
 import time
 import datetime
 import json
+import logging
+
+from project import db
 from  project.api.tools.objCountByTimer import ObjCountByTimer
 from  project.config import ProductionConfig as prod
+
+logging.basicConfig(level=logging.INFO)
 
 # initialize the list of class labels MobileNet SSD was trained to
 # detect, then generate a set of bounding box colors for each class
@@ -23,9 +19,9 @@ CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
            "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
            "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
            "sofa", "train", "tvmonitor"]
-LOOKED1 = {"person": [], "car": [] , "bus":[], "bicycle":[], "dog":[], "horse":[], "motorbike":[]}
+LOOKED1 = {"person": []}
 
-subject_of_interes = ["person", "car", "bus" , "bicycle", "dog", "horse", "motorbike"]
+subject_of_interes = ["person"]
 DNN_TARGET_MYRIAD = False
 
 HASH_DELTA = 7  # how many bits difference between 2 hashcodes
@@ -33,9 +29,8 @@ DIMENSION_X = 300
 DIMENSION_Y = 300
 piCameraResolution = (640, 480)  # (1024,768) #(640,480)  #(1920,1080) #(1080,720) # (1296,972)
 piCameraRate = 16
-NUMBER_OF_THREADS = 2
+NUMBER_OF_THREADS = 1
 
-from flask import Blueprint, jsonify, request
 
 #SECRET_CODE = open("/run/secrets/secret_code", "r").read().strip()
 
@@ -44,7 +39,7 @@ from flask import Blueprint, jsonify, request
 hashes = {}
 
 def classify_frame(net, frame, params):
-    topic_label = ''
+
     cam = params['cam']
     confidence = params['confidence']
     rectangles = []
@@ -98,7 +93,7 @@ def classify_frame(net, frame, params):
             hash = 0
             try:
                 crop_img = Image.fromarray(crop_img_data)
-                hash = dhash(crop_img_data)
+                hash = dhash(crop_img)
             except:
                 continue  # pass
 
@@ -143,15 +138,15 @@ def classify_frame(net, frame, params):
                 now = datetime.datetime.now()
                 day = "{date:%Y-%m-%d}".format(date=now)
                 db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, startX, startY, x_dim, y_dim, cam)
-            params = do_statistic(cam,  hashes)
+            statist = do_statistic(cam,  hashes)
             #db.getConn().commit()
 
         # draw at the top left corner of the screen
         #cv2.putText(frame, topic_label, (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
         # print(" Classify frame ... <---")
         # place frame in queue for further processing
-        result = {"topic_label": topic_label, "rectangles": rectangles, "params":params }
-    return result #frame
+        #result = {"topic_label": topic_label, "rectangles": rectangles, "params":params }
+    return statist #frame
 
 
 
@@ -182,7 +177,6 @@ def do_statistic(cam, hashes):
 def get_parameters_json(hashes, cam):
     ret = []
     for key in hashes:
-        # logging.debug(images[key])
         trace = Trace()
         trace.name = key.split()[0]
         trace.cam = cam       

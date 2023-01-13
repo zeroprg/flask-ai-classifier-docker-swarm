@@ -1,8 +1,3 @@
-import os
-import logging
-import argparse
-
-
 
 def configure(FILE):
     # construct the argument parse and parse the arguments

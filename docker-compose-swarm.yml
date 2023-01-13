@@ -5,7 +5,7 @@ services:
   cam:
     image: zeroprg/flask-docker-swarm_cam:latest
     deploy:
-      replicas: 3
+      replicas: 4
       restart_policy:
         condition: on-failure
       #placement:
@@ -14,45 +14,40 @@ services:
       - 3020:3020
     environment:
       - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
-      - CONFIDENCE=0.85
+      - CONFIDENCE=0.5
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_IP_ADDRESS=192.168.0.100
       - DB_USERNAME=odroid
       - DB_PASSWORD=vist2508
       - DB_NAME=streamer
-    depends_on:
-    #  - db
-      - web
     networks:
       - flask
 
-  web:
-    image: zeroprg/flask-docker-swarm_web:latest
-    deploy:
-      replicas: 2
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints: [node.role == worker]
-    ports:
-      - 4000:4000
-    environment:
-      - FLASK_ENV=production
-      - APP_SETTINGS=/home/app/web/config.txt
-      - DB_USERNAME=odroid
-      - DB_IP_ADDRESS=192.168.0.100
-      - DB_PASSWORD=vist2508
-      - DB_NAME=streamer
-    #depends_on:
-    #  - db
-    networks:
-      - flask
-    healthcheck:
-      test: curl --fail http://localhost:4000/ping || exit 1
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  #web:
+  #  image: zeroprg/flask-docker-swarm_web:latest
+  #  deploy:
+  #    replicas: 2
+  #    restart_policy:
+  #      condition: on-failure
+  #    placement:
+  #      constraints: [node.role == worker]
+  #  ports:
+  #    - 4000:4000
+  #  environment:
+  #    - FLASK_ENV=production
+  #    - APP_SETTINGS=/home/app/web/config.txt
+  #    - DB_USERNAME=odroid
+  #    - DB_IP_ADDRESS=192.168.0.100
+  #    - DB_PASSWORD=vist2508
+  #    - DB_NAME=streamer
+  #  networks:
+  #    - flask
+  #  healthcheck:
+  #    test: curl --fail http://localhost:4000/ping || exit 1
+  #    interval: 10s
+  #    timeout: 5s
+  #    retries: 5
 
 #  db:
 #    hostname: 'primary'
@@ -128,9 +123,6 @@ services:
       - 80:80
     environment:
       - CHOKIDAR_USEPOLLING=true
-#    volumes: 
-#      - ./app.log:/var/log/nginx/app.log
-
     depends_on:
       - cam
     networks:
@@ -147,7 +139,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.role == worker
+          - node.role == manager
     ports:
       - 8080:8080
     volumes:

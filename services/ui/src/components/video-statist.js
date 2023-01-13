@@ -43,7 +43,7 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
                 onMouseEnter={() => setIsShown(true)}
                 onMouseLeave={() => setIsShown(false)}>
                 {menu(isShown)}
-            >
+            
             <VideoStreamer key={camera.url}
                     camera={camera}
                     timerange={timerange}

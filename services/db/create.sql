@@ -28,7 +28,7 @@ CREATE TABLE statistic (
 	"type" text NULL,
 	currentime int8 NULL,
 	y int2 NULL,
-	hashcodes VARCHAR(410) NULL,
+	hashcodes VARCHAR(3000) NULL,
 	cam uuid NULL
 );
 

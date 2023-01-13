@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 from imutils.video import VideoStream
 import io
@@ -5,21 +6,16 @@ import zlib
 import requests
 from requests.exceptions import HTTPError
 
-import base64
-
-import dhash
-from PIL import Image
-import time
-import datetime
-import json
-from project.objCountByTimer import ObjCountByTimer
-from multiprocessing import Process
-from multiprocessing import Queue
 import logging
-import cv2
+import base64
+import time
+import json
+from multiprocessing import Process
+
 import json
 from json import JSONEncoder
 
+from project.caffe_classifier import classify_frame
 
 subject_of_interes = ["person", "car"]
 DNN_TARGET_MYRIAD = False
@@ -31,9 +27,8 @@ piCameraResolution = (640, 480)  # (1024,768) #(640,480)  #(1920,1080) #(1080,72
 piCameraRate = 16
 NUMBER_OF_THREADS = 1
 
-logger = logging.getLogger('logger')
+logging.basicConfig(level=logging.INFO)
 
-logger.setLevel(logging.DEBUG)
 
 class Detection:
     def __init__(self, classify_server, confidence, model, video):
@@ -54,7 +49,7 @@ class Detection:
                                   #,output_queue))
             p_get_frame.daemon = False
             p_get_frame.start()
-            logger.info("-------- Process was just started for video: {} --------".format(video))
+            logging.info("-------- Process was just started for video: {} --------".format(video))
             time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
         
 
@@ -62,17 +57,20 @@ class Detection:
         if self.video_s is None:
             self.video_s = self.init_video_stream()
         while True:
-            try:
+            try:                
                 frame = self.read_video_stream(self.video_s)
                 if frame is None: return
             except:
                 print('Exception during reading stream by URL:{0}'.format(self.video_url))
                 return
-            result = call_classifier(self.classify_server, frame, self.cam, self.confidence, self.model)
+            # call it remotely
+            #result = call_classifier(self.classify_server, frame, self.cam, self.confidence, self.model)
+            # call locally
+            result = call_classifier_locally( frame, self.cam, self.confidence, self.model) 
             if(result is not None and 'rectangles' in result and len(result['rectangles'])>0):
-                logger.debug("result: {}".format(result))
+                logging.debug("result: {}".format(result))
 
-                    # Draw rectangles
+              # Draw rectangles
                 '''
                 for rec in result['rectangles']:
                     x = rec.get('startX') - 25
@@ -114,6 +112,9 @@ class Detection:
                 return frame
         return frame
 
+def call_classifier_locally( frame, cam, confidence, model):
+       parameters = {'cam': cam, 'confidence': confidence , 'model': model} 
+       classify_frame(frame, parameters)
 
 
 def call_classifier(classify_server, frame, cam, confidence, model):
@@ -125,21 +126,23 @@ def call_classifier(classify_server, frame, cam, confidence, model):
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}  
     payload = json.dumps({'image': im_b64, 'parameters': parameters}, indent=2)
     jsonResponse = None
-    logger.debug("------------ call_classifier just called for cam: {} -------".format(cam))
+    logging.debug("------------ call_classifier just called for cam: {} -------".format(cam))
     try:
         response = requests.post(url=classify_server,
-                            data=payload, headers=headers)                            
+                            data=payload, headers=headers)  
+        #print("response is:"+ str(response) )                          
         response.raise_for_status()
         # access JSOn content
         jsonResponse = response.json()
-        logger.debug("Entire JSON response")
-        logger.debug(jsonResponse)
+        print(jsonResponse)
+        logging.debug("Entire JSON response")
+        logging.debug(jsonResponse)
 
     except HTTPError as http_err:
         print('HTTP error occurred when connected to {0}: {1}'.format(classify_server, http_err))
     except Exception as err:
         print('Connection to {0} failed: {1}'.format(classify_server,err))
-    logger.debug("call_classifier jsonResponse for cam: {} {}".format(cam,jsonResponse ))   
+    logging.debug("call_classifier jsonResponse for cam: {} {}".format(cam,jsonResponse ))   
     return jsonResponse
 
 

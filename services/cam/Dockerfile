@@ -58,6 +58,5 @@ RUN chown -R app:app $APP_HOME
 USER app
 
 # run server
- #cant be used due to using Process(es)
- #CMD gunicorn -w 4 -b 0.0.0.0:3020 manage:app
-CMD python3 manage.py run -h 0.0.0.0 -p 3020
+CMD python3 videostreams.py && gunicorn -w 4 -b 0.0.0.0:3020 manage:app
+ 

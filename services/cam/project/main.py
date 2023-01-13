@@ -1,43 +1,22 @@
-from multiprocessing import Process
-from multiprocessing import Queue
+import time
 import os
 import threading
-import argparse
-import time
-import logging
-import mimetypes
-import json
-import requests
-import urllib.request
-import urllib.error
 import cv2
-
+import json
+import logging
 
 from project.config import  ProductionConfig as prod
 from project.classifier import Detection
-from project import db, detectors, imagesQueue, comp_node, videos
-import platform 
-from project.sleep_decorator import sleep
+from project import db, detectors, comp_node, videos
 
-from flask import Blueprint, Response, request, g, redirect, url_for, send_from_directory
+
+from flask import Blueprint, Response, request, send_from_directory
 from flask_cors import cross_origin, CORS
 
-logger = logging.getLogger('logger')
-logger.setLevel(logging.INFO)
-console = logging.StreamHandler()
-logger.addHandler(console)
-logger.debug('DEBUG mode')
-
-
-
-
-
+logging.basicConfig(level=logging.INFO)
 
     # if its windows
-#    if os.name == 'nt':
-#        return  platform.node()
-#    else:
-#        return  os.uname()[1]
+
 
 DELETE_FILES_LATER = 7*24*3600000 #   ( 7 days in miliseconds)
 ENCODING = "utf-8"
@@ -55,233 +34,12 @@ port =  prod.PORT
 IP_ADDRESS = prod.DB_IP_ADDRESS
 
 
-class CameraMove:
-    def __init__(self, move_left, move_right, timestep=10):
-        if move_left == None or move_right == None: return
-        self.timestep = timestep
-        self.move_left = move_left  # 'http://www.google.com' # move_left
-        self.move_right = move_right  # 'http://www.google.com' #move_right
-        self.t1 = threading.Timer(timestep, self.cameraLoop)
-        self.t1.start()
-
-    def cameraLoop(self):
-        logger.debug(self.move_left)
-        os.system(self.move_left)  # urlopen(self.move_left)
-        time.sleep(5.0)
-        os.system(self.move_left)  # urlopen(self.move_left)
-        time.sleep(5.0)
-        os.system(self.move_left)  # urlopen(self.move_left)
-        time.sleep(10.0)
-        os.system(self.move_right)  # urlopen(self.move_right)
-        time.sleep(5.0)
-        os.system(self.move_right)  # urlopen(self.move_right)
-        time.sleep(5.0)
-        os.system(self.move_right)  # urlopen(self.move_right)
-        time.sleep(2.0)
-        time.sleep(20.0)
-        self.t1 = threading.Timer(self.timestep, self.cameraLoop)
-
-        self.t1.start()
-
-
 main_blueprint = Blueprint("main", __name__)
 
 
 def change_res(camera, width, height):
     camera.set(3, width)
     camera.set(4, height)
-
-
-
-
-
-
-
-"""Delete old images later then DELETE_FILES_LATER milliseconds every 24 hours"""  
-def clean_up_service():
-  threading.Timer(3600*24, clean_up_service).start()
-  db.delete_frames_later_then(DELETE_FILES_LATER)
-
-""" Lock urls record for every 101 seconds """
-def lock_urls_for_os():
-  threading.Timer(101, lock_urls_for_os).start()      
-  #db.update_url_by_os(comp_node())
-  videos_ = db.select_all_urls()
-
-  for params in videos_:
-        """ grab the first video which was not processed for last 10 min. and from this node """
-        if params['id'] not in detectors and params['currentime'] + 60000 > time.time()*1000:
-           
-            params['os'] = comp_node()
-            logger.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
-            try:
-                db.update_urls(params)
-            except Exception as e:
-                logger.info("Exception {}".format(e))
-            else:
-                #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-                 
-                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
-                
-                #if video stream not active remove it 
-                if( detection.errors == 0 ):
-                    detectors[params['id']] = detection
-                else:
-                    db.delete_urls(params)
-                    logger.info("Url {} has been deleted".format(params['url']))
-                    
-                i = len(detectors)    
-                if i == prod.MAXIMUM_VIDEO_STREAMS: break
-
-
-def start_one_stream_processes(video, prod=prod, detectors=detectors):
-
-    detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-            video)
-    #if video stream not active remove it 
-    if( detection.errors == 0 ):
-        detectors[video['id']] = detection
-    else:
-        db.delete_urls(video)
-    
-
-    
-    logger.info("p_classifiers for cam: {} started by {} ".format(video['id'], comp_node() ))
-
-
-
-
-
-
-def start():
-    time.sleep(1)
-    logger.info("[INFO] loading model...")
-    # construct a child process *indepedent* from our main process of
-    # execution
-    logger.info("[INFO] starting process...")
-    # initialize the video stream, allow the cammera sensor to warmup,
-    # and initialize the FPS counter
-    logger.info("[INFO] starting video stream...")
-    initialize_video_streams()
-    clean_up_service()
-    lock_urls_for_os()
-  
- 
-#@sleep(1)
-def deny_service_call(url, params=None, detectors=detectors, prod = prod):  
-    time.sleep(20)
-
-    try:
-        r = requests.post(url,data=params)
-        print(r)
-        #r.raise_for_status()
-        if r.status_code == 412 :
-            """ Servicing this video was denied other nodes didn't grab this video """       
-            #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-            detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
-                params)
-            
-            #if video stream not active remove it 
-            if( detection.errors == 0 ):
-                detectors[params['id']] = detection
-            else:
-                db.delete_urls(params)
-           
-
-            logger.info("Adding a new detector with {}".format(params['id']))
-            #logger.info(imagesQueue)       
-        else: # code 200 Ok  successefully deny this service on another node
-            """ get this service to myself """          
-            try:
-                logger.info("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
-                db.update_urls(params)                
-            except Exception as e:
-                logger.info("Exception {}".format(e))
-
-    except Exception as e:
-        # Email admin / log
-        logger.info('HTTPError: {} for {}'.format(e,url))
-        # Re-raise the exception for the decorator
-        raise urllib.error.HTTPError
-
-
-# initialize the video stream, allow the cammera sensor to warmup,
-# and initialize the FPS counter
-def initialize_video_streams(url=None, videos=[]):
-    i = 0
-    
-    arg = None
-    if url is not None:
-        arg = url
-        i = len(videos)
-        logger.info('new url:' + url)
-    #  initialise picam or IPCam
-    else:
-        arg = prod.args.get('video_file' + str(i), None)
-    logger.info('Video urls:')
-    """ Insertion """
-    while arg is not None:
-        if not (i, arg) in videos:
-            #camright.append(prod.args.get('cam_right' + str(i), None))
-            #camleft.append(prod.args.get('cam_left' + str(i), None))
-            #CameraMove(camright[i], camleft[i])
-            params = { 'cam': i, 'url': arg ,'os': comp_node()}
-
-            try:
-                videos.append(params)                
-                db.insert_urls(params)
-            except: pass
-            finally:
-                arg = prod.args.get('video_file' + str(i), None)
-                i += 1 
-                logger.info(arg)
-    videos_ = db.select_all_urls()
-    """ Update all videos as mine , start greeding algorithm here ..."""
-
-    """ Updation """
-    for video in videos_:
-        
-        params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node(), 'currentime':time.time()*1000 }
-        try:
-            logger.debug("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
-            if params['id'] not in detectors: #and video['currentime'] > time.time()*1000 - 60000:
-                db.update_urls(params)            
-        except Exception as e:
-            logger.info("Exception {}".format(e))
-        else:            
-            params['videos_length'] = len(detectors)
-            """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
-            #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)
-            #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-            
-            detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
-            
-            #if video stream not active remove it 
-            if( detection.errors == 0 ):
-                detectors[params['id']] = detection
-            else:
-                db.delete_urls(params)
-                
-    
-                
-                
-            logger.info("p_classifiers for cam: {} started by {} ".format(video['id'], comp_node() ))
-            
-            #url = 'http://{}:{}{}'.format(IP_ADDRESS,port,deny_service_url)
-            #p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
-            #p_deny_service.daemon=False
-            #p_deny_service.start()
-            i = len(detectors)
-            if i == prod.MAXIMUM_VIDEO_STREAMS: break
-                
-            
-    videos = db.select_all_urls()            
-
-    logger.info(videos)
-    # Start process
-    #time.sleep(1.0)
-    return videos
-
 
 
 
@@ -297,6 +55,14 @@ cors = CORS(main_blueprint, resources={r"/urls": {"origins": 'http://localhost:{
 # api = Api(main_blueprint)
 # api.decorators=[cors.crossdomain(origin='*')]
 
+@main_blueprint.route("/ping", methods=["GET"])
+def ping_pong():    
+    logging.info('Hitting the "/ping" route')
+    node = os.uname()[1]
+    if os.name == 'nt':
+        node = 'Windows'
+    return Response(json.dumps({"status": "success", "message": "ping-pong!", "container_id": node},
+                               default=str, indent = 4), mimetype='text/plain', status=200)
 
 @main_blueprint.route('/<path:filename>')
 @cross_origin(origin='http://localhost:{}'.format(port))
@@ -307,8 +73,17 @@ def serve_static(filename):
 @main_blueprint.route('/health')
 @cross_origin(origin='http://localhost:{}'.format(port))
 def health():
-    ret = {'os': comp_node(), 'totalDetectors': len(detectors), 'detectors': detectors}
-    logger.info(ret)
+    
+    with db.engine.connect() as conn:
+        objects_rows = conn.execute("SELECT count(*) FROM OBJECTS" ).fetchall()
+        print("Total objects : {}".format(objects_rows[0][0]))
+        statistic_rows = conn.execute("SELECT count(*) FROM STATISTIC" ).fetchall()
+        print("Total statistic : {}".format(statistic_rows[0][0]))
+        print("Database connection health was fine !!!")  
+
+
+    ret = {'os': comp_node(), "Total objects": objects_rows[0][0],  "statistic table rows": statistic_rows[0][0]}
+    logging.info(ret)
     return Response(json.dumps(ret,default=str, indent = 4), mimetype='text/plain', status=200)
 
 
@@ -316,10 +91,10 @@ def health():
 @cross_origin(origin='http://localhost:{}'.format(port))
 def deny_service():
     params = request.form.to_dict()
-    logger.debug(params)  
+    logging.debug(params)  
     if  params['os'] ==  comp_node():
         msg = "Video with id:{} was failed to delegate to the same node: {}".format(params['id'],params['os'])
-        logger.debug(msg)
+        logging.debug(msg)
         return Response({"message":msg} , mimetype='text/plain', status=412)    
     """ if request come rom different node  """ 
     """ Griddy algorithm started here  if  list of videos too big and my list too small """
@@ -327,12 +102,12 @@ def deny_service():
             """ delete this video service """
             if detectors.get(params['id'], None) is not None: del detectors[params['id']]
             #if imagesQueue.get(params['id'], None) is not None: del imagesQueue[params['id']]
-           #  logger.info("------------------- !!!!!!!! Was updated !!!!!!!!!!!! --------------------")
+           #  logging.info("------------------- !!!!!!!! Was updated !!!!!!!!!!!! --------------------")
             msg = "Video with id:{} successfully deleted on node: {}".format(params['id'],params['os'])
             return Response({"message":msg}, mimetype='text/plain', status=200)
     else:
         msg = "Video with id:{} was failed to delegate to node: {}".format(params['id'],comp_node())
-        logger.debug(msg)
+        logging.debug(msg)
     return Response({"message":msg} , mimetype='text/plain', status=412)    
                 
    
@@ -358,7 +133,7 @@ def moreparams():
         hour_back2 = int(hour_back2)
     else:
         hour_back2 = 1  # default value: 60 min back
-    logger.debug("cam: {}, hour_back:{}, now_in_seconds:{}".format(cam, hour_back1, hour_back2))
+    logging.debug("cam: {}, hour_back:{}, now_in_seconds:{}".format(cam, hour_back1, hour_back2))
 
     params = gen_params(cam=cam, time1=hour_back1, time2=hour_back2 ,object_of_interest=object_of_interest)
     return Response(params, mimetype='text/plain')
@@ -413,7 +188,7 @@ def gen_params(cam='', time1=0, time2=5*60*60*1000, object_of_interest=[]):
     print("time1: {} time2: {}".format(time1, time2))
     ls = db.select_statistic_by_time(cam, time1, time2, object_of_interest)
     ret = json.dumps(ls, default=str)  # , indent = 4)
-    logger.debug(ret)
+    logging.debug(ret)
     return ret
 
 
@@ -423,7 +198,7 @@ def ping_video_url(url):
         vs = cv2.VideoCapture(url)
         flag, _ = vs.read()
     except Exception as e:        
-        logger.info("Exception in ping url: {}".format(e))
+        logging.info("Exception in ping url: {}".format(e))
  
     
         
@@ -440,14 +215,14 @@ def urls():
     cam_id = request.args.get('id', default=None)
 
     if add_url is not None:
-        logger.info('adding a new video urls ' + add_url)
+        logging.info('adding a new video urls ' + add_url)
         if ping_video_url(add_url):
             try:
                 
                 params = { 'url': add_url }
                 db.insert_urls(params)
             except Exception as e:
-                logger.debug("Exception during saving url:{} : {}".format(add_url,e))
+                logging.debug("Exception during saving url:{} : {}".format(add_url,e))
                 msg = "URL already exist it was already  added successfully"
                 return Response({"message":msg}, mimetype='text/plain', status=500)           
             else:

@@ -27,11 +27,19 @@ video_file2=http://158.58.130.148/mjpg/video.mjpg
 #cam_left1=curl 'http://z**o:V*st*!@192.168.1.101:81/decoder_control.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&command=4&onestep=2&_=35282579520910.657573406191367'
 
 
-
+#initial model to recognise objects
+# ------------ YOLO ----------------
 #prototxt=yolo-coco/yolov3-tiny.cfg
-prototxt=MobileNetSSD_deploy.prototxt.txt
-#model=yolo-coco/yolov3-tiny.weights
-model=MobileNetSSD_deploy.caffemodel
+#model=./models/YOLO/yolov3-tiny.weights
+
+#prototxt=./models/YOLO/yolov4-tiny.cfg
+#model=./models/YOLO/yolov4-tiny.weights
+
+# ------------ MobileNetSSD ---------
+prototxt=./models/caffemodel/MobileNetSSD/MobileNetSSD_deploy.prototxt
+model=./models/caffemodel/MobileNetSSD/MobileNetSSD_deploy.caffemodel
+
+
 confidence=0.87
 
 #server for object classifications

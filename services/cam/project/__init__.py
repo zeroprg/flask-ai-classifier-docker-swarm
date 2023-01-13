@@ -21,10 +21,13 @@ vs = None
 
 fps = None
 p_get_frame = None
+
 comp_uuid = str(uuid.uuid4())
-db = Sql(SQLALCHEMY_DATABASE_URI = prod.SQLALCHEMY_DATABASE_URI)
 def comp_node():
     return comp_uuid
+
+db = Sql(SQLALCHEMY_DATABASE_URI = prod.SQLALCHEMY_DATABASE_URI)
+
 # instantiate the extensions
 #migrate = Migrate()
 

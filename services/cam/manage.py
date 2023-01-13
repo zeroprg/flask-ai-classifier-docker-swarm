@@ -1,15 +1,15 @@
+import  logging
 from flask.cli import FlaskGroup
-import logging
-
 from sqlalchemy import text
 
 from project import create_app, db
 
-from project.main import  start
-
 app = create_app()
 
 cli = FlaskGroup(create_app=create_app)
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 #@cli.command("recreate_db")
 #def recreate_db():
@@ -28,18 +28,15 @@ cli = FlaskGroup(create_app=create_app)
 @cli.command("health" )
 def seed_db():
     """ Check connectivity."""
-    print("Check connection health:")
-    logging.basicConfig()
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
-    
+    logger("Check connection health:")
+
     with db.engine.connect() as conn:
         conn.execute(text("select 'Hi everything fine, don.t worry'"))
-        print("Total objects : {}".format(conn.execute("SELECT count(*) FROM OBJECTS" ).fetchall()))
-        print("Total statistic : {}".format(conn.execute("SELECT count(*) FROM STATISTIC" ).fetchall()))        
-    print("Database connection health was fine !!!")
+        logger("Total objects : {}".format(conn.execute("SELECT count(*) FROM OBJECTS" ).fetchall()))
+        logger("Total statistic : {}".format(conn.execute("SELECT count(*) FROM STATISTIC" ).fetchall()))        
+    logger("Database connection health was fine !!!")
 
 if __name__ == "__main__":
-    start()
     cli()
 
     
