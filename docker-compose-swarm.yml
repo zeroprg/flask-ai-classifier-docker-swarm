@@ -8,12 +8,13 @@ services:
       replicas: 3
       restart_policy:
         condition: on-failure
-      placement:
-        constraints: [node.role == worker]
+      #placement:
+      #  constraints: [node.role == worker]
     ports:
       - 3020:3020
     environment:
       - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
+      - CONFIDENCE=0.85
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_IP_ADDRESS=192.168.0.100

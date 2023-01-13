@@ -32,7 +32,7 @@ video_file2=http://158.58.130.148/mjpg/video.mjpg
 prototxt=MobileNetSSD_deploy.prototxt.txt
 #model=yolo-coco/yolov3-tiny.weights
 model=MobileNetSSD_deploy.caffemodel
-confidence=0.3
+confidence=0.87
 
 #server for object classifications
 CLASSIFIER_SERVER = http://192.168.1.63:4000/classify
