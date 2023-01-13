@@ -41,7 +41,7 @@ logger.debug('DEBUG mode')
 
 DELETE_FILES_LATER = 7*24*3600000 #   ( 7 days in miliseconds)
 ENCODING = "utf-8"
-IMAGES_BUFFER = 200
+
 #  --------------------  constanst and definitions -------------------------
 deny_service_url = '/deny_service'
 
@@ -92,35 +92,6 @@ def change_res(camera, width, height):
     camera.set(4, height)
 
 
-def get_frame(images_queue):
-    while True:
-        try:
-            images_queue.get()
-        except:
-            continue
-        #if SHOW_VIDEO:
-        #    cv2.imshow("Camera" + str(cam), images_queue.get())
-        #    key = cv2.waitKey(1) & 0xFF
-
-
-
-def fetchImagesFromQueueToVideo(filename, imagesQueue):
-    # fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # 'x264' doesn't work
-    # fourcc = cv2.VideoWriter_fourcc(*'MPEG')
-    # fourcc = 0x00000021
-    # logger.debug(fourcc)
-    # out = cv2.VideoWriter(filename,fourcc, 29.0, size, False)  # 'False' for 1-ch instead of 3-ch for color
-    # logger.debug(out)
-    # fgbg= cv2.createBackgroundSubtractorMOG2()
-    # logger.debug(fgbd)
-    while (imagesQueue.qsize() > 2):
-        #    fgmask = imagesQueue.get() #fgbg.apply(imagesQueue.get())
-        imagesQueue.get()
-        # np.save(filename,imagesQueue.get())
-    #    out.write(fgmask)
-    # cv2.imshow('img',fgmask)
-    # out.release()
-
 
 
 
@@ -164,8 +135,7 @@ def lock_urls_for_os():
 
 
 def start_one_stream_processes(video, prod=prod, detectors=detectors):
-    #print(imagesQueue)
-    #if imagesQueue.get(video['id'], None) is not None :
+
     detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"],
             video)
     #if video stream not active remove it 
@@ -178,9 +148,7 @@ def start_one_stream_processes(video, prod=prod, detectors=detectors):
     
     logger.info("p_classifiers for cam: {} started by {} ".format(video['id'], comp_node() ))
 
-  #  p = Process(target=get_frame, args=(imagesQueue[cam], cam))
-  #  p.daemon = True
-  #  p.start()
+
 
 
 
@@ -200,7 +168,7 @@ def start():
   
  
 #@sleep(1)
-def deny_service_call(url, params=None, detectors=detectors, prod = prod, IMAGES_BUFFER=IMAGES_BUFFER):  
+def deny_service_call(url, params=None, detectors=detectors, prod = prod):  
     time.sleep(20)
 
     try:
@@ -314,18 +282,6 @@ def initialize_video_streams(url=None, videos=[]):
     #time.sleep(1.0)
     return videos
 
-def detect(cam):
-    """Video streaming generator function."""
-    try:
-        # logger.debug('imagesQueue:', imagesQueue.empty())
-        while True:
-            while (not imagesQueue[cam].empty()):
-                frame = imagesQueue[cam].get(block=True)
-                iterable = cv2.imencode('.jpg', frame)[1].tobytes()
-                yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + iterable + b'\r\n'
-    except GeneratorExit:
-        pass
-
 
 
 
@@ -381,18 +337,6 @@ def deny_service():
                 
    
 
-
-@main_blueprint.route('/video_feed', methods=['GET'])
-@cross_origin(origin='http://localhost:{}'.format(port))
-def video_feed():
-    """Video streaming route. Put this in the src attribute of an img tag."""
-    cam = request.args.get('cam', default=0, type=str)
-    logger.debug(imagesQueue) 
-    logger.debug("imagesQueue len: {}".format(len(imagesQueue)))
-    if imagesQueue.get(cam, None) is not None:
-        return Response(detect(cam),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-    else: redirect('http://{}:{}{}'.format(IP_ADDRESS,port,'/video_feed'))
 
 
 @main_blueprint.route('/moreparams')

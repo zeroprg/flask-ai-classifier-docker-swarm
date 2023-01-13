@@ -22,7 +22,7 @@ services:
       - DB_PASSWORD=vist2508
       - DB_NAME=streamer
     depends_on:
-      - db
+    #  - db
       - web
     networks:
       - flask
@@ -30,11 +30,11 @@ services:
   web:
     image: zeroprg/flask-docker-swarm_web:latest
     deploy:
-      replicas: 3
+      replicas: 2
       restart_policy:
         condition: on-failure
-      #placement:
-      #  constraints: [node.role == manager]
+      placement:
+        constraints: [node.role == worker]
     ports:
       - 4000:4000
     environment:
@@ -44,8 +44,8 @@ services:
       - DB_IP_ADDRESS=192.168.0.100
       - DB_PASSWORD=vist2508
       - DB_NAME=streamer
-    depends_on:
-      - db
+    #depends_on:
+    #  - db
     networks:
       - flask
     healthcheck:
@@ -139,21 +139,21 @@ services:
 
 
 
-#  visualizer:
-#    image: alexellis2/visualizer-arm
-#    deploy:
-#      replicas: 1
-#      restart_policy:
-#        condition: on-failure
-#      placement:
-#        constraints:
-#          - node.role == worker
-#    ports:
-#      - 8080:8080
-#    volumes:
-#      - "/var/run/docker.sock:/var/run/docker.sock"
-#    networks:
-#      - flask
+  visualizer:
+    image: alexellis2/visualizer-arm
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == worker
+    ports:
+      - 8080:8080
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - flask
 
 
 networks:
