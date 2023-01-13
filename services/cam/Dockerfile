@@ -53,7 +53,7 @@ COPY . $APP_HOME
 
 # Chown all the files to the app user
 RUN chown -R app:app $APP_HOME
-
+RUN chmod +x run.sh
 # Change to the app user
 USER app
 
