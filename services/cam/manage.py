@@ -8,7 +8,7 @@ from project import create_app, db
 from project.main import  start
 
 app = create_app()
-start()
+
 cli = FlaskGroup(create_app=create_app)
 
 #@cli.command("recreate_db")
@@ -39,6 +39,7 @@ def seed_db():
     print("Database connection health was fine !!!")
 
 if __name__ == "__main__":
+    start()
     cli()
 
     
