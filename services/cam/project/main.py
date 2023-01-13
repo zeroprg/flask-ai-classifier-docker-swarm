@@ -298,7 +298,7 @@ cors = CORS(main_blueprint, resources={r"/urls": {"origins": 'http://localhost:{
 # api.decorators=[cors.crossdomain(origin='*')]
 
 
-@main_blueprint.route('/static/<path:filename>')
+@main_blueprint.route('/<path:filename>')
 @cross_origin(origin='http://localhost:{}'.format(port))
 def serve_static(filename):
     root_dir = os.path.dirname(os.getcwd())

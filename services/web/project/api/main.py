@@ -9,10 +9,10 @@ import base64
 from PIL import Image
 
 
-from flask import Blueprint, Response, jsonify, request, g
+from flask import Blueprint, Response, jsonify, request
 from project.api.classifyer import classify_frame
-from project.config import  ProductionConfig as prod
-import project.api.tools.config_file
+
+from flask_cors import cross_origin, CORS
 
 from project import db, net
 
@@ -21,7 +21,7 @@ LOG = logging.getLogger("classifier-api.error")
 
 main_blueprint = Blueprint("main", __name__)
 
-
+cors = CORS(main_blueprint, resources={r"/classify": {"origins": '*'}})
 
 @main_blueprint.route("/ping", methods=["GET"])
 def ping_pong():
@@ -54,6 +54,7 @@ def from_base64(base64_data):
     return cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
 @main_blueprint.route('/classify', methods=['POST'])
+@cross_origin(origin='*')
 def classify():
     data = request.get_json()
     params = data['parameters']
