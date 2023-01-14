@@ -5,7 +5,7 @@ import json
 import logging
 
 from project.config import  ProductionConfig as prod
-from project import db, detectors, comp_node, videos
+from project import db, comp_node, videos
 
 
 from flask import Blueprint, Response, request, send_from_directory
@@ -17,9 +17,6 @@ logging.basicConfig(level=logging.INFO)
 ENCODING = "utf-8"
 
 #  --------------------  constanst and definitions -------------------------
-deny_service_url = '/deny_service'
-
-
 IMG_PAGINATOR = 40
 
 port =  prod.PORT
@@ -77,32 +74,6 @@ def health():
     ret = {'os': comp_node(), "Total objects": objects_rows[0][0],  "statistic table rows": statistic_rows[0][0]}
     logging.info(ret)
     return Response(json.dumps(ret,default=str, indent = 4), mimetype='text/plain', status=200)
-
-
-@main_blueprint.route(deny_service_url, methods=['POST'])
-@cross_origin(origin='http://localhost:{}'.format(port))
-def deny_service():
-    params = request.form.to_dict()
-    logging.debug(params)  
-    if  params['os'] ==  comp_node():
-        msg = "Video with id:{} was failed to delegate to the same node: {}".format(params['id'],params['os'])
-        logging.debug(msg)
-        return Response({"message":msg} , mimetype='text/plain', status=412)    
-    """ if request come rom different node  """ 
-    """ Griddy algorithm started here  if  list of videos too big and my list too small """
-    if len(detectors) > int(params['videos_length']) :
-            """ delete this video service """
-            if detectors.get(params['id'], None) is not None: del detectors[params['id']]
-            #if imagesQueue.get(params['id'], None) is not None: del imagesQueue[params['id']]
-           #  logging.info("------------------- !!!!!!!! Was updated !!!!!!!!!!!! --------------------")
-            msg = "Video with id:{} successfully deleted on node: {}".format(params['id'],params['os'])
-            return Response({"message":msg}, mimetype='text/plain', status=200)
-    else:
-        msg = "Video with id:{} was failed to delegate to node: {}".format(params['id'],comp_node())
-        logging.debug(msg)
-    return Response({"message":msg} , mimetype='text/plain', status=412)    
-                
-   
 
 
 
