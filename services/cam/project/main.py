@@ -37,7 +37,7 @@ def change_res(camera, width, height):
 #main_blueprint.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy   dog'
 #main_blueprint.config['CORS_HEADERS'] = 'Content-Type'
 
-cors = CORS(main_blueprint, resources={r"/urls": {"origins": 'http://localhost:{}'.format(port)}})
+cors = CORS(main_blueprint, resources={r"*": {"origins": '*'}})
 
 
 
@@ -54,13 +54,13 @@ def ping_pong():
                                default=str, indent = 4), mimetype='text/plain', status=200)
 
 @main_blueprint.route('/<path:filename>')
-@cross_origin(origin='http://localhost:{}'.format(port))
+@cross_origin(origin='*')
 def serve_static(filename):
     root_dir = os.path.dirname(os.getcwd())
     return send_from_directory(os.path.join(root_dir, 'static', 'js'), filename)
 
 @main_blueprint.route('/health')
-@cross_origin(origin='http://localhost:{}'.format(port))
+@cross_origin(origin='*')
 def health():
     
     with db.engine.connect() as conn:
@@ -78,7 +78,7 @@ def health():
 
 
 @main_blueprint.route('/moreparams')
-@cross_origin(origin='http://localhost:{}'.format(port))
+@cross_origin(origin='*')
 def moreparams():
     """ Read list of json files or return one specific  for specific time """
     hour_back1 = request.args.get('hour_back1', default=1, type=int)
@@ -103,7 +103,7 @@ def moreparams():
 
 
 @main_blueprint.route('/moreimgs')
-@cross_origin(origin='http://localhost:{}'.format(port))
+@cross_origin(origin='*')
 def moreimgs():
     """ Read list of json files or return one specific  for specific time """
     hour_back1 = request.args.get('hour_back1', default=0, type=int)
@@ -127,7 +127,7 @@ def moreimgs():
 
 
 @main_blueprint.route('/imgs_at_time')
-@cross_origin(origin='http://localhost:{}'.format(port))
+@cross_origin(origin='*')
 def imgs_at_time():
     """ Read list of json files or return one specific  for specific time """
     seconds = request.args.get('time', default=int(time.time()*1000), type=int)
@@ -168,7 +168,7 @@ def ping_video_url(url):
     return flag
 
 @main_blueprint.route('/urls', methods=['GET', 'POST'])
-@cross_origin(origin='http://localhost:{}'.format(port))
+@cross_origin(origin='*')
 def urls():
     """Add/Delete/Update a new video url, list all availabe urls."""
     list_url = request.args.get('list', default=None)
@@ -219,7 +219,7 @@ def urls():
 
 
 @main_blueprint.route('/params_feed')
-@cross_origin(origin='http://localhost:{}'.format(port))
+@cross_origin(origin='*')
 def params_feed():
     """Parameters streaming route. Put this in the src attribute of an img tag."""
     hours = request.args.get('hour_back1', default=1)
