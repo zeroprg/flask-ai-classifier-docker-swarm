@@ -1,12 +1,10 @@
 import time
 import os
-import threading
 import cv2
 import json
 import logging
 
 from project.config import  ProductionConfig as prod
-from project.classifier import Detection
 from project import db, detectors, comp_node, videos
 
 
@@ -15,21 +13,15 @@ from flask_cors import cross_origin, CORS
 
 logging.basicConfig(level=logging.INFO)
 
-    # if its windows
 
-
-DELETE_FILES_LATER = 7*24*3600000 #   ( 7 days in miliseconds)
 ENCODING = "utf-8"
 
 #  --------------------  constanst and definitions -------------------------
 deny_service_url = '/deny_service'
 
 
-camleft = []
-camright = []
-
 IMG_PAGINATOR = 40
-SHOW_VIDEO = False
+
 port =  prod.PORT
 IP_ADDRESS = prod.DB_IP_ADDRESS
 
@@ -217,27 +209,14 @@ def urls():
     if add_url is not None:
         logging.info('adding a new video urls ' + add_url)
         if ping_video_url(add_url):
-            try:
-                
+            try:                
                 params = { 'url': add_url }
                 db.insert_urls(params)
             except Exception as e:
                 logging.debug("Exception during saving url:{} : {}".format(add_url,e))
                 msg = "URL already exist it was already  added successfully"
                 return Response({"message":msg}, mimetype='text/plain', status=500)           
-            else:
-                
-                params['os'] = comp_node()
-                #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
-                
-                #if video stream not active remove it 
-                if( detection.errors == 0 ):
-                    detectors[params['id']] = detection
-                else:
-                    db.delete_urls(params)
-                
-                
+            else:                
                 return Response('{"message":"URL added successfully"}', mimetype='text/plain',status=200)
         else:
             return Response('{"message":"URL has no video"}', mimetype='text/plain',status=400)
