@@ -11,7 +11,7 @@ from project import db, comp_node, videos
 from flask import Blueprint, Response, request, send_from_directory
 from flask_cors import cross_origin, CORS
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 ENCODING = "utf-8"
@@ -53,7 +53,7 @@ def ping_pong():
     return Response(json.dumps({"status": "success", "message": "ping-pong!", "container_id": node},
                                default=str, indent = 4), mimetype='text/plain', status=200)
 
-@main_blueprint.route('/<path:filename>')
+@main_blueprint.route('/static/<path:filename>')
 @cross_origin(origin='*')
 def serve_static(filename):
     root_dir = os.path.dirname(os.getcwd())
@@ -161,7 +161,7 @@ def ping_video_url(url):
         vs = cv2.VideoCapture(url)
         flag, _ = vs.read()
     except Exception as e:        
-        logging.info("Exception in ping url: {}".format(e))
+        logging.critical("Exception in ping url: {}".format(e))
  
     
         
@@ -176,6 +176,7 @@ def urls():
     deleted_id = request.args.get('delete', default=None)
     updated_url = request.args.get('updated', default=None)
     cam_id = request.args.get('id', default=None)
+    logging.debug("list_url:{} add_url: {} deleted_id: {} updated_url: {} cam_id:{} ".format(list_url,add_url, deleted_id, updated_url, cam_id))
 
     if add_url is not None:
         logging.info('adding a new video urls ' + add_url)
@@ -184,7 +185,7 @@ def urls():
                 params = { 'url': add_url }
                 db.insert_urls(params)
             except Exception as e:
-                logging.debug("Exception during saving url:{} : {}".format(add_url,e))
+                logging.critical("Exception during saving url:{} : {}".format(add_url,e))
                 msg = "URL already exist it was already  added successfully"
                 return Response({"message":msg}, mimetype='text/plain', status=500)           
             else:                

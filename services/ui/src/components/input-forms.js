@@ -39,7 +39,7 @@ class InputURL extends Component {
                             <div className="form-group">
                                 <label className="control-label col-sm-2" htmlFor="pwd">URL:</label>
                                 <div className="col-sm-12">
-                                    <input type="URL" className="form-control" id="url" name="url" placeholder="Enter Camera ip or URL address here"
+                                    <input type="URL" className="form-control" id="url" name="url" placeholder="Enter Camera ip or URL address here (analyse will started after 100 secs, be pation)"
                                            value={this.state.url} onChange={this.handleInputChange}/>
                                 </div>
                             </div>

@@ -10,7 +10,7 @@ from project import db, detectors, comp_node
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-DELETE_FILES_LATER = 7*24*3600000 #   ( 7 days in miliseconds)
+DELETE_FILES_LATER = 3*24*3600000 #   ( 3 days in miliseconds)
 
 def start():
     time.sleep(1)
@@ -22,8 +22,9 @@ def start():
     # and initialize the FPS counter
     logger.info("[INFO] starting video stream...")
     initialize_video_streams()
-    clean_up_service()
-    lock_urls_for_os()
+    cleaning_thread.start()  # in  3 days
+    lock_urls_thread.start() # in 101 secs
+
 
 # initialize the video stream, allow the cammera sensor to warmup,
 # and initialize the FPS counter
@@ -102,19 +103,22 @@ def initialize_video_streams(url=None, videos=[]):
     return videos
 
 
+
 """Delete old images later then DELETE_FILES_LATER milliseconds every 24 hours"""  
 def clean_up_service():
-  threading.Timer(3600*24, clean_up_service).start()
   db.delete_frames_later_then(DELETE_FILES_LATER)
+  cleaning_thread.start()
+
+cleaning_thread = threading.Timer(3600*24, clean_up_service).start() #once per 24 hours
 
 """ Lock urls record for every 101 seconds """
 def lock_urls_for_os():
-  threading.Timer(101, lock_urls_for_os).start()      
+  
   #db.update_url_by_os(comp_node())
   videos_ = db.select_all_urls()
 
   for params in videos_:
-        """ grab the first video which was not processed for last 10 min. and from this node """
+        """ grab the the videos which was not processed for last 10 min. and start process it from this node """
         if params['id'] not in detectors and params['currentime'] + 60000 > time.time()*1000:
            
             params['os'] = comp_node()
@@ -122,9 +126,8 @@ def lock_urls_for_os():
             try:
                 db.update_urls(params)
             except Exception as e:
-                logger.info("Exception {}".format(e))
+                logger.critical("Exception {}".format(e))
             else:
-                #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
                  
                 detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
                 
@@ -137,6 +140,8 @@ def lock_urls_for_os():
                     
                 i = len(detectors)    
                 if i == prod.MAXIMUM_VIDEO_STREAMS: break
+  lock_urls_thread.start() # run the same function again after 100 sec
+lock_urls_thread = threading.Timer(100, lock_urls_for_os).start()  # start after 100 sec   
 
 
 
