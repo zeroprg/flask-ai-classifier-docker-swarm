@@ -18,7 +18,7 @@ def seed_db():
     """ Check connectivity."""
     print("Check connection health:")
     logging.basicConfig()
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     objects_rows = statistic_rows = 0
 
     with db.engine.connect() as conn:

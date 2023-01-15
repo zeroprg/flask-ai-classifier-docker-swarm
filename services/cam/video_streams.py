@@ -12,6 +12,7 @@ logger.setLevel(logging.INFO)
 
 DELETE_FILES_LATER = 3*24*3600000 #   ( 3 days in miliseconds)
 
+
 def start():
     time.sleep(1)
     logger.info("[INFO] loading model...")
@@ -22,8 +23,9 @@ def start():
     # and initialize the FPS counter
     logger.info("[INFO] starting video stream...")
     initialize_video_streams()
-    cleaning_thread.start()  # in  3 days
-    lock_urls_thread.start() # in 101 secs
+    threading.Timer(3600*24, clean_up_service).start() # in  3 days
+    threading.Timer(100, lock_urls_for_os).start()  # start after 100 sec 
+
 
 
 # initialize the video stream, allow the cammera sensor to warmup,
@@ -107,9 +109,10 @@ def initialize_video_streams(url=None, videos=[]):
 """Delete old images later then DELETE_FILES_LATER milliseconds every 24 hours"""  
 def clean_up_service():
   db.delete_frames_later_then(DELETE_FILES_LATER)
-  cleaning_thread.start()
+  threading.Timer(3600*24, clean_up_service).start() # in  3 days
 
-cleaning_thread = threading.Timer(3600*24, clean_up_service).start() #once per 24 hours
+
+
 
 """ Lock urls record for every 101 seconds """
 def lock_urls_for_os():
@@ -140,9 +143,7 @@ def lock_urls_for_os():
                     
                 i = len(detectors)    
                 if i == prod.MAXIMUM_VIDEO_STREAMS: break
-  lock_urls_thread.start() # run the same function again after 100 sec
-lock_urls_thread = threading.Timer(100, lock_urls_for_os).start()  # start after 100 sec   
-
+  threading.Timer(100, lock_urls_for_os).start()                
 
 
 if __name__ == "__main__":

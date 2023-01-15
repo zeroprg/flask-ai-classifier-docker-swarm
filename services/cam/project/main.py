@@ -11,7 +11,7 @@ from project import db, comp_node, videos
 from flask import Blueprint, Response, request, send_from_directory
 from flask_cors import cross_origin, CORS
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 ENCODING = "utf-8"
