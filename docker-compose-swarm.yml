@@ -128,7 +128,23 @@ services:
     networks:
       - flask
 
-
+  aicams:
+    image: zeroprg/flask-docker-swarm_aicams:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+         - node.role == worker
+    ports:
+      - 80:81
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - cam
+    networks:
+      - flask
 
 
   visualizer:
