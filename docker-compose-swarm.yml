@@ -138,7 +138,7 @@ services:
         constraints:
          - node.role == worker
     ports:
-      - 80:81
+      - 81:81
     environment:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
