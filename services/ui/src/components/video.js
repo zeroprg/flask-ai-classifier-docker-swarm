@@ -30,7 +30,7 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly}) => {
     };
     
     
-    const menu = (isShown) => (
+    const menu = (isShown, showvideo) => (
         isShown ?
         <nav className="menu">
             <input type="checkbox" href="#" className="menu-open" name="menu-open" id="menu-open"/>
@@ -40,7 +40,7 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly}) => {
                 <span className="hamburger hamburger-3"></span>
             </label>            
             <span  className="menu-item" onClick={()=>{ videoClickHandler(); showVideoSectionOnly();}}> 
-                <i className={ showvideo? "fa fa-bar-chart" : "fa fa-play"}></i>
+                <i className={ showvideo ? "fa fa-bar-chart" : "fa fa-play"}></i>
             </span>            
         </nav>
         :<span/>
@@ -56,6 +56,7 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly}) => {
 
     useEffect(() => {
         setShowBoxes(showBoxes);
+
         }, [showBoxes]);
 
         //style={{padding-top:'100px;'}}
@@ -66,7 +67,7 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly}) => {
     return(<span      
             onMouseEnter={() => setIsShown(true)}
             onMouseLeave={() => setIsShown(false)}  >
-            {menu(isShown)}
+            {menu(isShown,showvideo)}
 
             <div style={{paddingTop:20}} ></div>
             <img id={'stream'+camera.cam}  className={classes.root}
