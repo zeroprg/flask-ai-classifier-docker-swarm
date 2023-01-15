@@ -5,6 +5,6 @@ npm run build && npm install -g build
 rm -rf build_prepered
 mv build build_prepered
 rm -rf static
-cp ~/projects/aicams static
+cp ~/projects/aicams.ca static
 sudo docker build -t zeroprg/flask-docker-swarm_ui:latest .
 sudo docker push zeroprg/flask-docker-swarm_ui:latest
