@@ -122,7 +122,7 @@ def lock_urls_for_os():
 
   for params in videos_:
         """ grab the the videos which was not processed for last 10 min. and start process it from this node """
-        if params['id'] not in detectors and params['currentime'] + 60000 > time.time()*1000:
+        if params['id'] not in detectors:
            
             params['os'] = comp_node()
             logger.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
