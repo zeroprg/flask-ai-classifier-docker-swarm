@@ -23,7 +23,7 @@ def start():
     # and initialize the FPS counter
     logger.info("[INFO] starting video stream...")
     initialize_video_streams()
-    threading.Timer(3600*24, clean_up_service).start() # in  3 days
+    threading.Timer(1200*24, clean_up_service).start() # in  1 days
     threading.Timer(100, lock_urls_for_os).start()  # start after 100 sec 
 
 
@@ -96,8 +96,7 @@ def initialize_video_streams(url=None, videos=[]):
             i = len(detectors)
             if i == prod.MAXIMUM_VIDEO_STREAMS: break
                 
-            
-    videos = db.select_all_urls()            
+       
 
     logger.info(videos)
     # Start process
@@ -116,15 +115,13 @@ def clean_up_service():
 
 """ Lock urls record for every 101 seconds """
 def lock_urls_for_os():
-  
-  #db.update_url_by_os(comp_node())
-  videos_ = db.select_all_urls()
+  os = comp_node()
+  videos_ = db.select_old_urls_which_not_mine(os)
 
   for params in videos_:
         """ grab the the videos which was not processed for last 10 min. and start process it from this node """
-        if params['id'] not in detectors:
-           
-            params['os'] = comp_node()
+        if params['id'] not in detectors:          
+            params['os'] = os
             logger.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
             try:
                 db.update_urls(params)
