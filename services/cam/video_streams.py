@@ -61,6 +61,7 @@ def initialize_video_streams(url=None, videos=[]):
     videos_ = db.select_old_urls_which_not_mine(params['os'])
     """ Update all videos as mine , start greeding algorithm here ..."""
     """ Updation """
+    logger.info( "Total number of alliens videos: {}".format(len(videos_)))
     for video in videos_:
         
         params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node(), 'currentime':time.time()*1000 }
@@ -117,7 +118,7 @@ def clean_up_service():
 def lock_urls_for_os():
   os = comp_node()
   videos_ = db.select_old_urls_which_not_mine(os)
-
+  logger.info( "Total number of alliens videos: {}".format(len(videos_)))
   for params in videos_:
         """ grab the the videos which was not processed for last 10 min. and start process it from this node """
         if params['id'] not in detectors:          
