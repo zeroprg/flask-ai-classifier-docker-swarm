@@ -58,7 +58,7 @@ def initialize_video_streams(url=None, videos=[]):
                 arg = prod.args.get('video_file' + str(i), None)
                 i += 1 
                 logger.info(arg)
-    videos_ = db.select_all_urls()
+    videos_ = db.select_old_urls_which_not_mine(params['os'])
     """ Update all videos as mine , start greeding algorithm here ..."""
     """ Updation """
     for video in videos_:
@@ -75,12 +75,12 @@ def initialize_video_streams(url=None, videos=[]):
             """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
             #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)
             #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-            
+   
             detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
-            
+            logger.info("A new detection  process was created." + str(detection))
             #if video stream not active remove it 
             if( detection.errors == 0 ):
-                detectors[params['id']] = detection
+                detectors[params['id']] = detection                
             else:
                 db.delete_urls(params)
                 

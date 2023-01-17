@@ -3,8 +3,10 @@ $fg:#07ff7f;
 $bg:#07010c;
 $pi:3.14;
 
+
+
 //config
-$menu-items:4;
+$menu-items:2;
 $open-distance:105px;
 $opening-angle:$pi*2;
 
@@ -32,8 +34,8 @@ h1{
 %ball{
   background:$fg;
   border-radius:100%;
-  width:90px;
-  height:60px;
+  width:80px;
+  height:80px;
   margin-left:-40px;
   position:absolute;
   top:20px;

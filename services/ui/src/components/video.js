@@ -4,7 +4,7 @@ import { propTypes } from 'react-bootstrap/esm/Image';
 //import { useMediaQuery } from 'react-responsive';
 
 
-const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly}) => {
+const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideosection, showMaxResolution, maxResolution}) => {
     const HOST = global.config.API
     //let checkBoxElem = useRef(null)    
     const [showBoxes, setShowBoxes] = useState(showBoxesAroundObjects);
@@ -22,15 +22,13 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly}) => {
       });
       const classes = useStyles(); 
 
-    const [showvideo, setShowVideo] = useState(true);
     const [isShown, setIsShown] = useState(false);
     
-    const videoClickHandler = () => {
-        setShowVideo(!showvideo);
-    };
+
+
     
     
-    const menu = (isShown, showvideo) => (
+    const menu = (isShown, showvideosection, maxResolution) => (
         isShown ?
         <nav className="menu">
             <input type="checkbox" href="#" className="menu-open" name="menu-open" id="menu-open"/>
@@ -39,8 +37,11 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly}) => {
                 <span className="hamburger hamburger-2"></span>
                 <span className="hamburger hamburger-3"></span>
             </label>            
-            <span  className="menu-item" onClick={()=>{ videoClickHandler(); showVideoSectionOnly();}}> 
-                <i className={ showvideo ? "fa fa-bar-chart" : "fa fa-play"}></i>
+            <span  className="menu-item" onClick={()=>{ showVideoSectionOnly();}}> 
+                <i className={ !showvideosection ? "fa fa-bar-chart" : "fa fa-play"}></i>
+            </span>
+            <span  className="menu-item" onClick={()=>{ showMaxResolution();}}> 
+                <i className={ !maxResolution ? "fa fa-expand" : "fa fa-toggle-down"}></i>
             </span>            
         </nav>
         :<span/>
@@ -66,16 +67,13 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly}) => {
 
     return(<span      
             onMouseEnter={() => setIsShown(true)}
-            onMouseLeave={() => setIsShown(false)}  >
-            {menu(isShown,showvideo)}
+            onMouseLeave={() => setIsShown(false)}>
+            {menu(isShown, showvideosection, maxResolution)}
 
             <div style={{paddingTop:20}} ></div>
             <img id={'stream'+camera.cam}  className={classes.root}
                  src={ showBoxes ? HOST+"video_feed?cam="+camera.id : camera.url } 
-                 alt="Video Streamer"
-                 
-
-                 >
+                 alt="Video Streamer">
     
             </img>    
 

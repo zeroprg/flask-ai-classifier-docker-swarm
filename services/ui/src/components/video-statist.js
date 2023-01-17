@@ -6,24 +6,37 @@ import Media from 'react-media';
 import { Fragment } from 'react';
 
 const VideoStat  = ({camera, timerange, object_of_interest}) => {
-    const [showvideosection, setShowVideoSectionOnly] = useState(true);
+    const [showvideosection, setShowVideosection] = useState(true);
+    const [maxResolution, setMaxResolution] = useState(false);
 
-    const videoClickHandler = () => (
-        setShowVideoSectionOnly(!showvideosection)
-    );
+    const videoClickHandlerEvent = () => {
+        setShowVideosection(!showvideosection);
+    };
+
+    const maxResolutionClickHandlerEvent = () => {
+        setMaxResolution(!maxResolution);
+    };
 
 
     const showVideoSectionOnly = (showvideosection, classname, camera) => (
         showvideosection ?
             <div key={`cam${camera.cam}`} className={classname}>            
-                <Video camera={camera} showVideoSectionOnly={videoClickHandler} />
+                <Video camera={camera} 
+                  showVideoSectionOnly={videoClickHandlerEvent} 
+                  showVideoSection = {showvideosection}                 
+                  showMaxResolution = {maxResolutionClickHandlerEvent}
+                  maxResolution = {maxResolution} 
+                  />
             </div>
             :             
             <VideoStreamer key={camera.url}
                     camera={camera}
                     timerange={timerange}
                     object_of_interest={object_of_interest}
-                    showVideoSectionOnly={videoClickHandler}     
+                    showVideoSectionOnly={videoClickHandlerEvent} 
+                    showVideoSection = {showvideosection}                 
+                    showMaxResolution = {maxResolutionClickHandlerEvent}
+                    maxResolution = {maxResolution} 
             />         
     );
 
@@ -39,9 +52,9 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
                                         {matches.small &&
                                                 showVideoSectionOnly(showvideosection, "col-sm-12", camera)}
                                         {matches.medium &&
-                                                showVideoSectionOnly(showvideosection, "col-sm-6", camera)}
+                                                showVideoSectionOnly(showvideosection, maxResolution? "col-sm-12": "col-sm-6", camera)}
                                         {matches.large &&
-                                                showVideoSectionOnly(showvideosection, "col-sm-4", camera)}
+                                                showVideoSectionOnly(showvideosection, maxResolution? "col-sm-12": "col-sm-4", camera)}
                                     </Fragment>
 
                                 );

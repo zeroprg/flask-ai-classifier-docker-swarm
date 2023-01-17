@@ -28,7 +28,7 @@ class VideoStreamer extends Component {
 
     render() {
         //const { error } = this.state;
-        const { camera, showVideoSectionOnly } = this.props;
+        const { camera, showVideoSectionOnly, showvideosection, showMaxResolution, maxResolution } = this.props;
 /*
         if (error) {
             return <p>{error.message}</p>;
@@ -40,7 +40,11 @@ class VideoStreamer extends Component {
                 <div className="row">
                     <div className="col-sm-4">
                            {this.props.child}
-                           <Video key={camera.id} camera = {camera} showBoxes={false} showVideoSectionOnly={showVideoSectionOnly} /> 
+                           <Video key={camera.id} camera = {camera} showBoxes={false} 
+                            showVideoSectionOnly={showVideoSectionOnly}
+                            showvideosection = {showvideosection}
+                            showMaxResolution = {showMaxResolution}
+                            maxResolution = {maxResolution}  /> 
                         </div>  
                         <div className="col-sm-8">
                           <ObjectOfInterestPlot cam={camera.id}
