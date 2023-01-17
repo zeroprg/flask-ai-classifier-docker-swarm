@@ -40,7 +40,7 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideos
             <span  className="menu-item" onClick={()=>{ showVideoSectionOnly();}}> 
                 <i className={ !showvideosection ? "fa fa-bar-chart" : "fa fa-play"}></i>
             </span>
-            <span  className="menu-item" onClick={()=>{ showMaxResolution();}}> 
+            <span  className="menu-item" onClick={()=>{showVideoSectionOnly(); showMaxResolution();}}> 
                 <i className={ !maxResolution ? "fa fa-expand" : "fa fa-toggle-down"}></i>
             </span>            
         </nav>
