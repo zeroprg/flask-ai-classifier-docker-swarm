@@ -1,8 +1,8 @@
 #!/bin/sh
 
  sudo git pull
- sudo docker service rm flask_cam flask_ui flask_visualizer # flask_web
- sudo docker network rm flask
+ 
+ #sudo docker network rm flask
  # used to delete all images  --> sudo docker image prune -a
  sudo docker rmi $(sudo docker images -a --filter=dangling=true -q)
  
@@ -15,6 +15,8 @@
  sudo docker push zeroprg/flask-docker-swarm_cam:latest
  sudo docker push zeroprg/flask-docker-swarm_ui:latest
  #sudo docker push zeroprg/flask-docker-swarm_web:latest
- sudo docker network create flask 
+ 
+ sudo docker service rm flask_cam flask_ui flask_visualizer # flask_web
+ #sudo docker network create flask 
  sudo docker stack deploy -c=docker-compose-swarm.yml flask
 
