@@ -161,9 +161,7 @@ def ping_video_url(url):
         vs = cv2.VideoCapture(url)
         flag, _ = vs.read()
     except Exception as e:        
-        logging.critical("Exception in ping url: {}".format(e))
- 
-    
+        logging.critical("Exception in ping url: {}".format(e))   
         
     return flag
 

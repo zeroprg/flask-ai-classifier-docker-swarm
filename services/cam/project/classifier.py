@@ -43,19 +43,13 @@ class Detection:
         self.errors = 0
         #self.output_queue = queue
 
-        for i in range(NUMBER_OF_THREADS):
-            p_get_frame = Process(target=self.classify)
+        self.video_s = self.init_video_stream()
 
-                                  #,output_queue))
-            p_get_frame.daemon = False
-            p_get_frame.start()
-            logging.info("-------- Process was just started for video: {} --------".format(video))
-            time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
+
         
 
     def classify(self):
-        if self.video_s is None:
-            self.video_s = self.init_video_stream()
+
         while True:
             try:                
                 frame = self.read_video_stream(self.video_s)
@@ -85,6 +79,7 @@ class Detection:
             
 
     def init_video_stream(self):
+        video_s = None
         if 'picam' == self.video_url:
             video_s = VideoStream(usePiCamera=True, resolution=piCameraResolution, framerate=piCameraRate).start()
             time.sleep(2.0)
@@ -93,11 +88,21 @@ class Detection:
             # grab the frame from the threaded video stream
             try:
                 video_s = cv2.VideoCapture(self.video_url)
+                frame = self.read_video_stream(self.video_s)               
+                
             except Exception as ex:
                 self.errors += 1                    
                 print('Error occurred when connected to {0}: {1}'.format(self.video_url, ex))
-                                
-            
+        if self.errors == 0: 
+          for i in range(NUMBER_OF_THREADS):
+            p_get_frame = Process(target=self.classify)
+
+                                #,output_queue))
+            p_get_frame.daemon = False
+            p_get_frame.start()
+            logging.info("-------- Process was just started for video: {} --------".format(video))
+            time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
+        
         return video_s
 
     def read_video_stream(self, video_s):

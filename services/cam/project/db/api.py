@@ -114,7 +114,7 @@ class Sql:
         conn = self.getConn()
         query = sql.select([self.urls]).where( sql.and_(
                                                 self.urls.c.os != str(os),
-                                                self.urls.c.currentime > _time - 60000)).order_by(text("currentime asc"))
+                                                self.urls.c.currentime < _time - 60000)).order_by(text("currentime asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -345,7 +345,7 @@ class Sql:
         try:
             query = sql.delete(self.objects).where( self.objects.currentime < millis_back )
             ResultProxy = conn.execute(query)
-            print(" delete_frames_later_then was {0} with params: {1}".format(ResultProxy.is_insert ,hours))
+            print(" delete_frames_later_then:  status: {0}  hoours: {1}".format(ResultProxy.is_insert ,hours))
         except Exception as e: print(" e: {}".format( e))
         finally:
             conn.close()

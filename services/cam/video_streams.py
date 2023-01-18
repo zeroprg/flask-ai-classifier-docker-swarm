@@ -10,7 +10,7 @@ from project import db, detectors, comp_node
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-DELETE_FILES_LATER = 3*24*3600000 #   ( 3 days in miliseconds)
+DELETE_FILES_LATER = 72 #   ( 3 days in hours)
 
 
 def start():
@@ -119,6 +119,7 @@ def lock_urls_for_os():
   os = comp_node()
   videos_ = db.select_old_urls_which_not_mine(os)
   logger.info( "Total number of alliens videos: {}".format(len(videos_)))
+  num_detections = 0
   for params in videos_:
         """ grab the the videos which was not processed for last 10 min. and start process it from this node """
         if params['id'] not in detectors:          
@@ -126,6 +127,7 @@ def lock_urls_for_os():
             logger.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
             try:
                 db.update_urls(params)
+                
             except Exception as e:
                 logger.critical("Exception {}".format(e))
             else:
@@ -135,12 +137,15 @@ def lock_urls_for_os():
                 #if video stream not active remove it 
                 if( detection.errors == 0 ):
                     detectors[params['id']] = detection
+                    num_detections +=1
+                    logger.info( "Video  {}  assigned  to the node: {}".format(params['id'], os))
                 else:
                     db.delete_urls(params)
                     logger.info("Url {} has been deleted".format(params['url']))
                     
                 i = len(detectors)    
                 if i == prod.MAXIMUM_VIDEO_STREAMS: break
+  logger.info( "Total number {} of assigned videos to the node: {}".format(num_detections, os))              
   threading.Timer(100, lock_urls_for_os).start()                
 
 
