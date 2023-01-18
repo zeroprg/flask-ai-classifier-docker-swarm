@@ -29,7 +29,7 @@ piCameraResolution = (640, 480)  # (1024,768) #(640,480)  #(1920,1080) #(1080,72
 piCameraRate = 16
 NUMBER_OF_THREADS = 1
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 class Detection:
@@ -56,7 +56,7 @@ class Detection:
                 if re.search('.jpg|.gif|.png', self.video_url):
                     frame = imutils.url_to_image(self.video_url)
                 else:
-                    frame = self.read_video_stream(self.video_s)
+                    frame = self.read_video_stream(cv2.VideoCapture(self.video_url))
                 if frame is None: return
             except:
                 print('Exception during reading stream by URL:{0}'.format(self.video_url))
