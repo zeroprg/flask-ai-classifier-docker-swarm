@@ -11,7 +11,7 @@ from project import db, detectors, comp_node
 logging.basicConfig(level=logging.INFO)
 
 DELETE_FILES_LATER = 72 #   ( 3 days in hours)
-URL_PINGS_NUMBER = 10000 # delete URL after that pings
+URL_PINGS_NUMBER = 100 # delete URL after that pings
 
 def start():
     time.sleep(1)
@@ -32,7 +32,7 @@ def start():
 # and initialize the FPS counter
 def initialize_video_streams(url=None, videos=[]):
     i = 0
-    
+    global detectors
     arg = None
     if url is not None:
         arg = url
@@ -102,9 +102,10 @@ def clean_up_service():
 """ Lock urls record for every 101 seconds """
 def lock_urls_for_os():
     os = comp_node()
+    global detectors
     videos_ = db.select_old_urls()
-    logging.info( "Total number of ready to re-process: {}".format(len(videos_)))
-    num = 0
+    logging.debug( "Total number of ready to re-process: {}".format(len(videos_)))
+    num = len(detectors) 
     num_detections = num_rm_detections = 0
     for params in videos_:
         """ grab the the videos which was not processed for last 1 min. and start process it from this node """
@@ -114,29 +115,35 @@ def lock_urls_for_os():
             try:
                 
                 detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
+                
                 detectors[params['id']] = detection
                 num_detections +=1
                 logging.info( "Video  {}  assigned  to the node: {}".format(params['id'], os))
                 db.update_urls(params)
                  
-                num = len(detectors)    
+                   
                 if num == prod.MAXIMUM_VIDEO_STREAMS: break
 
                 
             except Exception as e:
                 logging.critical("Exception {}".format(e))
     #if video streams not active remove it
-    for detection in detectors:               
-        if( detection.errors > URL_PINGS_NUMBER  and  (time.time()*1000 - detection.createdtime) < 60000 ):
-            db.delete_urls(detection.cam)
+    logging.debug( "Detectors:  {}".format(detectors))
+    for cam in detectors:
+        logging.debug( "Detection[ {} ]:  {}, errors: {}".format(cam,detectors[cam], detectors[cam].errors))                
+        # remove all processes which older then 1 min and not pingable ( more then URL_PINGS_NUMBER pinged )
+        if( detectors[cam].errors > URL_PINGS_NUMBER  and  (time.time()*1000 - detectors[cam].createdtime) > 60000 ):
+            #db.update_urls(cam) do not delete url only update status how many minutess was not active. (time.time()*1000 - detectors[cam].createdtime)/1000
             logging.info("Url {} has been deleted".format(detection.video_url))
-            if( detectors.has_key(detection.cam) ) : del detectors[detection.cam]
+            for process in detectors[cam].processes: 
+                process.terminate()
+            del detectors[cam]
             num_rm_detections +=1
 
-    logging.info( "Node: {} Total number: {} of assigned videos ".format(os, num)) 
-    logging.info( "Node: {} Total number of removed videos: {}".format( os, num_rm_detections))
+    logging.debug( "Node: {} Total number: {} of an assigned videos ".format(os, num)) 
+    logging.debug( "Node: {} Total number of removed videos: {}".format( os, num_rm_detections))
                          
-    threading.Timer(100, lock_urls_for_os).start()                
+    threading.Timer(1, lock_urls_for_os).start()                
 
 
 if __name__ == "__main__":

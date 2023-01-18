@@ -44,15 +44,18 @@ class Detection:
         self.classify_server = classify_server
         self.errors = 0
         self.createdtime = time.time()*1000
+        self.processes = []
 
         for i in range(NUMBER_OF_THREADS):
             p_get_frame = Process(target=self.classify)
 
                                   #,output_queue))
             p_get_frame.daemon = False
+            self.processes.append(p_get_frame)
             p_get_frame.start()
             logging.info("-------- Process was just started for video: {} --------".format(video))
             time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
+            
 
        
         
@@ -111,9 +114,7 @@ class Detection:
       
                     logging.debug("Try to connect to video {} ".format(self.video_url))
                     video_s = cv2.VideoCapture(self.video_url)                    
-                    frame = self.read_video_stream(video_s)
-
-                
+                 
             except Exception as ex:
                 self.errors += 1                    
                 logging.info('Error occurred when connected to {0}: {1}'.format(self.video_url, ex))
