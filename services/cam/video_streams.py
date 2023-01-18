@@ -125,7 +125,7 @@ def lock_urls_for_os():
             except Exception as e:
                 logging.critical("Exception {}".format(e))
     #if video streams not active remove it
-    for detection in detections:               
+    for detection in detectors:               
         if( detection.errors > URL_PINGS_NUMBER ):
             db.delete_urls(detection.cam)
             logging.info("Url {} has been deleted".format(detection.video_url))
