@@ -34,7 +34,7 @@ class Detection:
     def __init__(self, classify_server, confidence, model, video):
         self.confidence = confidence
         self.model = model
-        self.video_url = video['url'] + '?' if '?' not in  video['url'] else '&' + 'stream=full&needlength'
+        self.video_url = video['url'] #+ '?' if '?' not in  video['url'] else '&' + 'stream=full&needlength'
         self.hashes = {}        
         self.topic_label = 'no data'
         self.net = self.video_s = None
@@ -88,7 +88,7 @@ class Detection:
             # grab the frame from the threaded video stream
             try:
                 video_s = cv2.VideoCapture(self.video_url)
-                frame = self.read_video_stream(self.video_s)               
+                frame = self.read_video_stream(video_s)               
                 
             except Exception as ex:
                 self.errors += 1                    
