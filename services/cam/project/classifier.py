@@ -43,6 +43,7 @@ class Detection:
         self.cam = video['id']
         self.classify_server = classify_server
         self.errors = 0
+        self.createdtime = time.time()*1000
 
         for i in range(NUMBER_OF_THREADS):
             p_get_frame = Process(target=self.classify)
@@ -61,12 +62,14 @@ class Detection:
             self.video_s = self.init_video_stream()
         while True:
             try:                
-    #            if re.search('.jpg|.gif|.png', self.video_url):
-    #                logging.debug("Try to connect jpg to {} ".format(self.video_url))
-    #                frame = imutils.url_to_image(self.video_url)
-    #            else:
-                logging.debug("Try to connect to video {} ".format(self.video_url))
-                frame = self.read_video_stream(self.video_s)
+                if re.search('\.jpg|\.gif|\.png', self.video_url):
+                    logging.debug("Try to connect jpg static {} ".format(self.video_url))
+                    frame = imutils.url_to_image(self.video_url)
+                    logging.debug("Connection to jpg static {} successed ".format(self.video_url))
+                else:
+                    logging.debug("Try to connect to video {} ".format(self.video_url))
+                    frame = self.read_video_stream(self.video_s)
+                    logging.debug("Connection to video {} successed ".format(self.video_url))
                 if frame is None: return
             except:
                 logging.critical('Exception during reading stream by URL:{0}'.format(self.video_url))
@@ -101,10 +104,10 @@ class Detection:
         else:
             # grab the frame from the threaded video stream
             try:
-        #        if re.search('*.jpg|*.gif|*.png', self.video_url):
-        #            logging.debug("Try to connect jpg to {} ".format(self.video_url))
-        #            frame = imutils.url_to_image(self.video_url)
-        #        else:
+                if re.search('\.jpg|\.gif|\.png', self.video_url):
+                    logging.debug("Try to connect jpg to {} ".format(self.video_url))
+                    frame = imutils.url_to_image(self.video_url)
+                else:
       
                     logging.debug("Try to connect to video {} ".format(self.video_url))
                     video_s = cv2.VideoCapture(self.video_url)                    

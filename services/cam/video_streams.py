@@ -11,7 +11,7 @@ from project import db, detectors, comp_node
 logging.basicConfig(level=logging.INFO)
 
 DELETE_FILES_LATER = 72 #   ( 3 days in hours)
-URL_PINGS_NUMBER = 1000 # delete URL after that pings
+URL_PINGS_NUMBER = 100 # delete URL after that pings
 
 def start():
     time.sleep(1)
@@ -104,6 +104,7 @@ def lock_urls_for_os():
     os = comp_node()
     videos_ = db.select_old_urls()
     logging.info( "Total number of ready to re-process: {}".format(len(videos_)))
+    num = 0
     num_detections = num_rm_detections = 0
     for params in videos_:
         """ grab the the videos which was not processed for last 1 min. and start process it from this node """
@@ -118,22 +119,22 @@ def lock_urls_for_os():
                 logging.info( "Video  {}  assigned  to the node: {}".format(params['id'], os))
                 db.update_urls(params)
                  
-                i = len(detectors)    
-                if i == prod.MAXIMUM_VIDEO_STREAMS: break
+                num = len(detectors)    
+                if num == prod.MAXIMUM_VIDEO_STREAMS: break
 
                 
             except Exception as e:
                 logging.critical("Exception {}".format(e))
     #if video streams not active remove it
     for detection in detectors:               
-        if( detection.errors > URL_PINGS_NUMBER ):
+        if( detection.errors > URL_PINGS_NUMBER  and  (time.time()*1000 - detection.createdtime) < 60000 ):
             db.delete_urls(detection.cam)
             logging.info("Url {} has been deleted".format(detection.video_url))
             if( detectors.has_key(detection.cam) ) : del detectors[detection.cam]
             num_rm_detections +=1
 
-    logging.info( "Total number {} of assigned videos to the node: {}".format(num_detections, os)) 
-    logging.info( "Total number {} of removed videos from the node: {}".format(num_rm_detections, os))
+    logging.info( "Node: {} Total number: {} of assigned videos ".format(os, num)) 
+    logging.info( "Node: {} Total number of removed videos: {}".format( os, num_rm_detections))
                          
     threading.Timer(100, lock_urls_for_os).start()                
 
