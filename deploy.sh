@@ -18,5 +18,5 @@
  
  sudo docker service rm flask_cam flask_ui flask_visualizer # flask_web
  #sudo docker network create flask 
- sudo docker stack deploy -c=docker-compose-swarm.yml flask
+ sudo docker stack deploy -c=docker-compose-swarm.yml  --with-registry-auth flask
 
