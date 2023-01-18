@@ -46,8 +46,7 @@ class Detection:
         #self.output_queue = queue
 
         self.video_s = self.init_video_stream()
-
-
+       
         
 
     def classify(self):
@@ -92,8 +91,11 @@ class Detection:
         else:
             # grab the frame from the threaded video stream
             try:
-                video_s = cv2.VideoCapture(self.video_url)
-                frame = self.read_video_stream(video_s)               
+                if re.search('.jpg|.gif|.png', self.video_url):
+                    frame = imutils.url_to_image(self.video_url)
+                else:
+                    video_s = cv2.VideoCapture(self.video_url)
+                    frame = self.read_video_stream(video_s)               
                 
             except Exception as ex:
                 self.errors += 1                    
