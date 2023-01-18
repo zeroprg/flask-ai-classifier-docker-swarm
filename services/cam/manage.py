@@ -8,8 +8,7 @@ app = create_app()
 
 cli = FlaskGroup(create_app=create_app)
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logging.setLevel(level=logging.INFO)
 
 #@cli.command("recreate_db")
 #def recreate_db():
@@ -28,13 +27,13 @@ logger.setLevel(logging.INFO)
 @cli.command("health" )
 def seed_db():
     """ Check connectivity."""
-    logger("Check connection health:")
+    logging.INFO("Check connection health:")
 
     with db.engine.connect() as conn:
         conn.execute(text("select 'Hi everything fine, don.t worry'"))
-        logger("Total objects : {}".format(conn.execute("SELECT count(*) FROM OBJECTS" ).fetchall()))
-        logger("Total statistic : {}".format(conn.execute("SELECT count(*) FROM STATISTIC" ).fetchall()))        
-    logger("Database connection health was fine !!!")
+        logging.INFO("Total objects : {}".format(conn.execute("SELECT count(*) FROM OBJECTS" ).fetchall()))
+        logging.INFO("Total statistic : {}".format(conn.execute("SELECT count(*) FROM STATISTIC" ).fetchall()))        
+    logging.INFO("Database connection health was fine !!!")
 
 if __name__ == "__main__":
     cli()

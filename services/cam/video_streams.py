@@ -7,21 +7,21 @@ from project.classifier import Detection
 from project import db, detectors, comp_node
 
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+
+logging.basicConfig(level=logging.INFO)
 
 DELETE_FILES_LATER = 72 #   ( 3 days in hours)
-
+URL_PINGS_NUMBER = 1000 # delete URL after that pings
 
 def start():
     time.sleep(1)
-    logger.info("[INFO] loading model...")
+    logging.info("[INFO] loading model...")
     # construct a child process *indepedent* from our main process of
     # execution
-    logger.info("[INFO] starting process...")
+    logging.info("[INFO] starting process...")
     # initialize the video stream, allow the cammera sensor to warmup,
     # and initialize the FPS counter
-    logger.info("[INFO] starting video stream...")
+    logging.info("[INFO] starting video stream...")
     initialize_video_streams()
     threading.Timer(1200*24, clean_up_service).start() # in  1 days
     threading.Timer(100, lock_urls_for_os).start()  # start after 100 sec 
@@ -37,11 +37,11 @@ def initialize_video_streams(url=None, videos=[]):
     if url is not None:
         arg = url
         i = len(videos)
-        logger.info('new url:' + url)
+        logging.info('new url:' + url)
     #  initialise picam or IPCam
     else:
         arg = prod.args.get('video_file' + str(i), None)
-    logger.info('Video urls:')
+    logging.info('Video urls:')
     """ Insertion """
     while arg is not None:
         if not (i, arg) in videos:
@@ -57,38 +57,26 @@ def initialize_video_streams(url=None, videos=[]):
             finally:
                 arg = prod.args.get('video_file' + str(i), None)
                 i += 1 
-                logger.info(arg)
-    videos_ = db.select_old_urls_which_not_mine(params['os'])
+                logging.info(arg)
+    videos_ = db.select_all_urls()
     """ Update all videos as mine , start greeding algorithm here ..."""
     """ Updation """
-    logger.info( "Total number of alliens videos: {}".format(len(videos_)))
+    logging.info( "Total number of videos ready for update: {}".format(len(videos_)))
     for video in videos_:
         
         params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node(), 'currentime':time.time()*1000 }
         try:
-            logger.debug("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
-            if params['id'] not in detectors: #and video['currentime'] > time.time()*1000 - 60000:
-                db.update_urls(params)            
-        except Exception as e:
-            logger.info("Exception {}".format(e))
-        else:            
-            params['videos_length'] = len(detectors)
-            """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
-            #deny_service(url, params=params, imagesQueue=imagesQueue, detectors=detectors)
-            #imagesQueue[params['id']] = Queue(maxsize=IMAGES_BUFFER + 5)
-   
-            detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
-            logger.info("A new detection  process was created." + str(detection))
-            #if video stream not active remove it 
-            if( detection.errors == 0 ):
-                detectors[params['id']] = detection                
-            else:
-                db.delete_urls(params)
+            logging.info("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
+            logging.debug("detectors: " + str(detectors) ) 
+            if params['id'] not in detectors:
+                """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
+                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
+                logging.DEBUG("A new detection  process was created." + str(detection))                 
                 
-    
-                
-                
-            logger.info("p_classifiers for cam: {} started by {} ".format(video['id'], comp_node() ))
+                detectors[params['id']] = detection
+                db.update_urls(params)
+                logging.info("p_classifiers for cam: {} started by {} ".format(params['id'], comp_node() ))
+             
             
             #url = 'http://{}:{}{}'.format(IP_ADDRESS,port,deny_service_url)
             #p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
@@ -96,13 +84,10 @@ def initialize_video_streams(url=None, videos=[]):
             #p_deny_service.start()
             i = len(detectors)
             if i == prod.MAXIMUM_VIDEO_STREAMS: break
-                
-       
+             
+        except Exception as e:
+            logging.info("Exception {}".format(e))
 
-    logger.info(videos)
-    # Start process
-    #time.sleep(1.0)
-    return videos
 
 
 
@@ -116,37 +101,41 @@ def clean_up_service():
 
 """ Lock urls record for every 101 seconds """
 def lock_urls_for_os():
-  os = comp_node()
-  videos_ = db.select_old_urls_which_not_mine(os)
-  logger.info( "Total number of alliens videos: {}".format(len(videos_)))
-  num_detections = 0
-  for params in videos_:
-        """ grab the the videos which was not processed for last 10 min. and start process it from this node """
+    os = comp_node()
+    videos_ = db.select_old_urls()
+    logging.info( "Total number of ready to re-process: {}".format(len(videos_)))
+    num_detections = num_rm_detections = 0
+    for params in videos_:
+        """ grab the the videos which was not processed for last 1 min. and start process it from this node """
         if params['id'] not in detectors:          
             params['os'] = os
-            logger.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
+            logging.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
             try:
-                db.update_urls(params)
                 
-            except Exception as e:
-                logger.critical("Exception {}".format(e))
-            else:
-                 
                 detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
-                
-                #if video stream not active remove it 
-                if( detection.errors == 0 ):
-                    detectors[params['id']] = detection
-                    num_detections +=1
-                    logger.info( "Video  {}  assigned  to the node: {}".format(params['id'], os))
-                else:
-                    db.delete_urls(params)
-                    logger.info("Url {} has been deleted".format(params['url']))
-                    
+                detectors[params['id']] = detection
+                num_detections +=1
+                logging.info( "Video  {}  assigned  to the node: {}".format(params['id'], os))
+                db.update_urls(params)
+                 
                 i = len(detectors)    
                 if i == prod.MAXIMUM_VIDEO_STREAMS: break
-  logger.info( "Total number {} of assigned videos to the node: {}".format(num_detections, os))              
-  threading.Timer(100, lock_urls_for_os).start()                
+
+                
+            except Exception as e:
+                logging.critical("Exception {}".format(e))
+    #if video streams not active remove it
+    for detection in detections:               
+        if( detection.errors > URL_PINGS_NUMBER ):
+            db.delete_urls(detection.cam)
+            logging.info("Url {} has been deleted".format(detection.video_url))
+            if( detectors.has_key(detection.cam) ) : del detectors[detection.cam]
+            num_rm_detections +=1
+
+    logging.info( "Total number {} of assigned videos to the node: {}".format(num_detections, os)) 
+    logging.info( "Total number {} of removed videos from the node: {}".format(num_rm_detections, os))
+                         
+    threading.Timer(100, lock_urls_for_os).start()                
 
 
 if __name__ == "__main__":

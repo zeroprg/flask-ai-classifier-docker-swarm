@@ -29,7 +29,7 @@ piCameraResolution = (640, 480)  # (1024,768) #(640,480)  #(1920,1080) #(1080,72
 piCameraRate = 16
 NUMBER_OF_THREADS = 1
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 class Detection:
@@ -43,24 +43,34 @@ class Detection:
         self.cam = video['id']
         self.classify_server = classify_server
         self.errors = 0
-        #self.output_queue = queue
 
-        self.video_s = self.init_video_stream()
+        for i in range(NUMBER_OF_THREADS):
+            p_get_frame = Process(target=self.classify)
+
+                                  #,output_queue))
+            p_get_frame.daemon = False
+            p_get_frame.start()
+            logging.info("-------- Process was just started for video: {} --------".format(video))
+            time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
+
        
         
 
     def classify(self):
-
+        if self.video_s is None:
+            self.video_s = self.init_video_stream()
         while True:
             try:                
-                if re.search('.jpg|.gif|.png', self.video_url):
-                    frame = imutils.url_to_image(self.video_url)
-                else:
-                    frame = self.read_video_stream(cv2.VideoCapture(self.video_url))
+    #            if re.search('.jpg|.gif|.png', self.video_url):
+    #                logging.debug("Try to connect jpg to {} ".format(self.video_url))
+    #                frame = imutils.url_to_image(self.video_url)
+    #            else:
+                logging.debug("Try to connect to video {} ".format(self.video_url))
+                frame = self.read_video_stream(self.video_s)
                 if frame is None: return
             except:
-                print('Exception during reading stream by URL:{0}'.format(self.video_url))
-                return
+                logging.critical('Exception during reading stream by URL:{0}'.format(self.video_url))
+                continue
             # call it remotely
             #result = call_classifier(self.classify_server, frame, self.cam, self.confidence, self.model)
             # call locally
@@ -91,24 +101,20 @@ class Detection:
         else:
             # grab the frame from the threaded video stream
             try:
-                if re.search('.jpg|.gif|.png', self.video_url):
-                    frame = imutils.url_to_image(self.video_url)
-                else:
-                    video_s = cv2.VideoCapture(self.video_url)
-                    frame = self.read_video_stream(video_s)               
+        #        if re.search('*.jpg|*.gif|*.png', self.video_url):
+        #            logging.debug("Try to connect jpg to {} ".format(self.video_url))
+        #            frame = imutils.url_to_image(self.video_url)
+        #        else:
+      
+                    logging.debug("Try to connect to video {} ".format(self.video_url))
+                    video_s = cv2.VideoCapture(self.video_url)                    
+                    frame = self.read_video_stream(video_s)
+
                 
             except Exception as ex:
                 self.errors += 1                    
-                print('Error occurred when connected to {0}: {1}'.format(self.video_url, ex))
-        if self.errors == 0: 
-          for i in range(NUMBER_OF_THREADS):
-            p_get_frame = Process(target=self.classify)
-
-                                #,output_queue))
-            p_get_frame.daemon = False
-            p_get_frame.start()
-            logging.info("-------- Process was just started for video: {} --------".format(self.video_url))
-            time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
+                logging.info('Error occurred when connected to {0}: {1}'.format(self.video_url, ex))
+        logging.debug("self.errors: {}".format(self.errors))       
         
         return video_s
 
@@ -126,6 +132,7 @@ class Detection:
 
 def call_classifier_locally( frame, cam, confidence, model):
        parameters = {'cam': cam, 'confidence': confidence , 'model': model} 
+       logging.debug("------------ call_classifier (local) for cam: {} -------".format(cam))
        classify_frame(frame, parameters)
 
 
@@ -138,7 +145,7 @@ def call_classifier(classify_server, frame, cam, confidence, model):
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}  
     payload = json.dumps({'image': im_b64, 'parameters': parameters}, indent=2)
     jsonResponse = None
-    logging.debug("------------ call_classifier just called for cam: {} -------".format(cam))
+    logging.debug("------------ call_classifier for cam: {} -------".format(cam))
     try:
         response = requests.post(url=classify_server,
                             data=payload, headers=headers)  
