@@ -1,6 +1,6 @@
  --create database streamer;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
---drop  table  objects;
+drop  table  objects cascade;
 
 CREATE TABLE objects (
 	hashcode int8 NOT NULL,
@@ -17,12 +17,13 @@ CREATE TABLE objects (
 	height int2 NULL,
 	CONSTRAINT objects_pkey PRIMARY KEY (hashcode)
 );
+
 CREATE INDEX index_cam ON objects USING btree (cam);
 CREATE INDEX index_cam_hashcode ON objects USING btree (cam, hashcode);
 CREATE INDEX index_currentime ON objects USING btree (currentime DESC);
 CREATE INDEX index_type ON objects USING btree (type);
 
---drop  table  statistic;
+drop  table  statistic;
 
 CREATE TABLE statistic (
 	"type" text NULL,
@@ -32,7 +33,7 @@ CREATE TABLE statistic (
 	cam uuid NULL
 );
 
---- drop  table  urls;
+drop  table  urls;
 
 CREATE OR REPLACE FUNCTION currentime_gen()
   RETURNS int8 
@@ -44,7 +45,7 @@ BEGIN
 END;
 $$;
 
-
+--drop sequence url_cam_seq cascade;
 CREATE SEQUENCE url_cam_seq;
 
 
