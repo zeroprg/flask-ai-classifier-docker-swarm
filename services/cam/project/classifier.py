@@ -1,11 +1,13 @@
 import cv2
 import numpy as np
+import imutils
 from imutils.video import VideoStream
 import io
 import zlib
 import requests
 from requests.exceptions import HTTPError
 
+import re
 import logging
 import base64
 import time
@@ -52,7 +54,10 @@ class Detection:
 
         while True:
             try:                
-                frame = self.read_video_stream(self.video_s)
+                if re.search('.jpg|.gif|.png', self.video_url):
+                    frame = imutils.url_to_image(self.video_url)
+                else:
+                    frame = self.read_video_stream(self.video_s)
                 if frame is None: return
             except:
                 print('Exception during reading stream by URL:{0}'.format(self.video_url))
@@ -100,7 +105,7 @@ class Detection:
                                 #,output_queue))
             p_get_frame.daemon = False
             p_get_frame.start()
-            logging.info("-------- Process was just started for video: {} --------".format(video))
+            logging.info("-------- Process was just started for video: {} --------".format(self.video_url))
             time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
         
         return video_s
