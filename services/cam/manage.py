@@ -8,7 +8,7 @@ app = create_app()
 
 cli = FlaskGroup(create_app=create_app)
 
-logging.setLevel(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 #@cli.command("recreate_db")
 #def recreate_db():
