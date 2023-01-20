@@ -133,7 +133,9 @@ def lock_urls_for_os():
         logging.debug( "Detection[ {} ]:  {}, errors: {}".format(cam,detectors[cam], detectors[cam].errors))                
         # remove all processes which older then 1 min and not pingable ( more then URL_PINGS_NUMBER pinged )
         if( detectors[cam].errors > URL_PINGS_NUMBER  and  (time.time()*1000 - detectors[cam].createdtime) > 60000 ):
-            #db.update_urls(cam) do not delete url only update status how many minutess was not active. (time.time()*1000 - detectors[cam].createdtime)/1000
+            params[idle_in_mins] =  (time.time()*1000 - detectors[cam].createdtime) / 60000
+            params[last_time_updated] = time.time()*1000
+            db.update_urls(params) #do not delete url only update status how many minutess was not active. (time.time()*1000 - detectors[cam].createdtime)/1000
             logging.info("Url {} has been deleted".format(detection.video_url))
             for process in detectors[cam].processes: 
                 process.terminate()
