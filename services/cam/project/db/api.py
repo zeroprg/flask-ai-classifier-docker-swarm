@@ -120,6 +120,21 @@ class Sql:
         conn.close()
         return rows
 
+    def select_urls_which_not_mine(self,os):
+        """
+            Query all urls which older then 1 min and pr not processed by this os
+            :return:
+        """
+        conn = self.getConn()
+        query = sql.select([self.urls]).where( 
+                                                self.urls.c.os != str(os)).order_by(text("currentime asc"))
+        ResultProxy = conn.execute(query)
+        cursor = ResultProxy.fetchall()
+        rows = [dict(r) for r in cursor]
+        conn.close()
+        return rows
+
+
     def select_old_urls(self):
         """
             Query all urls which older then 1 min 
@@ -134,6 +149,7 @@ class Sql:
         rows = [dict(r) for r in cursor]
         conn.close()
         return rows
+
 
     
     def insert_urls(self, params):
