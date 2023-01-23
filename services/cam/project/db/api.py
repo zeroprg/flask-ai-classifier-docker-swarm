@@ -134,6 +134,21 @@ class Sql:
         conn.close()
         return rows
 
+    def select_nobody_urls(self):
+        """
+            Query all urls which older then 1 min and pr not processed by this os
+            :return:
+        """
+        conn = self.getConn()
+        query = sql.select([self.urls]).where( sql.or_(
+                                                self.urls.c.os == "",
+                                                self.urls.c.os == None)).order_by(text("currentime asc"))
+        ResultProxy = conn.execute(query)
+        cursor = ResultProxy.fetchall()
+        rows = [dict(r) for r in cursor]
+        conn.close()
+        return rows
+    
 
     def select_old_urls(self):
         """
@@ -154,10 +169,11 @@ class Sql:
     
     def insert_urls(self, params):
         conn = self.getConn()
+        row = None
         try:
             query = sql.insert(self.urls)
             ResultProxy = conn.execute(query, params)
-            row_id = None
+   
             for result in ResultProxy: row  = result
             print(" insert_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
         except Exception as e:
@@ -184,7 +200,8 @@ class Sql:
     def delete_urls(self, params):
         conn = self.getConn()
         try:
-            query = sql.delete(self.urls).where(self.urls.c.id == params['id'])
+            query = sql.delete(self.urls).where(sql.or_( self.urls.c.id == params['id'] , 
+                                                        self.urls.c.id == params['url'] ))
             ResultProxy = conn.execute(query, params)
             print(" delete_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
         except Exception as e:

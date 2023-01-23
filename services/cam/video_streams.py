@@ -103,7 +103,7 @@ def clean_up_service():
 def lock_urls_for_os():
     os = comp_node()
     global detectors
-    videos_ = db.select_urls_which_not_mine()
+    videos_ = db.select_nobody_urls()
     logging.debug( "Total number of ready to re-process: {}".format(len(videos_)))
     num = len(detectors) 
     num_detections = num_rm_detections = 0

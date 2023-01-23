@@ -29,7 +29,7 @@ import Plotter from './plotter';
       fetch(DEFAULT_QUERY + objectOfInterest)
           .then(response => {
               // make sure to check for errors
-              console.log(" response:" + response)
+              //console.log(" response:" + response)
               if (response.ok) {
                   console.log(" response:" + JSON.stringify(response, null, 2) )
                   return response.json();

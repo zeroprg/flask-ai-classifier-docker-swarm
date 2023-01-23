@@ -33,7 +33,7 @@ CREATE TABLE statistic (
 	cam uuid NULL
 );
 
-drop  table  urls;
+
 
 CREATE OR REPLACE FUNCTION currentime_gen()
   RETURNS int8 
@@ -45,10 +45,10 @@ BEGIN
 END;
 $$;
 
---drop sequence url_cam_seq cascade;
+drop sequence url_cam_seq cascade;
 CREATE SEQUENCE url_cam_seq;
 
-
+drop  table  urls;
 CREATE TABLE urls (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	url varchar NOT NULL,

@@ -105,3 +105,16 @@ body {
   display: inline;
 }
 
+#SnackBar colors
+.info {
+    background-color: blue;
+}
+.error {
+    background-color: red;
+}
+.warning {
+    background-color: orange;
+}
+.success {
+    background-color: green;
+}

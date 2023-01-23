@@ -1,8 +1,5 @@
 import React ,{ useEffect, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { propTypes } from 'react-bootstrap/esm/Image';
-//import { useMediaQuery } from 'react-responsive';
-
 
 const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideosection, showMaxResolution, maxResolution}) => {
     const HOST = global.config.API

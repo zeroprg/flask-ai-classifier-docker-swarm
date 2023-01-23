@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Tabs,Tab } from 'react-bootstrap';
 
-import SelectObj from './obj_select';
-
 import ObjectOfInterestPlot from './obj_plot'
 import ObjectOfInterest from './objects_of_interest'
 import Video from './video';

@@ -1,9 +1,7 @@
 import React, { Component, Fragment } from 'react';
 
-import Video from './video';
-import VideoStreamer from './video-streamer';
 
-import { Menu, Item } from "react-gooey-nav";
+import VideoStreamer from './video-streamer';
 import VideoStat from './video-statist';
 
 const object_of_interest = ['car','person'];
@@ -15,8 +13,7 @@ class VideoStreamers extends Component {
         this.setState({param:param});
     }
 
-    
-
+ 
     constructor(props) {
         super(props);
         this.state = {value: '' , showvideo: true};           
@@ -34,7 +31,7 @@ class VideoStreamers extends Component {
 
         fetch( DEFAULT_QUERY )
             .then(response => {
-                console.log(" response:" + response)
+                //console.log(" response:" + response)
                 if (response.ok) {
                     //console.log(" response:" + JSON.stringify(response, null, 2) )
                     return response.json();

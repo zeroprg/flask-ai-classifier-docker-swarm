@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { XYPlot, XAxis, YAxis, VerticalGridLines,  HorizontalGridLines,  DiscreteColorLegend, VerticalRectSeries} from 'react-vis';
+import { XYPlot, XAxis, YAxis, VerticalGridLines,  HorizontalGridLines,  VerticalBarSeries} from 'react-vis';
 
 class Plotter extends Component {
 
@@ -33,11 +33,7 @@ class Plotter extends Component {
             <XYPlot xType="time" width={this.state.width}  height={230}
                 xDomain={[ time - this.props.timerange.end*ONE_HOUR, time - this.props.timerange.start*ONE_HOUR ]}
             >
-                <DiscreteColorLegend
-                    style={{position: 'absolute', left: '10px', top: '10px'}}
-                    orientation="horizontal"
-                    items= {[...new Set(this.props.data.map(data => data.label))]}
-                />
+
 
             <HorizontalGridLines />
             <VerticalGridLines />
@@ -45,7 +41,7 @@ class Plotter extends Component {
             <YAxis title="Frequency" />
             
             { this.props.data.map( data =>
-                <VerticalRectSeries key = {data.label}  data = {data.values} />
+                <VerticalBarSeries key = {data.label}  data = {data.values} />
             )}
             </XYPlot>
         

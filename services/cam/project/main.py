@@ -37,7 +37,7 @@ def change_res(camera, width, height):
 #main_blueprint.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy   dog'
 #main_blueprint.config['CORS_HEADERS'] = 'Content-Type'
 
-cors = CORS(main_blueprint, resources={r"*": {"origins": '*'}})
+cors = CORS(main_blueprint)
 
 
 
@@ -60,7 +60,6 @@ def serve_static(filename):
     return send_from_directory(os.path.join(root_dir, 'static', 'js'), filename)
 
 @main_blueprint.route('/health')
-@cross_origin(origin='*')
 def health():
     
     with db.engine.connect() as conn:
@@ -78,7 +77,6 @@ def health():
 
 
 @main_blueprint.route('/moreparams')
-@cross_origin(origin='*')
 def moreparams():
     """ Read list of json files or return one specific  for specific time """
     hour_back1 = request.args.get('hour_back1', default=1, type=int)
@@ -103,7 +101,6 @@ def moreparams():
 
 
 @main_blueprint.route('/moreimgs')
-@cross_origin(origin='*')
 def moreimgs():
     """ Read list of json files or return one specific  for specific time """
     hour_back1 = request.args.get('hour_back1', default=0, type=int)
@@ -127,7 +124,6 @@ def moreimgs():
 
 
 @main_blueprint.route('/imgs_at_time')
-@cross_origin(origin='*')
 def imgs_at_time():
     """ Read list of json files or return one specific  for specific time """
     seconds = request.args.get('time', default=int(time.time()*1000), type=int)
@@ -165,33 +161,42 @@ def ping_video_url(url):
         
     return flag
 
-@main_blueprint.route('/urls', methods=['GET', 'POST'])
-@cross_origin(origin='*')
+
+@main_blueprint.route('/urls', methods=['POST'])
+def add_urls():
+    payload = request.get_json()    
+    logging.debug("request payload: {} ".format(payload))
+    add_url = payload['add']
+    logging.debug("add_url: {} ".format(add_url))
+    if add_url is not None:
+            logging.info('adding a new video urls ' + add_url)
+            if ping_video_url(add_url):
+                try:
+                    params = { 'url': add_url }
+                    db.insert_urls(params)
+                except Exception as e:
+                    logging.critical("Exception during saving url:{} : {}".format(add_url,e))
+                    msg = "URL already exist it was already  added successfully"
+                    return Response({"message":msg}, mimetype='text/plain', status=500)           
+                else:     
+                    logging.info("URL {} added successfully".format(add_url))           
+                    return Response('{"message":"URL added successfully"}', mimetype='text/plain',status=200)
+            else:
+                logging.info("URL {} has no video".format(add_url))
+                return Response('{"message":"URL has no video"}', mimetype='text/plain',status=400)
+
+
+@main_blueprint.route('/urls', methods=['GET'])
 def urls():
     """Add/Delete/Update a new video url, list all availabe urls."""
     list_url = request.args.get('list', default=None)
-    add_url = request.args.get('add', default=None)
     deleted_id = request.args.get('delete', default=None)
     updated_url = request.args.get('updated', default=None)
     cam_id = request.args.get('id', default=None)
-    logging.debug("list_url:{} add_url: {} deleted_id: {} updated_url: {} cam_id:{} ".format(list_url,add_url, deleted_id, updated_url, cam_id))
+    logging.debug("list_url:{} deleted_id: {} updated_url: {} cam_id:{} ".format(list_url, deleted_id, updated_url, cam_id))
 
-    if add_url is not None:
-        logging.info('adding a new video urls ' + add_url)
-        if ping_video_url(add_url):
-            try:                
-                params = { 'url': add_url }
-                db.insert_urls(params)
-            except Exception as e:
-                logging.critical("Exception during saving url:{} : {}".format(add_url,e))
-                msg = "URL already exist it was already  added successfully"
-                return Response({"message":msg}, mimetype='text/plain', status=500)           
-            else:                
-                return Response('{"message":"URL added successfully"}', mimetype='text/plain',status=200)
-        else:
-            return Response('{"message":"URL has no video"}', mimetype='text/plain',status=400)
-
-    elif list_url is not None:
+   
+    if list_url is not None:
         url_list = db.select_all_urls() 
         return Response(json.dumps(url_list, default=str), mimetype='text/json')
         
@@ -218,7 +223,6 @@ def urls():
 
 
 @main_blueprint.route('/params_feed')
-@cross_origin(origin='*')
 def params_feed():
     """Parameters streaming route. Put this in the src attribute of an img tag."""
     hours = request.args.get('hour_back1', default=1)

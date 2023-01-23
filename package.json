@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "iconv": "^3.0.1"
+  }
+}

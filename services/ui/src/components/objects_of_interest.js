@@ -34,9 +34,9 @@ const ObjectOfInterest = (props) => {
         fetch(DEFAULT_QUERY)
             .then(response => {
                 // make sure to check for errors
-                console.log(" response:" + response)
+                //console.log(" response:" + response)
                 if (response.ok) {
-                    console.log(" response:" + JSON.stringify(response, null, 2) )
+                   // console.log(" response:" + JSON.stringify(response, null, 2) )
                     return response.json();
                 } else {
                     console.log(" error:")
