@@ -1,5 +1,5 @@
 SQLAlchemy
-Flask=1.1.1
+Flask==1.1.1
 gunicorn==19.9.0
 psycopg2-binary
 dhash
