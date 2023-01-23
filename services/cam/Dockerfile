@@ -28,6 +28,7 @@ FROM zeroprg/flask-docker-swarm_cv2:latest
 # ----- NEW ----
 # Install curl
 RUN apt-get update && apt-get install -y curl
+RUN apt-get install python3-flask
 
 # Create directory for the app user
 RUN mkdir -p /home/app

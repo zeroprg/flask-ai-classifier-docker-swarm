@@ -1,5 +1,5 @@
 SQLAlchemy
-Flask==2.0.1
+Flask=1.1.1
 gunicorn==19.9.0
 psycopg2-binary
 dhash
@@ -7,4 +7,4 @@ imutils
 requests
 Pillow
 flask_cors
-jinja2==3.0.3
+jinja2
