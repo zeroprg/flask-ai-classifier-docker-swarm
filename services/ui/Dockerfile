@@ -4,8 +4,6 @@ FROM arm32v7/nginx:latest
 RUN rm -rf /usr/share/nginx/html/*
 
 COPY ./build_prepered /usr/share/nginx/html
-COPY ./sitemap.xml /usr/share/nginx/html
-COPY ./robots.txt /usr/share/nginx/html
 #COPY ./static /usr/share/nginx/html/static
 
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
