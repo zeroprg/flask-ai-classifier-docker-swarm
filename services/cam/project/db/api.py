@@ -141,8 +141,8 @@ class Sql:
         """
         conn = self.getConn()
         query = sql.select([self.urls]).where( sql.or_(
-                                                self.urls.c.os == "",
-                                                self.urls.c.os == None)).order_by(text("cam asc"))
+                                                self.urls.c.os.isEmpty(),
+                                                self.urls.c.os.is_(None))).order_by(text("cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
