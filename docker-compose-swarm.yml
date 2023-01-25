@@ -1,11 +1,11 @@
-version: '3.5'
+version: '3.8'
 
 services:
 
   cam:
     image: zeroprg/flask-docker-swarm_cam:latest
     deploy:
-      replicas: 3
+      replicas: 6
       #max_replicas_per_node: 1 doesn't work
       restart_policy:
         condition: on-failure
@@ -15,7 +15,7 @@ services:
       - 3020:3020
     environment:
       - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
-      - CONFIDENCE=0.5
+      - CONFIDENCE=0.678
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_IP_ADDRESS=192.168.0.100
