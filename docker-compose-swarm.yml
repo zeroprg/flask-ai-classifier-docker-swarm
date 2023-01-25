@@ -10,6 +10,7 @@ services:
         condition: on-failure
       placement:
         constraints: [node.role == worker]
+        max_replicas_per_node: 1
     ports:
       - 3020:3020
     environment:
