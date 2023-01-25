@@ -6,11 +6,11 @@ services:
     image: zeroprg/flask-docker-swarm_cam:latest
     deploy:
       replicas: 3
-      max_replicas_per_node: 1
+      #max_replicas_per_node: 1 doesn't work
       restart_policy:
         condition: on-failure
       placement:
-        constraints: [node.role == worker]
+        constraints: [node.role == worker ]
     ports:
       - 3020:3020
     environment:

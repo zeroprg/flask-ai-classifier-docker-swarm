@@ -97,7 +97,7 @@ class Sql:
         :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).order_by(text("currentime asc"))
+        query = sql.select([self.urls]).order_by(text("cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
