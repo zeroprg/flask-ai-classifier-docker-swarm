@@ -5,7 +5,7 @@ services:
   cam:
     image: zeroprg/flask-docker-swarm_cam:latest
     deploy:
-      replicas: 5
+      replicas: 3
       restart_policy:
         condition: on-failure
       placement:
