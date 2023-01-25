@@ -5,14 +5,14 @@ services:
   cam:
     image: zeroprg/flask-docker-swarm_cam:latest
     deploy:
-      replicas: 6
+      replicas: 3
       #max_replicas_per_node: 1 doesn't work
       restart_policy:
         condition: on-failure
       placement:
-        constraints: [node.role == worker ]
-    ports:
-      - 3020:3020
+        constraints:
+        # - node.role==worker
+          - node.hostname!=odr2
     environment:
       - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
       - CONFIDENCE=0.678
@@ -111,16 +111,15 @@ services:
 #    networks:
 #      - flask
 
-
   ui:
     image: zeroprg/flask-docker-swarm_ui:latest
     deploy:
-      replicas: 1
+      replicas: 2
       restart_policy:
         condition: on-failure
-      placement:
-        constraints:
-         - node.role == manager
+      #placement:
+      #  constraints:
+      #   - node.hostname != odr2
     ports:
       - 80:80
     environment:
@@ -129,6 +128,7 @@ services:
       - cam
     networks:
       - flask
+
 
   aicams:
     image: zeroprg/flask-docker-swarm_aicams:latest
