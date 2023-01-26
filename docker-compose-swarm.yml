@@ -26,7 +26,7 @@ services:
     networks:
       - flask
     ports:
-       3020:3020
+      - 3020:3020
 
   #web:
   #  image: zeroprg/flask-docker-swarm_web:latest
