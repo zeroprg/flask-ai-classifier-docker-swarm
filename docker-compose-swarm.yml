@@ -25,6 +25,8 @@ services:
       - MAXIMUM_VIDEO_STREAMS = 10 #maimum streams processed per node
     networks:
       - flask
+    ports:
+       3020:3020
 
   #web:
   #  image: zeroprg/flask-docker-swarm_web:latest

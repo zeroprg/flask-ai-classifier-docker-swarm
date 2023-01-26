@@ -190,25 +190,26 @@ def add_urls():
 def urls():
     """Add/Delete/Update a new video url, list all availabe urls."""
     list_url = request.args.get('list', default=None)
-    deleted_id = request.args.get('delete', default=None)
+    delete_url = request.args.get('delete', default=None)
     updated_url = request.args.get('updated', default=None)
     cam_id = request.args.get('id', default=None)
-    logging.debug("list_url:{} deleted_id: {} updated_url: {} cam_id:{} ".format(list_url, deleted_id, updated_url, cam_id))
+    logging.debug("list_url:{} delete_url: {} updated_url: {} cam_id:{} ".format(list_url, delete_url, updated_url, cam_id))
 
    
     if list_url is not None:
         url_list = db.select_all_urls() 
         return Response(json.dumps(url_list, default=str), mimetype='text/json')
         
-    elif deleted_id is not None:
+    elif delete_url is not None:
         for video in videos:
-            if video["id"] == deleted_id:
+            if video["url"] == delete_url:
                 videos.remove(video)
-            try:
-                db.delete_url_by_id(deleted_id)
-                return Response('{"message":"URL deleted successfully"}', mimetype='text/plain')
-            except:
-                return None, 500
+                params = {'url': delete_url}    
+                try:
+                    db.delete_urls(params)
+                    return Response('{"message":"URL deleted successfully"}', mimetype='text/plain')
+                except:
+                    return None, 500
     elif updated_url is not None:
         for video in videos:
             if video["id"] == cam_id:

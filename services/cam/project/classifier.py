@@ -73,10 +73,11 @@ class Detection:
                     logging.debug("Try to connect to video {} ".format(self.video_url))
                     frame = self.read_video_stream(self.video_s)
                     logging.debug("Connection to video {} successed ".format(self.video_url))
-                if frame is None: return
+                if frame is None: return False
             except:
-                logging.critical('Exception during reading stream by URL:{0}'.format(self.video_url))
-                continue
+                logging.critical('Exception when connected to URL:{0}'.format(self.video_url))
+                self.errors += 1 
+                return False
             # call it remotely
             #result = call_classifier(self.classify_server, frame, self.cam, self.confidence, self.model)
             # call locally
@@ -117,7 +118,7 @@ class Detection:
                  
             except Exception as ex:
                 self.errors += 1                    
-                logging.info('Error occurred when connected to {0}: {1}'.format(self.video_url, ex))
+                logging.critical('Error occurred when connected to {0}: {1}'.format(self.video_url, ex))
         logging.debug("self.errors: {}".format(self.errors))       
         
         return video_s
