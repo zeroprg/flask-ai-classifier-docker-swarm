@@ -11,7 +11,7 @@ from project import db, detectors, comp_node
 logging.basicConfig(level=logging.INFO)
 
 DELETE_FILES_LATER = 72 #   ( 3 days in hours)
-URL_PINGS_NUMBER = 100 # delete URL after that pings
+URL_PINGS_NUMBER = 1 # delete URL after that pings
 
 def start():
     time.sleep(1)
