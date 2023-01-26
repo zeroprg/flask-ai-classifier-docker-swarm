@@ -58,6 +58,7 @@ RUN chmod +x run.sh
 # Change to the app user
 USER app
 
+EXPOSE 3020
 # run server and bounded programs
 CMD ["./run.sh"]
  
