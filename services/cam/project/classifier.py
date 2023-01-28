@@ -45,6 +45,8 @@ class Detection:
         self.errors = 0
         self.createdtime = time.time()*1000
         self.processes = []
+        self._objects_counted = 0
+        
 
         for i in range(NUMBER_OF_THREADS):
             p_get_frame = Process(target=self.classify)
@@ -57,8 +59,16 @@ class Detection:
             time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)
             
 
-       
-        
+    @property
+    def objects_counted(self):
+        return self._objects_counted   
+    
+    @objects_counted.setter
+    def objects_counted(self, value):
+        self._objects_counted = value
+    
+    def get_object_counted(self):
+        return self._objects_counted
 
     def classify(self):
         if self.video_s is None:
@@ -66,13 +76,13 @@ class Detection:
         while True:
             try:                
                 if re.search('\.jpg|\.gif|\.png', self.video_url):
-                    logging.debug("Try to connect jpg static {} ".format(self.video_url))
+                    #logging.debug("Try to connect jpg static {} ".format(self.video_url))
                     frame = imutils.url_to_image(self.video_url)
-                    logging.debug("Connection to jpg static {} successed ".format(self.video_url))
+                   # logging.debug("Connection to jpg static {} successed ".format(self.video_url))
                 else:
-                    logging.debug("Try to connect to video {} ".format(self.video_url))
+                   # logging.debug("Try to connect to video {} ".format(self.video_url))
                     frame = self.read_video_stream(self.video_s)
-                    logging.debug("Connection to video {} successed ".format(self.video_url))
+                  #  logging.debug("Connection to video {} successed ".format(self.video_url))
                 if frame is None: return False
             except:
                 logging.critical('Exception when connected to URL:{0}'.format(self.video_url))
@@ -81,21 +91,22 @@ class Detection:
             # call it remotely
             #result = call_classifier(self.classify_server, frame, self.cam, self.confidence, self.model)
             # call locally
-            result = call_classifier_locally( frame, self.cam, self.confidence, self.model) 
-            if(result is not None and 'rectangles' in result and len(result['rectangles'])>0):
-                logging.debug("result: {}".format(result))
-
-              # Draw rectangles
-                '''
-                for rec in result['rectangles']:
-                    x = rec.get('startX') - 25
-                    y = rec.get('startY') - 25
-                    cv2.rectangle(frame, (x,y), (rec.get('endX') + 25, rec.get('endY') + 25), (255, 0, 0), 1)
-                    cv2.putText(frame, rec.get('text') , (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                    cv2.putText(frame, result.get('topic_label', 'None')  , (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-            
-            self.output_queue.put(frame)
+            result = call_classifier_locally(self,  frame, self.cam, self.confidence, self.model)            
+            self._objects_counted = self._objects_counted + result['objects_counted']
+            #logging.info("self._objects_counted: {} , result['objects_counted']: {}".format(self._objects_counted, result['objects_counted']))
+             
+                
+            # Draw rectangles
             '''
+            for rec in result['rectangles']:
+                x = rec.get('startX') - 25
+                y = rec.get('startY') - 25
+                cv2.rectangle(frame, (x,y), (rec.get('endX') + 25, rec.get('endY') + 25), (255, 0, 0), 1)
+                cv2.putText(frame, rec.get('text') , (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+                cv2.putText(frame, result.get('topic_label', 'None')  , (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+        
+        self.output_queue.put(frame)
+        '''
             #output_queue.put_nowait(frame)
             
 
@@ -110,7 +121,7 @@ class Detection:
             try:
                 if re.search('\.jpg|\.gif|\.png', self.video_url):
                     logging.debug("Try to connect jpg to {} ".format(self.video_url))
-                    frame = imutils.url_to_image(self.video_url)
+                    imutils.url_to_image(self.video_url)
                 else:
       
                     logging.debug("Try to connect to video {} ".format(self.video_url))
@@ -135,10 +146,13 @@ class Detection:
                 return frame
         return frame
 
-def call_classifier_locally( frame, cam, confidence, model):
-       parameters = {'cam': cam, 'confidence': confidence , 'model': model} 
-       logging.debug("------------ call_classifier (local) for cam: {} -------".format(cam))
-       classify_frame(frame, parameters)
+def call_classifier_locally(self, frame, cam, confidence, model):
+    parameters = {'cam': cam, 'confidence': confidence , 'model': model} 
+    logging.debug("------------ call_classifier (local) for cam: {} -------".format(cam))
+    result = classify_frame(frame, parameters)
+    self.topic_label = result['topic_label'] if 'topic_label' in result else 'no data'
+    logging.debug("... frame classified: {}".format(result))
+    return result   
 
 
 def call_classifier(classify_server, frame, cam, confidence, model):

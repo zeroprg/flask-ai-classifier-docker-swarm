@@ -59,7 +59,9 @@ def classify_init():
 hashes = {}
 
 def classify_frame( frame, params, net=classify_init()):
-    topic_label = ''
+    topic_label = 'No data'
+    result = {}
+    objects_counted = 0
     cam = params['cam']
     confidence = params['confidence']
     rectangles = []
@@ -74,7 +76,6 @@ def classify_frame( frame, params, net=classify_init()):
     (fH, fW) = frame.shape[:2]
  
     net.setInput(blob)
-    params = None
     detections = net.forward()
 
     # logger.debug(detections)
@@ -143,7 +144,10 @@ def classify_frame( frame, params, net=classify_init()):
                     if hashes[key].getCountedObjects() == 0:
                         continue
                     label += ' ' + key + ':' + str(hashes[key].getCountedObjects())
+                    result[key] = hashes[key].getCountedObjects()
+                    objects_counted += result[key] 
                 topic_label = label
+                
 
 
             # process further only  if image is really different from other ones
@@ -166,7 +170,9 @@ def classify_frame( frame, params, net=classify_init()):
         #cv2.putText(frame, topic_label, (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
         # print(" Classify frame ... <---")
         # place frame in queue for further processing
-        result = {"topic_label": topic_label, "rectangles": rectangles, "params":params }
+        result["topic_label"] = topic_label
+        result["rectangles"] = rectangles
+        result["objects_counted"] = objects_counted
     return result #frame
 
 

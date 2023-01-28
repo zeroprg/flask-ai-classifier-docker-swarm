@@ -1,9 +1,12 @@
 import cv2
 import base64
 import time
+import logging
 import sqlalchemy as sql
 from sqlalchemy import text
 # import psycopg2
+
+logging.basicConfig(level=logging.INFO)
 
 class Sql:
     def __init__ (self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
@@ -57,9 +60,9 @@ class Sql:
             else:    
                 raise Exception('No value defined for parameter DAYS_IN_MILLSEC')
             conn.execute(query)
-            print(" objects were deleted for date later then {} days".format(DAYS_IN_MILLSEC/3600000/24))
+            logging.debug(" objects were deleted for date later then {} days".format(DAYS_IN_MILLSEC/3600000/24))
         except Exception as e:
-            print(" e: {}".format( e))
+            logging.debug(" e: {}".format( e))
         finally:
             conn.close()
 
@@ -85,9 +88,9 @@ class Sql:
                 raise Exception('No value defined for parameter os')
             ResultProxy = conn.execute(query,params)
         except Exception as e:
-            print(" e: {}".format( e))
+            logging.debug(" e: {}".format( e))
         else:
-            print(" urls was updated  with params: {}".format(ResultProxy.last_updated_params() ))
+            logging.debug(" urls was updated  with params: {}".format(ResultProxy.last_updated_params() ))
         finally:
             conn.close()
 
@@ -103,8 +106,39 @@ class Sql:
         rows = [dict(r) for r in cursor]
         conn.close()
         return rows
+    
+    def select_all_active_urls(self):
+        """
+        Query all active (which return some objects) rows in the urls table
+        :return:
+        """
+        conn = self.getConn()
+        query = sql.select([self.urls]).where(self.urls.c.objects_counted >= 0).order_by(text("cam asc"))
+        ResultProxy = conn.execute(query)
+        cursor = ResultProxy.fetchall()
+        rows = [dict(r) for r in cursor]
+        conn.close()
+        return rows
+    
+    def select_all_active_urls_olderThen_secs(self, secs):
+        """
+        Query all active (which return some objects) rows in the urls table which are older the in minutes
+        :return:
+        """
+        _time = int(time.time()*1000)
+        conn = self.getConn()
+        query = sql.select([self.urls]).where(
+                                            sql.and_(
+                                                self.urls.c.objects_counted >= 0,
+                                                self.urls.c.currentime < _time - secs*1000)
+                                        ).order_by(text("cam asc"))
+        ResultProxy = conn.execute(query)
+        cursor = ResultProxy.fetchall()
+        rows = [dict(r) for r in cursor]
+        conn.close()
+        return rows    
 
-    def select_old_urls_which_not_mine(self,os):
+    def select_old_urls_which_not_mine_olderThen_secs(self,os, secs):
         """
             Query all urls which older then 1 min and pr not processed by this os
             :return:
@@ -113,7 +147,7 @@ class Sql:
         conn = self.getConn()
         query = sql.select([self.urls]).where( sql.and_(
                                                 self.urls.c.os != str(os),
-                                                self.urls.c.currentime < _time - 60000)).order_by(text("cam asc"))
+                                                self.urls.c.currentime < _time - secs*1000)).order_by(text("cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -175,9 +209,9 @@ class Sql:
             ResultProxy = conn.execute(query, params)
    
             for result in ResultProxy: row  = result
-            print(" insert_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
+            logging.debug(" insert_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
         except Exception as e:
-            print(" e: {}".format( e))
+            logging.debug(" e: {}".format( e))
         finally:
             conn.close()            
         return row 
@@ -185,14 +219,14 @@ class Sql:
     def update_urls(self, params):
         conn = self.getConn()
         try:
-            if params['id'] is not None:
-                query = sql.update(self.urls).where(self.urls.c.id == params['id']).values(cam=params['cam'], os=params['os'], url=params['url'], idle_in_mins = params['idle_in_mins'] , last_time_updated = params['last_time_updated'])
+            if 'id' in params:
+                query = sql.update(self.urls).where(self.urls.c.id == params['id']).values(params)
             else:    
-                query = sql.update(self.urls).where(self.urls.c.url == params['url']).values(cam=params['cam'], os=params['os'], idle_in_mins = params['idle_in_mins'] , last_time_updated = params['last_time_updated'])
+                query = sql.update(self.urls).where(self.urls.c.url == params['url']).values(params)
             ResultProxy = conn.execute(query, params)
-            print(" update_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
+            logging.debug(" update_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
         except Exception as e:
-            print(" e: {}".format( e))
+            logging.debug(" e: {}".format( e))
             raise e
         finally:
             conn.close() 
@@ -203,9 +237,9 @@ class Sql:
             query = sql.delete(self.urls).where(sql.or_( self.urls.c.id == params['id'] , 
                                                         self.urls.c.id == params['url'] ))
             ResultProxy = conn.execute(query, params)
-            print(" delete_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
+            logging.debug(" delete_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
         except Exception as e:
-            print(" e: {}".format( e))
+            logging.debug(" e: {}".format( e))
             raise e
         finally:
             conn.close() 
@@ -223,9 +257,9 @@ class Sql:
             values = {'type': param['name'],'currentime': param['x'], 'y': param['y'], 'hashcodes': hashcodes, 'cam':param['cam'] }     
             query = sql.insert(self.statistic)
             ResultProxy = conn.execute(query, values)
-            print(" insert_statistic was {0} with params: {1}".format(ResultProxy.is_insert ,params))    
+            logging.debug(" insert_statistic was {0} with params: {1}".format(ResultProxy.is_insert ,params))    
         except Exception as e:
-            print(" e: {}".format( e))
+            logging.debug(" e: {}".format( e))
         finally:
             conn.close()     
 
@@ -245,9 +279,9 @@ class Sql:
             time2=time1 
             time1=a
 
-        print(time2,time1, obj)
+        logging.debug(time2,time1, obj)
         tuple_ =  obj.split(',')
-        #print(str)
+        #logging.debug(str)
         #cur.execute("SELECT type, currentime as x0, currentime + 30000 as x, y as y FROM statistic filter type IN" +str+ " AND cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY type,currentime ASC", #DeSC
         #    (cam, time2, time1 ))
 
@@ -272,7 +306,7 @@ class Sql:
                     rows.append({'label':record[0],'values': 
                     [ {'x0':v[1], 'x':v[1] + 30000,'y':v[2]} for v in list(filter( lambda x : x[0] == type , cursor))] })
                 _type=type
-        #print(rows)
+        #logging.debug(rows)
         return rows
 
 # ####################  Objects operations ######################################## #
@@ -296,7 +330,7 @@ class Sql:
         
         if y_dim <39 or x_dim <39 or x_dim/y_dim > 4.7 or y_dim/x_dim > 4.7: return
         #cur.execute("UPDATE objects SET currentime="+self.P+" WHERE hashcode="+self.P, (time, str(hashcode)))
-        #print("cam= {}, x_dim={}, y_dim={}".format(cam, x_dim, y_dim))
+        #logging.debug("cam= {}, x_dim={}, y_dim={}".format(cam, x_dim, y_dim))
         buffer = cv2.imencode('.jpg', numpy_array)[1]
         jpg_as_base64='data:image/jpeg;base64,'+ base64.b64encode(buffer).decode('utf-8')
 
@@ -309,8 +343,8 @@ class Sql:
                       'width': int(x_dim),'height': int(y_dim), 'x_dim': int(startX), 'y_dim': int(startY) , 'cam':cam}     
             query = sql.insert(self.objects)
             ResultProxy = conn.execute(query, values)
-            #print(" insert_frame was {0} with params: {1}".format(ResultProxy.is_insert ,values))
-        except Exception as e: print(" e: {}".format( e))
+            #logging.debug(" insert_frame was {0} with params: {1}".format(ResultProxy.is_insert ,values))
+        except Exception as e: logging.debug(" e: {}".format( e))
         finally:
             conn.close()
 
@@ -359,7 +393,7 @@ class Sql:
             time2=time1 
             time1=a
         #str =  "('" + obj.replace(",","','") + "')"    
-        print(time2,time1, obj)
+        logging.debug(time2,time1, obj)
         tuple_ =  obj.split(',')
         
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects filter cam="+self.P+" AND  type IN " +str+ " AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC LIMIT "+self.P+" OFFSET "+self.P+"", 
@@ -393,8 +427,8 @@ class Sql:
         try:
             query = sql.delete(self.objects).where( self.objects.currentime < millis_back )
             ResultProxy = conn.execute(query)
-            print(" delete_frames_later_then:  status: {0}  hoours: {1}".format(ResultProxy.is_insert ,hours))
-        except Exception as e: print(" e: {}".format( e))
+            logging.debug(" delete_frames_later_then:  status: {0}  hoours: {1}".format(ResultProxy.is_insert ,hours))
+        except Exception as e: logging.debug(" e: {}".format( e))
         finally:
             conn.close()
     

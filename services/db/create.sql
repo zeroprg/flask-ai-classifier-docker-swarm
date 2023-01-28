@@ -55,7 +55,7 @@ CREATE TABLE urls (
 	cam int2 NULL DEFAULT nextval('url_cam_seq'::regclass),
 	email varchar NULL,
 	os varchar(36) NULL,
-
+    objects_counted int4,  
 	currentime int8 NOT NULL DEFAULT currentime_gen(),
 	last_time_updated int8,
 	idle_in_mins int4,

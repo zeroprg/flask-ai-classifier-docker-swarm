@@ -11,8 +11,10 @@ from project import db, detectors, comp_node
 logging.basicConfig(level=logging.INFO)
 
 DELETE_FILES_LATER = 72 #   ( 3 days in hours)
-URL_PINGS_NUMBER = 1 # delete URL after that pings
-
+URL_PINGS_NUMBER = 100 # delete process which use this URL after that pings
+delete_expired_streams_interval = 100 #secs
+update_urls_from_stream_interval = 20 #secs
+clean_up_service_interval = 3600*24 #secs
 def start():
     time.sleep(1)
     logging.info("[INFO] loading model...")
@@ -22,11 +24,12 @@ def start():
     # initialize the video stream, allow the cammera sensor to warmup,
     # and initialize the FPS counter
     logging.info("[INFO] starting video stream...")
+    
     initialize_video_streams()
-    threading.Timer(1200*24, clean_up_service).start() # in  1 days
-    threading.Timer(100, lock_urls_for_os).start()  # start after 100 sec 
-
-
+    
+    threading.Timer(clean_up_service_interval, clean_up_service).start() # in  3 days 
+    threading.Timer(delete_expired_streams_interval, delete_expired_streams).start()
+    threading.Timer(update_urls_from_stream_interval, update_urls_from_stream).start()
 
 # initialize the video stream, allow the cammera sensor to warmup,
 # and initialize the FPS counter
@@ -58,7 +61,7 @@ def initialize_video_streams(url=None, videos=[]):
                 arg = prod.args.get('video_file' + str(i), None)
                 i += 1 
                 logging.info(arg)
-    videos_ = db.select_all_urls()
+    videos_ = db.select_all_active_urls()
     """ Update all videos as mine , start greeding algorithm here ..."""
     """ Updation """
     logging.info( "Total number of videos ready for update: {}".format(len(videos_)))
@@ -83,7 +86,7 @@ def initialize_video_streams(url=None, videos=[]):
             #p_deny_service.daemon=False
             #p_deny_service.start()
             i = len(detectors)
-            if i == prod.MAXIMUM_VIDEO_STREAMS: break
+            if i >= prod.MAXIMUM_VIDEO_STREAMS: break
              
         except Exception as e:
             logging.info("Exception {}".format(e))
@@ -94,59 +97,76 @@ def initialize_video_streams(url=None, videos=[]):
 """Delete old images later then DELETE_FILES_LATER milliseconds every 24 hours"""  
 def clean_up_service():
   db.delete_frames_later_then(DELETE_FILES_LATER)
-  threading.Timer(3600*24, clean_up_service).start() # in  3 days
+  threading.Timer( clean_up_service , clean_up_service).start() # in  3 days
 
 
-
-
-""" Lock urls record for every 101 seconds """
-def lock_urls_for_os():
-    os = comp_node()
+"""  Delete terminated processes and processes with not active urls """
+def delete_expired_streams():
     global detectors
-    videos_ = db.select_nobody_urls()
-    logging.debug( "Total number of ready to re-process: {}".format(len(videos_)))
-    num = len(detectors) 
-    num_detections = num_rm_detections = 0
-    for params in videos_:
-        """ grab the the videos which was not processed for last 1 min. and start process it from this node """
-        if params['id'] not in detectors:          
-            params['os'] = os
-            logging.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
-            try:
-                
-                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
-                
-                detectors[params['id']] = detection
-                num_detections +=1
-                logging.info( "Video  {}  assigned  to the node: {}".format(params['id'], os))
-                db.update_urls(params)
-                 
-                   
-                if num == prod.MAXIMUM_VIDEO_STREAMS: break
-
-                
-            except Exception as e:
-                logging.critical("Exception {}".format(e))
-    #if video streams not active remove it
-    logging.debug( "Detectors:  {}".format(detectors))
+    params = {'os': comp_node()}
+    
+    # Delete terminated process
+    for cam in detectors:
+        for process in detectors[cam].processes:
+            if( process.is_alive() == False): # at least one is dead kill all
+                logging.debug( "Detection process {} assigned  to the node: {} was deleted".format(detectors[cam], params['os']))
+                del detectors[cam]
+               
+    params['last_time_updated'] = time.time()*1000
+   
+    # Delete all detectors which has errors with connections
+    
     for cam in detectors:
         logging.debug( "Detection[ {} ]:  {}, errors: {}".format(cam,detectors[cam], detectors[cam].errors))                
         # remove all processes which older then 1 min and not pingable ( more then URL_PINGS_NUMBER pinged )
-        if( detectors[cam].errors > URL_PINGS_NUMBER  and  (time.time()*1000 - detectors[cam].createdtime) > 60000 ):
+        if( detectors[cam].errors > URL_PINGS_NUMBER):
             params['idle_in_mins'] =  (time.time()*1000 - detectors[cam].createdtime) / 60000
-            params['last_time_updated'] = time.time()*1000
-            db.update_urls(params) #do not delete url only update status how many minutess was not active. (time.time()*1000 - detectors[cam].createdtime)/1000
-            logging.info("Url {} has been deleted".format(detection.video_url))
+            params['objects_counted'] = 0
+            logging.debug("Url {} has been deleted".format(detectors[cam].video_url))
             for process in detectors[cam].processes: 
                 process.terminate()
             del detectors[cam]
-            num_rm_detections +=1
 
-    logging.debug( "Node: {} Total number: {} of an assigned videos ".format(os, num)) 
-    logging.debug( "Node: {} Total number of removed videos: {}".format( os, num_rm_detections))
-                         
-    threading.Timer(1, lock_urls_for_os).start()                
+            db.update_urls(params) #do not delete url only update status how many minutess was not active. (time.time()*1000 - detectors[cam].createdtime)/1000
+    threading.Timer(delete_expired_streams_interval, delete_expired_streams).start()
 
+"""Create a new Detections (Process) and update a expired videos with latest update time """
+def update_urls_from_stream():
+    global detectors
+    # update last_time_updated and object_counted from the time when the process was started
+    params = {}
+    currenttime=time.time()*1000
+    params['os'] = comp_node()
+    params['idle_in_mins'] = 0 
+
+    
+    for cam in detectors:
+        detection = detectors[cam]
+        #params['objects_counted'] = detection.get_object_counted()
+        #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!! {}".format(detection.objects_counted))
+        params['last_time_updated'] = currenttime        
+        params['id'] = cam
+        logging.info("url update with params: {}".format(params))
+        db.update_urls(params)
+    # consider if URL was not updated buy Detection process more then 3 intervals of processing time
+    videos_ = db.select_all_active_urls_olderThen_secs(3*update_urls_from_stream_interval)
+    for params in videos_:
+        if len(detectors)  >= prod.MAXIMUM_VIDEO_STREAMS: break
+        cam = params['id']
+        params['os'] = comp_node()
+        params['idle_in_mins'] = 0
+        try:
+            if cam not in detectors:          
+                logging.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
+                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
+                detectors[cam] = detection
+                params['last_time_updated'] = currenttime
+                params['objects_counted'] = 0
+                db.update_urls(params)              
+                logging.debug( "Video  {}  assigned  to the node: {}".format(params['id'],  params['os']))
+        except Exception as e:
+            logging.critical("Exception in Detection creation with url{} , e: {}".format(params['url'], e))
+    threading.Timer(update_urls_from_stream_interval, update_urls_from_stream).start()            
 
 if __name__ == "__main__":
     start()

@@ -5,17 +5,17 @@ services:
   cam:
     image: zeroprg/flask-docker-swarm_cam:latest
     deploy:
-      replicas: 1
+      replicas: 2
       #max_replicas_per_node: 1 doesn't work
       restart_policy:
         condition: on-failure
       placement:
         constraints:
-          - node.role==worker
+        #  - node.role==manager
           - node.hostname!=odr2
     environment:
       - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
-      - CONFIDENCE=0.678
+      - CONFIDENCE=0.33
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_IP_ADDRESS=192.168.0.100
@@ -119,9 +119,11 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
-      #placement:
-      #  constraints:
+      placement:
+        constraints:
       #   - node.hostname != odr2
+         - node.role == worker
+
     ports:
       - 80:80
     environment:
@@ -140,7 +142,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-         - node.role == manager
+         - node.role == worker
     ports:
       - 81:81
     environment:
