@@ -12,8 +12,8 @@ logging.basicConfig(level=logging.INFO)
 
 DELETE_FILES_LATER = 72 #   ( 3 days in hours)
 URL_PINGS_NUMBER = 100 # delete process which use this URL after that pings
-delete_expired_streams_interval = 100 #secs
-update_urls_from_stream_interval = 20 #secs
+delete_expired_streams_interval = 200 #secs
+update_urls_from_stream_interval = 100 #secs
 clean_up_service_interval = 3600*24 #secs
 def start():
     time.sleep(1)
