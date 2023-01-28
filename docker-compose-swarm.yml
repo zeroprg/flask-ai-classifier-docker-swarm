@@ -15,7 +15,7 @@ services:
           - node.hostname!=odr2
     environment:
       - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
-      - CONFIDENCE=0.33
+      - CONFIDENCE=0.33678
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_IP_ADDRESS=192.168.0.100
