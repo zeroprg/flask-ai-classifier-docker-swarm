@@ -142,7 +142,7 @@ def update_urls_from_stream():
     
     for cam in detectors:
         detection = detectors[cam]
-        #params['objects_counted'] = detection.get_object_counted()
+        params['objects_counted'] = detection.objects_counted
         #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!! {}".format(detection.objects_counted))
         params['last_time_updated'] = currenttime        
         params['id'] = cam
