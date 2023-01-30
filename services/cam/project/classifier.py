@@ -18,22 +18,25 @@ import json
 from json import JSONEncoder
 
 from project.caffe_classifier import classify_frame
-
+from project import  URL_PINGS_NUMBER
 subject_of_interes = ["person", "car"]
 DNN_TARGET_MYRIAD = False
 
-HASH_DELTA = 43  # bigger number  more precise object's count
+HASH_DELTA = 70  # bigger number  more precise object's count
 DIMENSION_X = 300
 DIMENSION_Y = 300
 piCameraResolution = (640, 480)  # (1024,768) #(640,480)  #(1920,1080) #(1080,720) # (1296,972)
 piCameraRate = 16
 NUMBER_OF_THREADS = 1
 
+
 logging.basicConfig(level=logging.INFO)
 
 
 class Detection:
+
     def __init__(self, classify_server, confidence, model, video):
+
         self.confidence = confidence
         self.model = model
         self.video_url = video['url'] #+ '?' if '?' not in  video['url'] else '&' + 'stream=full&needlength'
@@ -46,6 +49,8 @@ class Detection:
         self.createdtime = time.time()*1000
         self.processes = []
         self._objects_counted = 0
+ 
+   
         
 
         for i in range(NUMBER_OF_THREADS):
@@ -66,9 +71,7 @@ class Detection:
     @objects_counted.setter
     def objects_counted(self, value):
         self._objects_counted = value
-    
-    def get_object_counted(self):
-        return self._objects_counted
+
 
     def classify(self):
         if self.video_s is None:
@@ -82,19 +85,26 @@ class Detection:
                 else:
                    # logging.debug("Try to connect to video {} ".format(self.video_url))
                     frame = self.read_video_stream(self.video_s)
+                    
                   #  logging.debug("Connection to video {} successed ".format(self.video_url))
                 if frame is None: return False
             except:
                 logging.critical('Exception when connected to URL:{0}'.format(self.video_url))
                 self.errors += 1 
                 return False
+            else:
+                self.errors = 0
             # call it remotely
             #result = call_classifier(self.classify_server, frame, self.cam, self.confidence, self.model)
             # call locally
             result = call_classifier_locally(self,  frame, self.cam, self.confidence, self.model)            
-            self._objects_counted = self._objects_counted + result['objects_counted']
-            #logging.info("self._objects_counted: {} , result['objects_counted']: {}".format(self._objects_counted, result['objects_counted']))
-             
+            self._objects_counted = self._objects_counted + result['objects_counted'] # doesn't work , always 0
+                
+            if( self.errors > URL_PINGS_NUMBER):
+                for process in self.processes: 
+                    process.terminate()
+                return False
+
                 
             # Draw rectangles
             '''
@@ -109,6 +119,8 @@ class Detection:
         '''
             #output_queue.put_nowait(frame)
             
+
+
 
     def init_video_stream(self):
         video_s = None

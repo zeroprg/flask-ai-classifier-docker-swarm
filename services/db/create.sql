@@ -97,7 +97,7 @@ AS SELECT objects.cam,
     max(objects.currentime) AS endtime,
     (max(objects.currentime) - min(objects.currentime)) / 60000 AS minutes
    FROM objects
-  WHERE (date_part('epoch'::text, now()) - (objects.currentime / 1000)::double precision) < (3600::double precision)
+  WHERE (date_part('epoch'::text, now()) - (objects.currentime / 1000)::double precision) < (600::double precision)
   GROUP BY objects.type, objects.cam
  HAVING ((max(objects.currentime) - min(objects.currentime)) / 60000) < 10;
 

@@ -21,19 +21,16 @@ LOOKED1 = {"person": []}
 subject_of_interes = ["person"]
 DNN_TARGET_MYRIAD = False
 
-HASH_DELTA = 7  # how many bits difference between 2 hashcodes
+HASH_DELTA = 8  # how many bits difference between 2 hashcodes
 DIMENSION_X = 300
 DIMENSION_Y = 300
 piCameraResolution = (640, 480)  # (1024,768) #(640,480)  #(1920,1080) #(1080,720) # (1296,972)
 piCameraRate = 16
 
-
-
 #SECRET_CODE = open("/run/secrets/secret_code", "r").read().strip()
 
 # static variable
 net = None
-
 
 def classify_init():
     global net
@@ -60,8 +57,8 @@ hashes = {}
 
 def classify_frame( frame, params, net=classify_init()):
     topic_label = 'No data'
-    result = {}
     objects_counted = 0
+    result = {}
     cam = params['cam']
     confidence = params['confidence']
     rectangles = []

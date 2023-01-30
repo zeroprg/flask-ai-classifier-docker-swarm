@@ -12,7 +12,8 @@ class VideoStreamer extends Component {
     state = {
         isLoading : false,
         timerange: this.props.timerange,
-        object_of_interest: this.props.object_of_interest
+        object_of_interest: this.props.object_of_interest,
+        isShown: false
         }
 
 
@@ -27,7 +28,12 @@ class VideoStreamer extends Component {
     render() {
         //const { error } = this.state;
         const { camera, showVideoSectionOnly, showvideosection, showMaxResolution, maxResolution } = this.props;
-/*
+ 
+        const well= this.state.isShown ? {
+            boxShadow: " 0 0 10px 5px green"
+        }
+        : {}
+        /*
         if (error) {
             return <p>{error.message}</p>;
         }
@@ -35,7 +41,9 @@ class VideoStreamer extends Component {
         
         return (            
                 <section id={'section'+camera.cam} key={'section'+camera.cam} style={{display: 'block'}}>
-                <div className="row">
+                <div className="row"  style={well}            
+                    onMouseEnter={() => this.setState({isShown:true})}
+                    onMouseLeave={() => this.setState({isShown:false})}>
                     <div className="col-sm-4">
                            {this.props.child}
                            <Video key={camera.id} camera = {camera} showBoxes={false} 
@@ -62,7 +70,7 @@ class VideoStreamer extends Component {
                                 cam={camera.id}
                             />  
                             </Tab>  
-                        
+                     {/*
                      <Tab eventKey="events" title="Events Notify" className="tabcontent">
                         <h3>Events notifyer</h3>
                             <p>Specify Events which will triger eMail or SMS/Voice notify.</p>
@@ -91,8 +99,8 @@ class VideoStreamer extends Component {
                             </select> 
                             :
                             <input type="text" placeholder="" min="0"  max="100" />
-                        </Tab> 
-                       
+                        </Tab>   
+                        */}
                     </Tabs>
                     </div>  {/*<div className="col-sm-6">*/}
                 </div> {/* className row */}

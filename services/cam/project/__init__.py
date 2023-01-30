@@ -13,8 +13,15 @@ import uuid
 #from flask import g
 
 """ 'Global' variables """
+DELETE_FILES_LATER = 72 #   ( 3 days in hours)
+URL_PINGS_NUMBER = 10 # delete process which use this URL after that pings
+delete_expired_streams_interval = 200 #secs
+update_urls_from_stream_interval = 100 #secs
+clean_up_service_interval = 3600*24 #secs
+
+
 args = {}
-imagesQueue = {}
+#imagesQueue = {}
 detectors = {}
 videos = []
 vs = None

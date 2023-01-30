@@ -115,7 +115,7 @@ const ObjectOfInterest = (props) => {
     if ( loading ) {
        return  ( 
                  <div style={tabcontentStyle}> 
-                 <img src={'img/big_loading.gif'} style={loadStyle}/>
+                 <img src={'img/fancybox_loading@2x.gif'} style={loadStyle}/>
                  </div> )
      }
      if(  !data || data.length === 0 ) {

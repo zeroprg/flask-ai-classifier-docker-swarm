@@ -17,9 +17,9 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
         setMaxResolution(!maxResolution);
     };
 
-
     const showVideoSectionOnly = (showvideosection, classname, camera) => (
         showvideosection ?
+
             <div key={`cam${camera.cam}`} className={classname}>            
                 <Video camera={camera} 
                   showVideoSectionOnly={videoClickHandlerEvent} 
@@ -36,7 +36,7 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
                     showVideoSectionOnly={videoClickHandlerEvent} 
                     showVideoSection = {showvideosection}                 
                     showMaxResolution = {maxResolutionClickHandlerEvent}
-                    maxResolution = {maxResolution} 
+                    maxResolution = {maxResolution}                   
             />         
     );
 

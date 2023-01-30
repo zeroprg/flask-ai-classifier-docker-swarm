@@ -49,7 +49,11 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideos
 
     const changeCheckBoxInput = () => {
             setShowBoxes(!showBoxes)
-        }
+    }
+    const well= isShown ? {
+        boxShadow: " 0 0 10px 5px green"
+    }
+    : {}
 
 
     useEffect(() => {
@@ -62,19 +66,19 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideos
 //                       onChange={changeCheckBoxInput}/> 
 //                <label class="custom-control-label" htmlFor={"checked"+ camera.id}> Show catched objects for {camera.url}</label>
 
-    return(<span      
+    return(<div style={well}     
             onMouseEnter={() => setIsShown(true)}
             onMouseLeave={() => setIsShown(false)}>
             {menu(isShown, showvideosection, maxResolution)}
 
-            <div style={{paddingTop:20}} ></div>
+         
             <img id={'stream'+camera.cam}  className={classes.root}
                  src={ showBoxes ? HOST+"video_feed?cam="+camera.id : camera.url } 
                  alt="Video Streamer">
     
             </img>    
 
-            </span>
+            </div>
   );
 }
 export default Video
