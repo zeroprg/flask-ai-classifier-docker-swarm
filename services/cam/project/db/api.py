@@ -113,7 +113,7 @@ class Sql:
         :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).where(self.urls.c.objects_counted >= 0).order_by(text("cam asc"))
+        query = sql.select([self.urls]).where(self.urls.c.objects_counted >= 0).order_by(text("objects_counted desc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -131,7 +131,7 @@ class Sql:
                                             sql.and_(
                                                 self.urls.c.objects_counted >= 0,
                                                 self.urls.c.currentime < _time - secs*1000)
-                                        ).order_by(text("cam asc"))
+                                        ).order_by(text("objects_counted desc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
