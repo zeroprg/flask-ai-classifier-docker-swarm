@@ -15,10 +15,11 @@ import json
 from multiprocessing import Process
 
 import json
-from json import JSONEncoder
 
+from json import JSONEncoder
+from project import db
 from project.caffe_classifier import classify_frame
-from project import  URL_PINGS_NUMBER
+from project import update_urls_from_stream_interval, URL_PINGS_NUMBER
 subject_of_interes = ["person", "car"]
 DNN_TARGET_MYRIAD = False
 
@@ -49,8 +50,8 @@ class Detection:
         self.createdtime = time.time()*1000
         self.processes = []
         self._objects_counted = 0
- 
-   
+        self.frame_counter = 0
+    
         
 
         for i in range(NUMBER_OF_THREADS):
@@ -74,6 +75,7 @@ class Detection:
 
 
     def classify(self):
+        global objects_counted
         if self.video_s is None:
             self.video_s = self.init_video_stream()
         while True:
@@ -99,7 +101,11 @@ class Detection:
             # call locally
             result = call_classifier_locally(self,  frame, self.cam, self.confidence, self.model)            
             self._objects_counted = self._objects_counted + result['objects_counted'] # doesn't work , always 0
-                
+            self.frame_counter += 1            
+            if( self.frame_counter  > 1000 ): 
+                self.frame_counter = 0
+                self.update_urls_db()                 
+                     
             if( self.errors > URL_PINGS_NUMBER):
                 for process in self.processes: 
                     process.terminate()
@@ -119,8 +125,17 @@ class Detection:
         '''
             #output_queue.put_nowait(frame)
             
-
-
+    """ Delete all detectors which have errors with connections """
+    def update_urls_db(self):  
+        # remove this  processes which older then 1 min and not pingable ( more then URL_PINGS_NUMBER pinged )
+        params = {'last_time_updated': time.time()*1000, "id": self.cam}
+        if( self.errors > URL_PINGS_NUMBER):
+            params['idle_in_mins'] =  (time.time()*1000 - self.createdtime) / 60000
+        params['objects_counted'] = self._objects_counted
+        #self._objects_counted = 0
+        db.update_urls(params) #do not delete url only update status how many minutess was not active. (time.time()*1000 - detectors[cam].createdtime)/1000
+        logging.debug("Url {} . id :{} has been updated with objects_counted:{}".format(self.video_url, self.cam, self._objects_counted))
+  
 
     def init_video_stream(self):
         video_s = None
@@ -184,7 +199,7 @@ def call_classifier(classify_server, frame, cam, confidence, model):
         response.raise_for_status()
         # access JSOn content
         jsonResponse = response.json()
-        print(jsonResponse)
+        #print(jsonResponse)
         logging.debug("Entire JSON response")
         logging.debug(jsonResponse)
 
