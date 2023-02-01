@@ -19,7 +19,7 @@ import json
 from json import JSONEncoder
 from project import db
 from project.caffe_classifier import classify_frame
-from project import update_urls_from_stream_interval, URL_PINGS_NUMBER
+from project import URL_PINGS_NUMBER
 subject_of_interes = ["person", "car"]
 DNN_TARGET_MYRIAD = False
 
