@@ -3,6 +3,7 @@ __pycache__
 *.prototxt.txt
 *.pyc
 .env
+api_key.txt
 node_modules
 nohup.out
 build
