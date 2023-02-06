@@ -89,7 +89,9 @@ class Detection:
                     frame = self.read_video_stream(self.video_s)
                     
                   #  logging.debug("Connection to video {} successed ".format(self.video_url))
-                if frame is None: return False
+                if frame is None:
+                    self.errors += 1 
+                    return False
             except:
                 logging.critical('Exception when connected to URL:{0}'.format(self.video_url))
                 self.errors += 1 

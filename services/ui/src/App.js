@@ -9,6 +9,8 @@ import { Snackbar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import green from '@material-ui/core/colors/green';
 import amber from '@material-ui/core/colors/amber';
+import Geo from './components/geo-locate';
+import MarkersMap from './components/map'
 
 const useStyles = makeStyles((theme) => ({
     success: {
@@ -26,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 
-  const App = () => {
+  const App = (props) => {
     const classes = useStyles();
     const [state, setState] = useState({
         urls: [],
@@ -60,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
 
   const loadData = () => {  
     const DEFAULT_QUERY = global.config.API + "urls?list=true"
-    const URL = global.config.API + "urls"
+   
     //const deleteURL = URL + "?delete="
     setState({...state, isLoading: true });
    
@@ -77,13 +79,14 @@ const useStyles = makeStyles((theme) => ({
             }
         })
         .then(data => {
-             setState({ ... state, data, isLoading: false })
+             setState({ ...state, data, isLoading: false })
              updateurls(data);
              return data;
             })
         .catch(error => setState({...state, error, isLoading: false }));
     }
     useEffect(() => {
+        console.log(props.req);
         loadData()
     }, []);
 
@@ -91,12 +94,13 @@ const useStyles = makeStyles((theme) => ({
         <div className="App"> 
           <SnackbarProvider value={{ handleOpen, handleClose }}>
           <header className="App-header">
-            <section className="hero">
+           <MarkersMap markers={state.urls}/>
+            <section>
                 <div className="texture-overlay"></div>
                 <div className="container">
                    <div className="row nav-wrapper"/> 
                    
-                    <div className="hero-content">
+                    <div>
                         <div className="col-md-12">
                             {/*<a href=""></a> */}
                         </div>
@@ -113,7 +117,7 @@ const useStyles = makeStyles((theme) => ({
     
                             <h1 className="animated fadeInDown">AI processed video streams from public cameras.</h1>
     
-                            <h3> This is free smart cloud storage  for cameras video streams works on ODROID ARM based computers   (100% python , no php  for more information check 
+                            <h3> This is free smart cloud storage  for cameras video streams works on 5 ODROID ARM computers   (100% python, 100% React, for more information check 
                             <a href="//aicams.info" target="_blank" rel="noopener noreferrer"> http://aicams.info</a> ), bellow public available video-streams: </h3>
                            {/*The way to reference child component ref={(cd) => this.child = cd} */}
     

@@ -8,3 +8,4 @@ requests
 Pillow
 flask_cors
 jinja2
+requests-mock

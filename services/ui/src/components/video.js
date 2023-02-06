@@ -47,9 +47,7 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideos
 
 // <b> {camera.url}: <button id={'drwZone'+ camera.cam} onClick = {this.showframes? 'refresh(' + camera.cam +')'}>Show zones</button>             <b> {camera.url}: <button id={'drwZone'+ camera.cam} onClick = {this.showframes? 'refresh(' + camera.cam +')'}>Show zones</button></b>         <br/> 
 
-    const changeCheckBoxInput = () => {
-            setShowBoxes(!showBoxes)
-    }
+
     const well= isShown ? {
         boxShadow: " 0 0 10px 5px green"
     }

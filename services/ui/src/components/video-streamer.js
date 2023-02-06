@@ -44,7 +44,7 @@ class VideoStreamer extends Component {
                 <div className="row"  style={well}            
                     onMouseEnter={() => this.setState({isShown:true})}
                     onMouseLeave={() => this.setState({isShown:false})}>
-                    <div className="col-sm-4">
+                    <div className="col-sm-12">
                            {this.props.child}
                            <Video key={camera.id} camera = {camera} showBoxes={false} 
                             showVideoSectionOnly={showVideoSectionOnly}
@@ -52,7 +52,7 @@ class VideoStreamer extends Component {
                             showMaxResolution = {showMaxResolution}
                             maxResolution = {maxResolution}  /> 
                         </div>  
-                        <div className="col-sm-8">
+                        <div className="col-sm-12">
                           <ObjectOfInterestPlot cam={camera.id}
                                                 timerange={this.state.timerange} 
                                                 onParamsChanged={this.onParamsChanged.bind(this)}

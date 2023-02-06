@@ -1,6 +1,9 @@
 import time
 import logging
 import threading
+import requests
+import socket
+from urllib.parse import urlsplit
 
 from project.config import  ProductionConfig as prod
 from project.classifier import Detection
@@ -133,6 +136,7 @@ def update_urls_from_stream():
         cam = params['id']
         params['os'] = comp_node()
         params['idle_in_mins'] = 0
+        populate_lat_long(params)
         try:
             if cam not in detectors:          
                 logging.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
@@ -145,6 +149,80 @@ def update_urls_from_stream():
         except Exception as e:
             logging.critical("Exception in Detection creation with url{} , e: {}".format(params['url'], e))
     threading.Timer(update_urls_from_stream_interval, update_urls_from_stream).start()            
+
+def populate_lat_long(params):
+    data = get_geolocation_by_ip(convert_url_to_ip(params['url']))
+
+    params['lat'] = data['location']['lat']
+    params['lng'] = data['location']['lng']
+    params['city'] =  data['location']['city']
+    params['postalcode'] =  data['location']['postalCode']
+    params['country'] =  data['location']['country']
+    
+
+ip_geolocation_key = None
+def get_geolocation_by_ip(ip): 
+    global ip_geolocation_key
+    if( ip_geolocation_key is None):
+        with open('api_key.txt', 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                if 'ip_geolocation' in line.lower():
+                    ip_geolocation_key = line.strip().split('=')[1]
+                    break
+    print(f"IP address: {ip}")
+    headers = {
+        "X-RapidAPI-Key": ip_geolocation_key,
+        "X-RapidAPI-Host": "whoisapi-ip-geolocation-v1.p.rapidapi.com"
+    }
+    json_response = None
+    url = "https://whoisapi-ip-geolocation-v1.p.rapidapi.com/api/v1?ipAddress={}".format(ip)
+    try:
+        response = requests.get(url=url, headers=headers)
+        response.raise_for_status()
+        json_response = response.json()
+        logging.debug("Entire JSON response: %s", json_response)
+    except requests.exceptions.HTTPError as http_err:
+        print("HTTP error occurred: %s", http_err)
+    except Exception as err:
+        print("Failed to get geolocation by IP: %s", err)
+    return json_response
+
+def get_hostname(url):
+    result = urlsplit(url)
+    return result.hostname
+
+def convert_url_to_ip(url):
+    try:        
+        hostname = get_hostname(url)
+        logging.debug("convert_url_to_ip: {}".format(hostname))
+        if(hostname is None): return None
+        return socket.gethostbyname(hostname)
+    except socket.gaierror as e:
+        logging.critical(f"Error resolving hostname: {e}")
+        return None
+    
+google_api_key = None
+def search_with_google(query):
+    global google_api_key
+    if( google_api_key is None):
+        with open('api_key.txt', 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                if 'google_search' in line.lower():
+                    google_api_key = line.strip().split('=')[1]
+                    break
+
+    url = "https://www.googleapis.com/customsearch/v1?q={}&key={}".format(query, google_api_key)
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        items = data.get("items", [])
+        urls = [item.get("link", "") for item in items]
+        return urls
+    else:
+        return []
+  
 
 if __name__ == "__main__":
     start()

@@ -34,7 +34,7 @@ import Plotter from './plotter';
                   console.log(" response:" + JSON.stringify(response, null, 2) )
                   return response.json();
               } else {
-                  console.log(" error:")
+                  //console.log(" error:")
                   throw new Error('Something went wrong ...');
               }              
           })
