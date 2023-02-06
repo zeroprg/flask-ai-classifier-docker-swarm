@@ -5,7 +5,6 @@ class TestConvertUrlToIp(unittest.TestCase):
     def test_valid_url(self):
         url = "https://csea-me-webcam.cse.umn.edu/mjpg/video.mjpg?timestamp=1443034719346"
         result = convert_url_to_ip(url)
-        print(f"IP address {result}")
         self.assertIsNotNone(result)
 
     def test_invalid_url(self):

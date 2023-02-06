@@ -170,7 +170,7 @@ def get_geolocation_by_ip(ip):
                 if 'ip_geolocation' in line.lower():
                     ip_geolocation_key = line.strip().split('=')[1]
                     break
-    print(f"IP address: {ip}")
+
     headers = {
         "X-RapidAPI-Key": ip_geolocation_key,
         "X-RapidAPI-Host": "whoisapi-ip-geolocation-v1.p.rapidapi.com"
