@@ -199,7 +199,7 @@ def convert_url_to_ip(url):
         if(hostname is None): return None
         return socket.gethostbyname(hostname)
     except socket.gaierror as e:
-        logging.critical(f"Error resolving hostname: {e}")
+        logging.critical("Error resolving hostname: {}".format(e))
         return None
     
 google_api_key = None
