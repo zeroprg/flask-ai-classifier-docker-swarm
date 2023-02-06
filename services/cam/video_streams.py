@@ -152,6 +152,7 @@ def update_urls_from_stream():
     threading.Timer(update_urls_from_stream_interval, update_urls_from_stream).start()            
 
 def populate_lat_long(params):
+    if( 'lat' in params ): return  
     data = get_geolocation_by_ip(convert_url_to_ip(params['url']))
 
     params['lat'] = data['location']['lat']

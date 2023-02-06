@@ -190,7 +190,7 @@ def update_urls():
     payload = request.get_json()    
     logging.debug("request payload: {} ".format(payload))
 
-    if update_url is not None:
+    if payload is not None:
         try:   
             db.update_urls(payload)
         except Exception as e:
