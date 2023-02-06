@@ -52,7 +52,7 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideos
         boxShadow: " 0 0 10px 5px green"
     }
     : {}
-
+    const header = (camera.city?camera.city+',':'') + (camera.region?camera.region+',':'') + (camera.country?camera.country:'')
 
     useEffect(() => {
         setShowBoxes(showBoxes);
@@ -64,15 +64,14 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideos
 //                       onChange={changeCheckBoxInput}/> 
 //                <label class="custom-control-label" htmlFor={"checked"+ camera.id}> Show catched objects for {camera.url}</label>
 
-    return(<div style={well}     
+    return(<div id={camera.cam} style={well}     
             onMouseEnter={() => setIsShown(true)}
             onMouseLeave={() => setIsShown(false)}>
             {menu(isShown, showvideosection, maxResolution)}
 
-         
-            <img id={'stream'+camera.cam}  className={classes.root}
-                 src={ showBoxes ? HOST+"video_feed?cam="+camera.id : camera.url } 
-                 alt="Video Streamer">
+            <p>{header}</p>
+            <img id={'stream'+camera.cam}  className={classes.root} alt={header}
+                 src={ showBoxes ? HOST+"video_feed?cam="+camera.id : camera.url }>
     
             </img>    
 

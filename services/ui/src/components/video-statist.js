@@ -42,7 +42,7 @@ const VideoStat  = ({camera, timerange, object_of_interest}) => {
 
     return (
         <Media queries={{
-                        small: "(max-width: 500px)",
+                        small: "(max-width: 430px)",
                         medium: "(min-width: 600px) and (max-width: 1366px)",
                         large: "(min-width: 1367px)"
                         }}>

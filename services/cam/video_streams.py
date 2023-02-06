@@ -67,6 +67,7 @@ def initialize_video_streams(url=None, videos=[]):
     for video in videos_:
         
         params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node(), 'currentime':time.time()*1000 }
+        populate_lat_long(params)
         try:
             logging.info("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
             logging.debug("detectors: " + str(detectors) ) 

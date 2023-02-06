@@ -17,8 +17,12 @@ const MarkersMap = (params) => {
 
   const handleMarkerClick = (cam) => {
     const stream = document.getElementById(`stream${cam}`);
+    const div= document.getElementById(cam);
+     
     if (stream) {
       stream.scrollIntoView({ behavior: 'smooth' });
+      stream.focus();
+      div.style.boxShadow = " 0 0 10px 5px green";
     }
   }
 
