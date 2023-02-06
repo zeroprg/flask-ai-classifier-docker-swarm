@@ -27,6 +27,7 @@ const ObjectOfInterest = (props) => {
     const [timerange, setTimerange] = useState({start:0,end:0});
     const [loading,setLoading]  = useState(true);
 
+    
     async function fetchImageData(cam, objectOfInterest, timerange) {
         const DEFAULT_QUERY =  global.config.API + "moreimgs?hour_back1=" + timerange.start + 
         "&cam=" + cam + "&hour_back2=" + timerange.end + "&object_of_interest=" + objectOfInterest
@@ -104,13 +105,6 @@ const ObjectOfInterest = (props) => {
         console.log('counter:'+ counter);
 
     }
-    
-
-    function renderableItems() {
-            return data.slice( counter - PAGINATOR , counter);
-    }
-    
-
 
     if ( loading ) {
        return  ( 
