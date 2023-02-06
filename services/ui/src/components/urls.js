@@ -30,29 +30,6 @@ buttonClickShow(cam) {
 
 }
 
-
-/*
-componentWillMount() {
-        // initial state
-    this.setState({
-        data : [[0, "http://213.226.254.135:91/mjpg/video.mjpg"]],
-        isLoading : false,
-       // error: {message: 'URL is empty' }
-    })
-}    
-
-
-                    <a  onClick={() =>  this.buttonClickHide(this.state.url+data[1] , data[0])} className="btn btn-primary a-btn - slide - text">
-                        <span className="glyphicon" aria-hidden="true"></span>
-                        <span>
-                            <strong>Hide</strong>
-                        </span>
-                    </a>
-
-*/
-  
-
-
 render() {
     const { data } = this.props;
 
