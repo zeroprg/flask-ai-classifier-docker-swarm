@@ -1,46 +1,55 @@
 import React, { useState } from 'react';
-import { YMaps, Map, Placemark } from '@pbe/react-yandex-maps';
+import { YMaps, Map, Placemark, ZoomControl, FullscreenControl } from '@pbe/react-yandex-maps';
 
 const MarkersMap = (params) => {
-  const [mapCenter, setMapCenter] = useState([55.75, 37.57]);
-
   const [loading, setLoading] = useState(true);
-  
   const [error, setError] = useState(false);
-  let markers;
-  
+  let markers; 
+  let cams;
+
+
   if (params.markers) {
     markers = params.markers.map(url => [url.lat, url.lng]);
+    cams = params.markers.map(url => url.cam);
   } else {
     setError(true);
   }
 
-  return ( 
+  const handleMarkerClick = (cam) => {
+    const stream = document.getElementById(`stream${cam}`);
+    if (stream) {
+      stream.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  return (
     <div>
-    {loading && (
+      {loading && (
         <p>... Loading video stream locations on map...</p>
       )}
-    {error && (
+      {error && (
         <p>Error: unable to load markers data.</p>
       )}
-      
-    <YMaps>
-      <Map  width="100%" height="500px" onLoad={() => {
-        setLoading(false);}}
-        
-        defaultState={{ center: mapCenter, zoom: 3 }}
-        onBoundsChange={({ target }) => target && setMapCenter(target.getCenter())}>
-        {markers.map((coords, index) => (
-          <Placemark
-            key={index}
-            geometry={coords}
-            options={{ preset: 'islands#blueCircleDotIcon' }}
-          />
-        ))}
-      </Map>
 
-  </YMaps>
-  </div>
-);};
+      <YMaps>
+        <Map width="100%" height="400px" onLoad={() => { setLoading(false); }}
+          defaultState={{ center: [55.75, 37.57], zoom: 3 }}
+        >
+          {markers.map((coords, index) => (
+            <Placemark
+              key={index}
+              geometry={coords}
+              options={{ preset: 'islands#blueCircleDotIcon' }}
+              onClick={() => handleMarkerClick(cams[index])}
+            />
+          ))}
+          <ZoomControl options={{ float: "right" }} />
+          <FullscreenControl />
+        </Map>
+
+      </YMaps>
+    </div>
+  );
+};
 
 export default MarkersMap;

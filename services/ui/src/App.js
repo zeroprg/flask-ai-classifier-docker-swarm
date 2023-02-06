@@ -94,19 +94,11 @@ const useStyles = makeStyles((theme) => ({
         <div className="App"> 
           <SnackbarProvider value={{ handleOpen, handleClose }}>
           <header className="App-header">
-           <MarkersMap markers={state.urls}/>
-            <section>
-                <div className="texture-overlay"></div>
+                <MarkersMap markers={state.urls}/>      
                 <div className="container">
                    <div className="row nav-wrapper"/> 
-                   
-                    <div>
-                        <div className="col-md-12">
-                            {/*<a href=""></a> */}
-                        </div>
-                        <div className="col-md-12">
-    
-                        <Snackbar 
+                   <div className="col-md-12">
+                            <Snackbar 
                                 open={open} 
                                 message={message} 
                                 variant={variant} 
@@ -124,11 +116,9 @@ const useStyles = makeStyles((theme) => ({
                             <InputURL updateparams={updateparams} /> 
     
                             {isVideoAndStatistic && <URLlist updateparams={updateparams} updateurls={updateurls} data={state.urls}/> }
-                              
-                         </div>
                     </div>
                 </div>
-            </section>
+     
            </header>
         
             <VideoStreamers param={state} urls={state.urls} />
