@@ -1,5 +1,9 @@
 import React ,{ useEffect, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import { SnackbarConsumer } from '../snackbarContext';
+
+import axios from 'axios'
+
 
 const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideosection, showMaxResolution, maxResolution}) => {
     const HOST = global.config.API
@@ -20,9 +24,24 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideos
       const classes = useStyles(); 
 
     const [isShown, setIsShown] = useState(false);
-    
 
-
+    const activateCamera = (handleOpen) => {
+        const URL = HOST + "urls"
+        const payload = {
+            id: camera.id,
+            url: camera.url,
+            objects_counted: 0 // activate this camera
+        }
+        axios.put(URL, payload)
+            .then(function (response) {
+                console.log(response);
+                handleOpen(response.data.message, 'success')
+            })
+            .catch(function (error) {
+                console.log(error);
+                handleOpen(error.response.data.message, 'error')
+            });
+    }
     
     
     const menu = (isShown, showvideosection, maxResolution) => (
@@ -34,12 +53,25 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideos
                 <span className="hamburger hamburger-2"></span>
                 <span className="hamburger hamburger-3"></span>
             </label>            
+
+            <span  className="menu-item" onClick={()=>{ showMaxResolution();}}> 
+                <i className={ !maxResolution ? "fa fa-expand" : "fa fa-toggle-down"}></i>
+            </span>
+            {
+            camera.objects_counted < 0 ? 
+            <SnackbarConsumer>
+                {({ handleOpen}) => (  
+                <span  className="menu-item" onClick={()=>{activateCamera(handleOpen)}}> 
+                    <i className="fa fa-camera"></i>
+                </span>
+                )}
+            </SnackbarConsumer>
+            : 
             <span  className="menu-item" onClick={()=>{ showVideoSectionOnly();}}> 
                 <i className={ !showvideosection ? "fa fa-bar-chart" : "fa fa-play"}></i>
             </span>
-            <span  className="menu-item" onClick={()=>{showVideoSectionOnly(); showMaxResolution();}}> 
-                <i className={ !maxResolution ? "fa fa-expand" : "fa fa-toggle-down"}></i>
-            </span>            
+            }            
+            
         </nav>
         :<span/>
     );

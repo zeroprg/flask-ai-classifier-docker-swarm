@@ -36,14 +36,14 @@ const MarkersMap = (params) => {
       )}
 
       <YMaps>
-        <Map width="100%" height="400px" onLoad={() => { setLoading(false); }}
+        <Map width="100%" height="350px" onLoad={() => { setLoading(false); }}
           defaultState={{ center: [55.75, 37.57], zoom: 3 }}
+          
         >
           {markers.map((coords, index) => (
             <Placemark
               key={index}
-              geometry={coords}
-              options={{ preset: 'islands#blueCircleDotIcon' }}
+              geometry={coords}             
               onClick={() => handleMarkerClick(cams[index])}
             />
           ))}

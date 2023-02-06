@@ -185,6 +185,22 @@ def add_urls():
                 logging.info("URL {} has no video".format(add_url))
                 return Response('{"message":"URL has no video"}', mimetype='text/plain',status=400)
 
+@main_blueprint.route('/urls', methods=['PUT'])
+def update_urls():
+    payload = request.get_json()    
+    logging.debug("request payload: {} ".format(payload))
+
+    if update_url is not None:
+        try:   
+            db.update_urls(payload)
+        except Exception as e:
+            logging.critical("Exception during saving payload: {} : {}".format(payload,e))
+            msg = "URL {} with id {} can't be updated successfully".format(payload['url'],payload['id'])
+            return Response({"message":msg}, mimetype='text/plain', status=500)           
+        else:     
+            logging.info("URL {} added successfully".format(payload['url']))           
+            return Response('{"message":"URL updated successfully"}', mimetype='text/plain',status=200)
+ 
 
 @main_blueprint.route('/urls', methods=['GET'])
 def urls():
@@ -210,16 +226,7 @@ def urls():
                     return Response('{"message":"URL deleted successfully"}', mimetype='text/plain')
                 except:
                     return None, 500
-    elif updated_url is not None:
-        for video in videos:
-            if video["id"] == cam_id:
-                video["url"] = updated_url
-            try:
-                params = {'id': cam_id, 'url': updated_url,  'os': comp_node()}
-                db.update_urls(params)
-            except:
-                return None, 500
-        return Response('{"message":"URLs updated successfully"}', mimetype='text/plain')
+
 
 
 
