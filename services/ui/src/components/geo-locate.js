@@ -6,7 +6,7 @@ const options = {
   url: "https://whoisapi-ip-geolocation-v1.p.rapidapi.com/api/v1",
   params: { ipAddress: "8.8.8.8" },
   headers: {
-    "X-RapidAPI-Key": "b4d99407admsh1ad112bea1f6cf7p1bb7fejsn98e9229bd48a",
+    "X-RapidAPI-Key": 0,
     "X-RapidAPI-Host": "whoisapi-ip-geolocation-v1.p.rapidapi.com",
   },
 };
