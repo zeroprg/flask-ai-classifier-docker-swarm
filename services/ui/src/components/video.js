@@ -24,7 +24,13 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideos
       const classes = useStyles(); 
 
     const [isShown, setIsShown] = useState(false);
-
+    const scrollToCamera = ()=>{
+        const stream = document.getElementById(`stream${camera.cam}`);
+        const div= document.getElementById(camera.cam);
+          stream.scrollIntoView({ behavior: 'smooth' });
+          stream.focus();
+          div.style.boxShadow = " 0 0 10px 5px green";
+    } 
     const activateCamera = (handleOpen) => {
         const URL = HOST + "urls"
         const payload = {
@@ -68,7 +74,7 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideos
             </SnackbarConsumer>
             : 
             <span  className="menu-item" onClick={()=>{ showVideoSectionOnly();}}> 
-                <i className={ !showvideosection ? "fa fa-bar-chart" : "fa fa-play"}></i>
+                <i className={ !showvideosection ? "fa fa-bar-chart" : "fa fa-play"} onClick={()=>{scrollToCamera()}}></i>
             </span>
             }            
             

@@ -1,5 +1,5 @@
 import unittest
-from video_streams import search_with_google
+from project import search_with_google
 
 class TestSearchWithGoogle(unittest.TestCase):
     def test_search_with_google(self):

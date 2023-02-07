@@ -1,7 +1,7 @@
 import unittest
-import mock
+from unittest import mock
 
-from video_streams import populate_lat_long
+from project import populate_lat_long
 
 class TestPopulateLatLong(unittest.TestCase):
     def test_populate_lat_long(self):
@@ -30,8 +30,8 @@ class TestPopulateLatLong(unittest.TestCase):
         def mock_convert_url_to_ip(url):
             return '8.8.8.8'
 
-        with mock.patch('video_streams.get_geolocation_by_ip', mock_get_geolocation_by_ip):
-            with mock.patch('video_streams.convert_url_to_ip', mock_convert_url_to_ip):
+        with mock.patch('project.get_geolocation_by_ip', mock_get_geolocation_by_ip):
+            with mock.patch('project.convert_url_to_ip', mock_convert_url_to_ip):
                 populate_lat_long(params)
                 self.assertEqual(params['lat'], 37.4192)
                 self.assertEqual(params['lng'], -122.0574)

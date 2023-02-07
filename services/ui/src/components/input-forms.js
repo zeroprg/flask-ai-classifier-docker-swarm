@@ -56,7 +56,7 @@ class InputURL extends Component {
             <div>
                 {this.state.isLoading? <img src={'img/fancybox_loading.gif'}></img>:''} 
                 <h3>Enter IP Camera url at this box </h3>
-                <h3><b>Warning:</b> "By specifying IP Address or camera URL bellow you will share your link with all other subscribers. To make this link private your have to subscribe to payable version"</h3>
+                <h3 style={{color: '#07ff7f'}}><b>Warning:</b> "By specifying IP Address or camera URL bellow you will share your link with all other subscribers. To make this link private your have to subscribe to payable version"</h3>
                 <div className="form-group">
                     <label className="control-label col-sm-2" htmlFor="pwd">URL:</label>
                     <div className="col-sm-12">

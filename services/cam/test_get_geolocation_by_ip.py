@@ -4,7 +4,7 @@ import io
 
 import unittest.mock
 
-from video_streams import get_geolocation_by_ip
+from project import get_geolocation_by_ip
 
 class TestGetGeolocationByIP(unittest.TestCase):
     def setUp(self):

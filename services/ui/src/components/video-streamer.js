@@ -19,11 +19,10 @@ const VideoStreamer = ({ camera, showVideoSectionOnly, showvideosection, showMax
     setLocalObjectOfInterest(object_of_interest);
   };
 
-  const well = isShown ? { boxShadow: " 0 0 10px 5px green" } : {};
 
   return (
     <section id={'section' + camera.cam} key={'section' + camera.cam} style={{ display: 'block' }}>
-      <div className="row" style={well}
+      <div className="row"
         onMouseEnter={() => setIsShown(true)}
         onMouseLeave={() => setIsShown(false)}>
         <div className="col-sm-12">

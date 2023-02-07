@@ -5,7 +5,7 @@ import json
 import logging
 
 from project.config import  ProductionConfig as prod
-from project import db, comp_node, videos
+from project import db, populate_lat_long, comp_node, videos
 
 
 from flask import Blueprint, Response, request, send_from_directory
@@ -173,6 +173,7 @@ def add_urls():
             if ping_video_url(add_url):
                 try:
                     params = { 'url': add_url }
+                    populate_lat_long(params)
                     db.insert_urls(params)
                 except Exception as e:
                     logging.critical("Exception during saving url:{} : {}".format(add_url,e))

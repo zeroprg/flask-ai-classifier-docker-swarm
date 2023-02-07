@@ -1,5 +1,5 @@
 import unittest
-from video_streams import convert_url_to_ip
+from project import convert_url_to_ip
 
 class TestConvertUrlToIp(unittest.TestCase):
     def test_valid_url(self):
