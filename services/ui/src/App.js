@@ -106,8 +106,16 @@ const useStyles = makeStyles((theme) => ({
                                 ref={snackbarRef}
                                 className={classes[variant]}/>
     
-                            <h1 className="animated fadeInDown">AI processed video streams from public cameras.</h1>
-    
+                            
+                            <p> The smart cloud storage solution for video streams from public cameras. Our platform is powered by 5 ODROID ARM computers running 100% Python and 100% React, ensuring optimal performance and user experience.
+
+At AIcams.info, we are dedicated to providing state-of-the-art deep learning algorithms to track and analyze video streams from surveillance cameras. Our platform enables you to test multiple deep learning networks on existing video streams and receive real-time insights and analysis.
+
+With AIcams.info, you have the ability to enter the URL of any public IP camera and access its video stream from our platform. However, please note that by specifying the IP address or camera URL, you will be sharing your link with all other subscribers. To make your link private, you will need to subscribe to our payable version.
+
+Enhance your surveillance capabilities with AIcams.info - try us today! <a href="http://aicams.info" class="arrow-btn">aicams.info</a> 
+</p>
+
                             <h3> This is free smart cloud storage  for cameras video streams works on 5 ODROID ARM computers   (100% python, 100% React, for more information check 
                             <a href="//aicams.info" target="_blank" rel="noopener noreferrer"> http://aicams.info</a> ), bellow public available video-streams: </h3>
                            {/*The way to reference child component ref={(cd) => this.child = cd} */}
