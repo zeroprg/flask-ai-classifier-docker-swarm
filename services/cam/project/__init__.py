@@ -66,7 +66,7 @@ def create_app(script_info=None):
 def populate_lat_long(params):
     if( 'lat' in params ): return  
     data = get_geolocation_by_ip(convert_url_to_ip(params['url']))
-    if(data['location'] is not None):
+    if('location' in data ):
         params['lat'] = data['location']['lat']
         params['lng'] = data['location']['lng']
         params['city'] =  data['location']['city']
@@ -95,11 +95,11 @@ def get_geolocation_by_ip(ip):
         response = requests.get(url=url, headers=headers)
         response.raise_for_status()
         json_response = response.json()
-        logging.debug("Entire JSON response: %s", json_response)
+        logging.debug("Entire JSON response: {}".format(json_response))
     except requests.exceptions.HTTPError as http_err:
-        print("HTTP error occurred: %s", http_err)
+        logging.critical("HTTP error occurred: {}".format(http_err) )
     except Exception as err:
-        print("Failed to get geolocation by IP: %s", err)
+        logging.critical("Failed to get geolocation by IP: {}".format(err))
     return json_response
 
 def get_hostname(url):
