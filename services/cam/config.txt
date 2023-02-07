@@ -8,10 +8,10 @@ video_file2=http://158.58.130.148/mjpg/video.mjpg
 
 
 #video_file0=picam
-#video_file1=http://192.168.0.100:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367
+#video_file1=http://192.168.1.100:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367
 #video_file2=http://192.168.0.101:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367
 #video_file0=http://38.101.209.29:8082/mjpg/video.mjpg?COUNTER
-#video_file0=http://192.168.0.100:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367
+#video_file0=http://192.168.1.100:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367
  
 #video_file1=http://192.168.0.101:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367 
 #video_file0=http://192.168.1.100:81/videostream.cgi?loginuse=GwEBAA%3D%3D&loginpas=Nw0AG1ZceWtl&_=15282579520910.657573406191367
@@ -46,7 +46,7 @@ confidence=0.33
 CLASSIFIER_SERVER = http://192.168.0.191:4000/classify
 
 #Database configuration (Postgres)
-DB_IP_ADDRESS=192.168.0.100
+DB_IP_ADDRESS=192.168.1.100
 
 DB_NAME=streamer
 MAXIMUM_VIDEO_STREAMS = 10
