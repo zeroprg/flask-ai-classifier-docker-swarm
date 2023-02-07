@@ -66,12 +66,12 @@ def create_app(script_info=None):
 def populate_lat_long(params):
     if( 'lat' in params ): return  
     data = get_geolocation_by_ip(convert_url_to_ip(params['url']))
-
-    params['lat'] = data['location']['lat']
-    params['lng'] = data['location']['lng']
-    params['city'] =  data['location']['city']
-    params['postalcode'] =  data['location']['postalCode']
-    params['country'] =  data['location']['country']
+    if(data['location'] is not None):
+        params['lat'] = data['location']['lat']
+        params['lng'] = data['location']['lng']
+        params['city'] =  data['location']['city']
+        params['postalcode'] =  data['location']['postalCode']
+        params['country'] =  data['location']['country']
     
 
 ip_geolocation_key = None
