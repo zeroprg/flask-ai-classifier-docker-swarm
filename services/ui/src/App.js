@@ -115,10 +115,6 @@ With AIcams.info, you have the ability to enter the URL of any public IP camera 
 
 Enhance your surveillance capabilities with AIcams.info - try us today! <a href="http://aicams.info" class="arrow-btn">aicams.info</a> 
 </p>
-
-                            <h3> This is free smart cloud storage  for cameras video streams works on 5 ODROID ARM computers   (100% python, 100% React, for more information check 
-                            <a href="//aicams.info" target="_blank" rel="noopener noreferrer"> http://aicams.info</a> ), bellow public available video-streams: </h3>
-                           {/*The way to reference child component ref={(cd) => this.child = cd} */}
     
                             <InputURL updateparams={updateparams} /> 
     
