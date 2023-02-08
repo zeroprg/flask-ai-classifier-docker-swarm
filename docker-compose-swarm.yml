@@ -14,11 +14,11 @@ services:
         #  - node.role==manager
           - node.hostname!=odr2
     environment:
-      - CLASSIFIER_SERVER=http://192.168.1.100:4000/classify
+      - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
       - CONFIDENCE=0.33678
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
-      - DB_IP_ADDRESS=192.168.1.100
+      - DB_IP_ADDRESS=192.168.0.100
       - DB_USERNAME=odroid
       - DB_PASSWORD=vist2508
       - DB_NAME=streamer
@@ -42,7 +42,7 @@ services:
   #    - FLASK_ENV=production
   #    - APP_SETTINGS=/home/app/web/config.txt
   #    - DB_USERNAME=odroid
-  #    - DB_IP_ADDRESS=192.168.1.100
+  #    - DB_IP_ADDRESS=192.168.0.100
   #    - DB_PASSWORD=vist2508
   #    - DB_NAME=streamer
   #  networks:
