@@ -89,10 +89,6 @@ def initialize_video_streams(url=None, videos=[]):
         except Exception as e:
             logging.critical("Exception {}".format(e))
 
-def update_existed_process(cam):
-
-    
-
 
 
 """Delete old images later then DELETE_FILES_LATER milliseconds every 24 hours"""  
