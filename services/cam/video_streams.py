@@ -83,7 +83,7 @@ def initialize_video_streams(url=None, videos=[]):
             #p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
             #p_deny_service.daemon=False
             #p_deny_service.start()
-            i = len(detectors)
+            i += 1
             if i >= prod.MAXIMUM_VIDEO_STREAMS: break
              
         except Exception as e:
