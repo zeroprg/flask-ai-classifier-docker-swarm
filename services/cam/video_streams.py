@@ -89,6 +89,9 @@ def initialize_video_streams(url=None, videos=[]):
         except Exception as e:
             logging.critical("Exception {}".format(e))
 
+def update_existed_process(cam):
+
+    
 
 
 
@@ -100,16 +103,19 @@ def clean_up_service():
 
 """  Delete terminated processes and processes with not active urls """
 def delete_expired_streams():
-    params = {'os': comp_node()}
-    del_cam = None
+    os = comp_node()
+    del_cam = []
     # Delete terminated process
     for cam in detectors:
         for process in detectors[cam].processes:
             if( process.is_alive() == False): # at least one is dead kill all
-                logging.debug( "Detection process {} assigned  to the node: {} was deleted".format(detectors[cam], params['os']))
-                del_cam = cam
-                break
-    if( del_cam is not None): del detectors[del_cam]              
+                logging.info( "Detection process {} assigned  to the node: {} was deleted".format(detectors[cam], os))
+                del_cam.append(cam)
+                
+        # update existed processes into db
+        params = { 'id': cam, 'os': comp_node(), 'last_time_updated':time.time()*1000 }
+        db.update_urls(params)
+    for cam in del_cam: del detectors[cam]          
     threading.Timer(delete_expired_streams_interval, delete_expired_streams).start()
 
 """Create a new Detections (Process) and update a expired videos with latest update time """
