@@ -71,11 +71,11 @@ def initialize_video_streams(url=None, videos=[]):
             logging.debug("detectors: " + str(detectors) ) 
             if params['id'] not in detectors:
                 """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
-                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
-                logging.DEBUG("A new detection  process was created." + str(detection))                 
+                db.update_urls(params)
+                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)             
                 
                 detectors[params['id']] = detection
-                db.update_urls(params)
+                logging.info("A new detection  process was created." + str(detection))                 
                 logging.info("p_classifiers for cam: {} started by {} ".format(params['id'], comp_node() ))
              
             
@@ -83,11 +83,11 @@ def initialize_video_streams(url=None, videos=[]):
             #p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
             #p_deny_service.daemon=False
             #p_deny_service.start()
-            i += 1
-            if i >= prod.MAXIMUM_VIDEO_STREAMS: break
+            
+            if len(detectors) >= prod.MAXIMUM_VIDEO_STREAMS: break
              
         except Exception as e:
-            logging.info("Exception {}".format(e))
+            logging.critical("Exception {}".format(e))
 
 
 
@@ -129,9 +129,9 @@ def update_urls_from_stream():
         db.update_urls(params)
         logging.debug("url update with params: {}".format(params))
     # consider if URL was not updated buy Detection process more then 3 intervals of processing time
-    videos_ = db.select_all_active_urls_olderThen_secs(3*update_urls_from_stream_interval)
+    videos_ = db.select_old_urls_which_not_mine_olderThen_secs(update_urls_from_stream_interval)
     for params in videos_:
-        if len(detectors)  >= prod.MAXIMUM_VIDEO_STREAMS: break
+        # if len(detectors)  >= prod.MAXIMUM_VIDEO_STREAMS: break
         cam = params['id']
         params['os'] = comp_node()
         params['idle_in_mins'] = 0
@@ -144,10 +144,11 @@ def update_urls_from_stream():
                 params['last_time_updated'] = currenttime
                 params['objects_counted'] = 0
                 db.update_urls(params)              
-                logging.debug( "Video  {}  assigned  to the node: {}".format(params['id'],  params['os']))
+                logging.info( "Video  {}  assigned  to the node: {}".format(params['id'],  params['os']))
         except Exception as e:
             logging.critical("Exception in Detection creation with url{} , e: {}".format(params['url'], e))
     threading.Timer(update_urls_from_stream_interval, update_urls_from_stream).start()            
+
 
 if __name__ == "__main__":
     start()

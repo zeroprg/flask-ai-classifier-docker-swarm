@@ -153,6 +153,23 @@ class Sql:
         rows = [dict(r) for r in cursor]
         conn.close()
         return rows
+    
+    def select_old_urls_which_is_mine_olderThen_secs(self,os, secs):
+        """
+            Query all urls which older then 1 min and pr not processed by this os
+            :return:
+        """
+        _time = int(time.time()*1000)
+        conn = self.getConn()
+        query = sql.select([self.urls]).where( sql.and_(
+                                                self.urls.c.os == str(os),
+                                                self.urls.c.currentime < _time - secs*1000)).order_by(text("objects_counted desc, cam asc"))
+        ResultProxy = conn.execute(query)
+        cursor = ResultProxy.fetchall()
+        rows = [dict(r) for r in cursor]
+        conn.close()
+        return rows
+
 
     def select_urls_which_not_mine(self,os):
         """
