@@ -66,7 +66,7 @@ def create_app(script_info=None):
 def populate_lat_long(params):
     if( 'lat' in params ): return  
     data = get_geolocation_by_ip(convert_url_to_ip(params['url']))
-    if('location' in data ):
+    if(data is not None and 'location' in data ):
         params['lat'] = data['location']['lat']
         params['lng'] = data['location']['lng']
         params['city'] =  data['location']['city']
