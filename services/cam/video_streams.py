@@ -107,7 +107,8 @@ def delete_expired_streams():
             if( process.is_alive() == False): # at least one is dead kill all
                 logging.info( "Detection process {} assigned  to the node: {} was deleted".format(detectors[cam], os))
                 del_cam.append(cam)
-                
+        # delete detector as soon someone else process it        
+        if( db.check_if_cam_in_processing(os,cam,update_urls_from_stream_interval) > 0 ): del_cam.append(cam)       
         # update existed processes into db
         params = { 'id': cam, 'os': comp_node(), 'last_time_updated':time.time()*1000 }
         db.update_urls(params)
