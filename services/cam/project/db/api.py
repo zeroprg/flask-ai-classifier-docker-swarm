@@ -100,7 +100,7 @@ class Sql:
         :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).order_by(text("objects_counted desc, cam asc"))
+        query = sql.select([self.urls]).order_by(text("objects_counted desc, last_time_updated desc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -113,7 +113,7 @@ class Sql:
         :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).where(self.urls.c.objects_counted >= 0).order_by(text("objects_counted desc, cam asc"))
+        query = sql.select([self.urls]).where(self.urls.c.objects_counted >= 0).order_by(text("objects_counted desc, last_time_updated asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -131,7 +131,7 @@ class Sql:
                                             sql.and_(
                                                 self.urls.c.objects_counted >= 0,
                                                 self.urls.c.last_time_updated < _time - secs*1000)
-                                        ).order_by(text("objects_counted desc, cam asc"))
+                                        ).order_by(text("objects_counted desc, last_time_updated asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -147,7 +147,7 @@ class Sql:
         conn = self.getConn()
         query = sql.select([self.urls]).where( sql.and_(
                                                 self.urls.c.os != str(os),
-                                                self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, cam asc"))
+                                                self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, last_time_updated asc,cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -163,7 +163,7 @@ class Sql:
         conn = self.getConn()
         query = sql.select([self.urls]).where( sql.and_(
                                                 self.urls.c.os == str(os),
-                                                self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, cam asc"))
+                                                self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, last_time_updated asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -178,7 +178,7 @@ class Sql:
         """
         conn = self.getConn()
         query = sql.select([self.urls]).where( 
-                                                self.urls.c.os != str(os)).order_by(text("objects_counted desc, cam asc"))
+                                                self.urls.c.os != str(os)).order_by(text("objects_counted desc, last_time_updated asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -193,7 +193,7 @@ class Sql:
         conn = self.getConn()
         query = sql.select([self.urls]).where( sql.or_(
                                                 self.urls.c.os == '',
-                                                self.urls.c.os == None)).order_by(text("objects_counted desc, cam asc"))
+                                                self.urls.c.os == None)).order_by(text("objects_counted desc, last_time_updated asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -209,7 +209,7 @@ class Sql:
         _time = int(time.time()*1000)
         conn = self.getConn()
         query = sql.select([self.urls]).where(
-                                                self.urls.c.currentime < _time - 60000).order_by(text("objects_counted desc, cam asc")) 
+                                                self.urls.c.currentime < _time - 60000).order_by(text("objects_counted desc, last_time_updated asc, cam asc")) 
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
