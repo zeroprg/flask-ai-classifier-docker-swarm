@@ -127,11 +127,11 @@ class Detection:
         '''
             #output_queue.put_nowait(frame)
             
-    """ Delete all detectors which have errors with connections """
+    """ Update current detector with idle time if it has errors or no objects counted"""
     def update_urls_db(self):  
         # remove this  processes which older then 1 min and not pingable ( more then URL_PINGS_NUMBER pinged )
         params = {'last_time_updated': time.time()*1000, "id": self.cam}
-        if( self.errors > URL_PINGS_NUMBER):
+        if( self._objects_counted == 0 or self.errors > URL_PINGS_NUMBER):
             params['idle_in_mins'] =  (time.time()*1000 - self.createdtime) / 60000
         params['objects_counted'] = self._objects_counted
         #self._objects_counted = 0

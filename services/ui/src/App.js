@@ -113,7 +113,7 @@ At AIcams.info, we are dedicated to providing state-of-the-art deep learning alg
 
 With AIcams.info, you have the ability to enter the URL of any public IP camera and access its video stream from our platform. However, please note that by specifying the IP address or camera URL, you will be sharing your link with all other subscribers. To make your link private, you will need to subscribe to our payable version.
 
-Enhance your surveillance capabilities with AIcams.info - try us today! <a href="http://aicams.info" class="arrow-btn">aicams.info</a> 
+Enhance your surveillance capabilities with AIcams.info - try us today! <a href="http://aicams.info" className="arrow-btn">aicams.info</a> 
 </p>
     
                             <InputURL updateparams={updateparams} /> 
