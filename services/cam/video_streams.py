@@ -110,8 +110,8 @@ def delete_expired_streams():
         # delete detector as soon someone else process it        
         if( db.check_if_cam_in_processing(os,cam,update_urls_from_stream_interval) > 0 ): del_cam.append(cam)       
         # update existed processes into db
-        params = { 'id': cam, 'os': comp_node(), 'last_time_updated':time.time()*1000 }
-        db.update_urls(params)
+        #params = { 'id': cam, 'os': comp_node(), 'last_time_updated':time.time()*1000 }
+        #db.update_urls(params)
     for cam in del_cam: del detectors[cam]          
     threading.Timer(delete_expired_streams_interval, delete_expired_streams).start()
 
