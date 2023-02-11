@@ -60,6 +60,8 @@ class Detection:
                                   #,output_queue))
             p_get_frame.daemon = False
             self.processes.append(p_get_frame)
+            # before process starts, ensure engine.dispose() is called
+            db.engine.dispose()
             p_get_frame.start()
             logging.info("-------- Process was just started for video: {} --------".format(video))
             time.sleep(0.1 + 0.69/NUMBER_OF_THREADS)

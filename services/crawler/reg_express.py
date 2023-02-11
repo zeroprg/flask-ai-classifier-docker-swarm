@@ -1,7 +1,5 @@
 import re
 
-from requests import request
-
 def translate_google_operator(google_operator):
     if not google_operator:
         return None
@@ -29,15 +27,15 @@ def translate_search_expression(search_expression):
         operator = operator.strip().lower()
         search_string = search_string.strip()
         if operator == 'inurl':
-            return re.compile(f'.*{search_string}.*', re.IGNORECASE)
+            return '.*{}.*'.format(search_string)
         elif operator == 'intitle':
-            return re.compile(f'^{search_string}$', re.IGNORECASE)
+            return '^{}$'.format(search_string)
         elif operator == 'site':
-            return re.compile(f'^{search_string}$', re.IGNORECASE)
+            return '^{}$'.format(search_string)
         elif operator == 'intext':
-            return re.compile(f'.*{search_string}.*', re.IGNORECASE)
+            return '.*{}.*'.format(search_string)
         elif operator == 'allintitle':
-            return re.compile(f'^{search_string}$', re.IGNORECASE)
+            return '^{}$'.format(search_string)
         else:
             return None
     
@@ -74,7 +72,9 @@ def merge_dicts(dict1, dict2):
 
 
 def accumulate_regexes():
-    regexes = {}
+    #regexes = {"inip": "(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"}
+    regexes = {"inip":  r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"}
+
     with open('google_search_operators', 'r',  encoding='utf-8') as f:
         for line in f:
             line = line.strip()
