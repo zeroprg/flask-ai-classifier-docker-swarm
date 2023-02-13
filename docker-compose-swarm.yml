@@ -22,7 +22,7 @@ services:
       - DB_USERNAME=odroid
       - DB_PASSWORD=vist2508
       - DB_NAME=streamer
-      - MAXIMUM_VIDEO_STREAMS = 4 #maimum streams processed per node
+      - MAXIMUM_VIDEO_STREAMS = 7 #maimum streams processed per node
     networks:
       - flask
     ports:

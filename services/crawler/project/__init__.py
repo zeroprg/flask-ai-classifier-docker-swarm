@@ -38,6 +38,40 @@ comp_uuid = str(uuid.uuid4())
 def comp_node():
     return comp_uuid
 
+def url_to_filename(url):
+    """Convert a URL to a valid filename by removing special characters."""
+    return "".join(c for c in url if c.isalnum() or c in (".", "_")) + ".txt"
+
+def geSession():
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36'
+    }
+    
+    session = requests.Session()
+    session.headers.update(headers)
+    return session;
+
+# Store information to a file
+def store_info(filename, last_visit_url, visited_urls):
+    with open(filename, "w") as file:
+        file.write("last_visit_url=" + last_visit_url + "\n")
+        for url in visited_urls:
+            file.write(url + "\n")
+
+# Read information from a file
+def read_info(filename):
+    last_visit_url = None
+    visited_urls = set()
+    try:
+        with open(filename, "r") as file:
+            for line in file:
+                if line.startswith("last_visit_url="):
+                    last_visit_url = line[len("last_visit_url="):].strip()
+                else:
+                    visited_urls.add(line.strip())
+    except FileNotFoundError:
+        logging.info("file name {} was not founded".format(filename))          
+    return last_visit_url, visited_urls
 
 def ping_video_url(url):
     """ Ping url """
