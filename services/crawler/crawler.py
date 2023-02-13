@@ -2,6 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
+import logging
+
+from project import populate_urls_in_db
+
+logging.basicConfig(level=logging.INFO)
+
+
 from reg_express import accumulate_regexes
 
 def search_and_traverse_urls(file_name):
@@ -12,7 +19,6 @@ def search_and_traverse_urls(file_name):
     regex_dict = accumulate_regexes()
     all_urls = set()
     visited = set()
-    image_urls = []
 
     # loop over websites
     for website in websites:
@@ -41,8 +47,8 @@ def search_and_traverse_urls(file_name):
             for url in urls:
                 print(url)
                 all_urls.add(url)
-                traverse_internal_urls(url, visited, regex_dict, image_urls)
-    return all_urls, image_urls
+                traverse_internal_urls(url, visited, regex_dict)
+    return all_urls
 
 def geSession():
     headers = {
@@ -53,35 +59,36 @@ def geSession():
     session.headers.update(headers)
     return session;
 
-def traverse_internal_urls(url, visited, regex_dict, image_urls):
+domain = None
+def traverse_internal_urls(url, visited, regex_dict):
     visited.add(url)
     print(url)   
-
+    global domain
+    if( domain is None): domain = url
     res = geSession().get(url)
         
     soup = BeautifulSoup(res.text, "html.parser")
-    internal_urls = [a["href"] for a in soup.select("* a[href^='/']")]
-    print("internal_urls : {} ".format(internal_urls))
+    internal_urls = [ domain + a["href"] for a in soup.select("* a[href^='/']")]
     images = [img["src"] for img in soup.select("* img[src]")]
-    print("images : {} ".format(images))
+   
     for operator, regex in regex_dict.items():
-        print("regex: ".format(regex))
+       
         if operator == "inurl":
             # search for URLs that contain the pattern
             found_urls = [img for img in images if any(re.search(regex_pattern, img) for regex_pattern in regex)]            
-            image_urls += found_urls
-            
-        if operator == "inip":
-            # search for URLs that contain the pattern
-            found_urls = [img for img in images if any(re.search(regex_pattern, img) for regex_pattern in regex)]
-            image_urls += found_urls
-            
-    print(image_urls)
+            for found_url in found_urls: populate_urls_in_db(found_url)
+       
+        # uncodiionally search for URLs that contain the IP pattern
+        found_ips = [img for img in images if re.search(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", img)]
+        for found_ip in found_ips: populate_urls_in_db(found_ip)
+        
+    
+#    print(image_urls)
     for internal_url in internal_urls:
+        if internal_url.endswith("/"):
+            internal_url = internal_url[:-1]
         if internal_url not in visited:
-            if internal_url.startswith("/"):
-                internal_url = url + internal_url
-            traverse_internal_urls(internal_url, visited, regex_dict, image_urls)
+            traverse_internal_urls(internal_url, visited, regex_dict)
 
 def test_search_and_traverse_urls():
     # Test 1: Check if search_and_traverse_urls is able to search all urls in a file and traverse internal urls
@@ -99,10 +106,11 @@ def test_traverse_internal_urls():
     regex_dict = accumulate_regexes()
 
     visited = set()
-    image_urls = []
-    traverse_internal_urls("http://insecam.org", visited, regex_dict, image_urls)
-    assert len(image_urls) == 2
+   
+    traverse_internal_urls("http://insecam.org", visited, regex_dict)
+    
 
 
 if __name__ == '__main__':
+    #search_and_traverse_urls("websites")
     test_traverse_internal_urls()

@@ -105,17 +105,21 @@ class Detection:
             # call locally
             result = call_classifier_locally(self,  frame, self.cam, self.confidence, self.model)            
             self._objects_counted = self._objects_counted + result['objects_counted'] # doesn't work , always 0
-            self.frame_counter += 1            
-            if( self.frame_counter  > 1000 ): 
-                self.frame_counter = 0
-                self.update_urls_db()                 
-                     
+            self.frame_counter += 1 
+            try:          
+                if( self.frame_counter  > 1000 ): 
+                    self.frame_counter = 0
+                    self.update_urls_db()                 
+            
+            except Exception as ex:
+                self.errors += 1                    
+                logging.critical('Error occurred when update process: {} , {}'.format(self.video_url, ex))
+                                        
             if( self.errors > URL_PINGS_NUMBER):
                 for process in self.processes: 
                     process.terminate()
                 return False
-
-                
+                 
             # Draw rectangles
             '''
             for rec in result['rectangles']:
