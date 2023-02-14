@@ -58,6 +58,7 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideos
                 <span className="hamburger hamburger-1"></span>
                 <span className="hamburger hamburger-2"></span>
                 <span className="hamburger hamburger-3"></span>
+                <span className="hamburger hamburger-4"></span>
             </label>            
 
             <span  className="menu-item" onClick={()=>{ showMaxResolution();}}> 
@@ -75,8 +76,11 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideos
             : 
             <span  className="menu-item" onClick={()=>{ showVideoSectionOnly();}}> 
                 <i className={ !showvideosection ? "fa fa-bar-chart" : "fa fa-play"} onClick={()=>{scrollToCamera()}}></i>
-            </span>
-            }            
+            </span>         
+            }  
+            <span  className="menu-item" onClick={()=>{window.scrollTo(0, 0)}}> 
+                <i className="fa fa-map"></i>
+            </span>             
             
         </nav>
         :<span/>
