@@ -200,12 +200,12 @@ class Sql:
         conn.close()
         return rows
 
-    def check_if_cam_in_processing(self, os, cam, secs):
+    def check_if_cam_in_processing(self, os, id, secs):
         conn = self.getConn()
         _time = int(time.time()*1000)    
         query = sql.select([self.urls]).where( sql.and_(
                                                 self.urls.c.os != os,
-                                                self.urls.c.cam == cam,
+                                                self.urls.c.id == id,
                                                 self.urls.c.last_time_updated > _time - secs*1000 ))
         
         ResultProxy = conn.execute(query)
