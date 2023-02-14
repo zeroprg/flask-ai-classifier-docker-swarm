@@ -121,8 +121,9 @@ def update_urls_from_stream():
     # update last_time_updated and object_counted from the time when the process was started
     params = {}
     currenttime=time.time()*1000
-    params['os'] = comp_node()
+    os = comp_node()
     params['idle_in_mins'] = 0 
+    params['os'] = os
 
     
     for cam in detectors:
@@ -132,16 +133,16 @@ def update_urls_from_stream():
         db.update_urls(params)
         logging.debug("url update with params: {}".format(params))
     # consider if URL was not updated buy Detection process more then 3 intervals of processing time
-    videos_ = db.select_old_urls_which_not_mine_olderThen_secs(update_urls_from_stream_interval)
+    videos_ = db.select_old_urls_which_not_mine_olderThen_secs(os,update_urls_from_stream_interval)
     for params in videos_:
         # if len(detectors)  >= prod.MAXIMUM_VIDEO_STREAMS: break
         cam = params['id']
-        params['os'] = comp_node()
+        params['os'] = os
         params['idle_in_mins'] = 0
         populate_lat_long(params)
         try:
             if cam not in detectors:          
-                logging.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], params['os'] ))
+                logging.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], os ))
                 detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
                 detectors[cam] = detection
                 params['last_time_updated'] = currenttime
