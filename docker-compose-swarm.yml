@@ -11,8 +11,8 @@ services:
         condition: on-failure
       placement:
         constraints:
-        #  - node.role==manager
-          - node.hostname!=odr2
+          - node.role==worker
+          #- node.hostname!=odr2
     environment:
       - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
       - CONFIDENCE=0.33678

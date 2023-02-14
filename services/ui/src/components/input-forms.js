@@ -78,8 +78,6 @@ class InputURL extends Component {
                         <FormControl component="fieldset">
                             <RadioGroup row aria-label="videoalignment" name="videoalignment" value={this.state.videoalignment} onChange={this.handleInputChange}>
                                 <FormControlLabel value="video" control={<Radio />} label="Show only video" />
-                                <FormControlLabel value="statistic" control={<Radio />} label="Show video and cameras statisic" />
-                                <FormControlLabel value="both" control={<Radio />} label="Show captured objects and video" />
                                 <FormControlLabel disabled value="objects" control={<Radio />} label="Show captured objects only" />
                             </RadioGroup>
                         </FormControl>                           
