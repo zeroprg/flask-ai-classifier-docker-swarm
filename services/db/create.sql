@@ -19,6 +19,7 @@ CREATE TABLE objects (
 );
 
 CREATE INDEX index_cam ON objects USING btree (cam);
+CREATE UNIQUE INDEX objects_hashcode_idx ON public.objects USING btree (hashcode)
 CREATE INDEX index_cam_hashcode ON objects USING btree (cam, hashcode);
 CREATE INDEX index_currentime ON objects USING btree (currentime DESC);
 CREATE INDEX index_type ON objects USING btree (type);
