@@ -97,23 +97,28 @@ def clean_up_service():
   threading.Timer( clean_up_service , clean_up_service).start() # in  3 days
 
 
-"""  Delete terminated processes and processes with not active urls """
 def delete_expired_streams():
     os = comp_node()
     del_cam = []
+    # Create a copy of the detectors dictionary to avoid modifying the original
+    # during iteration
+    detectors_copy = detectors.copy()
     # Delete terminated process
-    for cam in detectors:
-        for process in detectors[cam].processes:
-            if( process.is_alive() == False): # at least one is dead kill all
-                logging.info( "Detection process {} assigned  to the node: {} was deleted".format(detectors[cam], os))
+    for cam in detectors_copy:
+        for process in detectors_copy[cam].processes:
+            if not process.is_alive(): # at least one is dead kill all
+                logging.info( "Detection process {} assigned  to the node: {} was deleted".format(detectors_copy[cam], os))
                 del_cam.append(cam)
         # delete detector as soon someone else process it        
-        if( db.check_if_cam_in_processing(os,cam,update_urls_from_stream_interval) > 0 ): del_cam.append(cam)       
+        if db.check_if_cam_in_processing(os, cam, update_urls_from_stream_interval) > 0:
+            del_cam.append(cam)       
         # update existed processes into db
         #params = { 'id': cam, 'os': comp_node(), 'last_time_updated':time.time()*1000 }
         #db.update_urls(params)
-    for cam in del_cam: del detectors[cam]          
+    for cam in del_cam:
+        del detectors[cam]          
     threading.Timer(delete_expired_streams_interval, delete_expired_streams).start()
+
 
 """Create a new Detections (Process) and update a expired videos with latest update time """
 def update_urls_from_stream():
