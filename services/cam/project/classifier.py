@@ -107,7 +107,7 @@ class Detection:
             self._objects_counted = self._objects_counted + result['objects_counted'] # doesn't work , always 0
             self.frame_counter += 1 
             try:          
-                if( self.frame_counter  > 1000 ): 
+                if( self.frame_counter  > 10000 ): 
                     self.frame_counter = 0
                     self.errors = 0
                     self.update_urls_db()                 

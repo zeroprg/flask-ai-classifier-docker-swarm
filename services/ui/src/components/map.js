@@ -4,7 +4,7 @@ import { YMaps, Map, Placemark, ZoomControl, FullscreenControl } from '@pbe/reac
 const MarkersMap = ({markers}) => {
   const [loading, setLoading] = useState(true);
   const is_counted = (count) =>{
-    return count > 0 ? 'Founded '+count+ ' objects per 1000 frames<br/>': '';
+    return count >= 0 ? 'Founded '+count+ ' objects per latest 10000 frames<br/>': '';
   }
 
   const handleMarkerClick = (cam) => {
