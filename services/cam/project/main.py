@@ -68,12 +68,12 @@ def health():
         statistic_rows = conn.execute("SELECT count(*) FROM STATISTIC" ).fetchall()
         print("Total statistic : {}".format(statistic_rows[0][0]))         
         time_in200_secs_back =  int(time.time() - 200 )* 1000;
-        processess = conn.execute('SELECT os FROM URLS WHERE count(os) is not NULL and last_time_updated > {}'.format(time_in200_secs_back)).fetchall()
+        processess = conn.execute('SELECT count(os) FROM URLS WHERE os is not NULL and last_time_updated > {}'.format(time_in200_secs_back)).fetchall()
         print("Total processes: {}".format(processess))
-        processess = conn.execute('SELECT count(*) from (SELECT distinct os FROM URLS WHERE os is not NULL and last_time_updated > {}) as dist_os'.format(time_in200_secs_back)).fetchall()
+        nodes = conn.execute('SELECT count(os) from (SELECT distinct os FROM URLS WHERE os is not NULL and last_time_updated > {}) as dist_os'.format(time_in200_secs_back)).fetchall()
         print("Total nodes involved in processesing: {}".format(processess))
         print("Database connection health was fine !!!") 
-    ret = {'os': comp_node(), "Total objects": objects_rows[0][0],  "statistic table rows": statistic_rows[0][0]}
+    ret = {'os': comp_node(), "Total objects": objects_rows[0][0],  "statistic table rows": statistic_rows[0][0], "nodes":nodes[0][0], "cameras processed":processess[0][0]}
     logging.info(ret)
     return Response(json.dumps(ret,default=str, indent = 4), mimetype='text/plain', status=200)
 
