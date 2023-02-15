@@ -140,7 +140,7 @@ def update_urls_from_stream():
     # consider if URL was not updated buy Detection process more then 3 intervals of processing time
     videos_ = db.select_old_urls_which_not_mine_olderThen_secs(os,update_urls_from_stream_interval)
     for params in videos_:
-        # if len(detectors)  >= prod.MAXIMUM_VIDEO_STREAMS: break
+        if len(detectors)  >= prod.MAXIMUM_VIDEO_STREAMS: break
         cam = params['id']
         params['os'] = os
         params['idle_in_mins'] = 0
