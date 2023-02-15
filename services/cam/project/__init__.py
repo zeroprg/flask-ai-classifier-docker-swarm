@@ -34,8 +34,10 @@ vs = None
 fps = None
 p_get_frame = None
 
-comp_uuid = str(uuid.uuid4())
+comp_uuid = None
 def comp_node():
+    global comp_comp_uuid
+    if(comp_uuid is None ): comp_uuid = str(uuid.uuid4())
     return comp_uuid
 
 db = Sql(SQLALCHEMY_DATABASE_URI = prod.SQLALCHEMY_DATABASE_URI)
