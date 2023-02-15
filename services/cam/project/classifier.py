@@ -109,6 +109,7 @@ class Detection:
             try:          
                 if( self.frame_counter  > 1000 ): 
                     self.frame_counter = 0
+                    self.errors = 0
                     self.update_urls_db()                 
             
             except Exception as ex:

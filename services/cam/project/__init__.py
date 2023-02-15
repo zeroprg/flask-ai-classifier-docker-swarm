@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO)
 
 """ 'Global' variables """
 DELETE_FILES_LATER = 72 #   ( 3 days in hours)
-URL_PINGS_NUMBER = 1 # delete process which use this URL after that pings
+URL_PINGS_NUMBER = 200 # delete process which use this URL after that pings
 delete_expired_streams_interval = 200 #secs
 update_urls_from_stream_interval = 100 #secs
 clean_up_service_interval = 3600*24 #secs
