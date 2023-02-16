@@ -58,7 +58,7 @@ def initialize_video_streams(url=None, videos=[]):
                 arg = prod.args.get('video_file' + str(i), None)
                 i += 1 
                 logging.info(arg)
-    videos_ = db.select_all_active_urls_olderThen_secs(60)
+    videos_ = db.select_all_active_urls_olderThen_secs(2*update_urls_from_stream_interval)
     """ Update all videos as mine , start greeding algorithm here ..."""
     """ Updation """
     logging.info( "Total number of videos ready for update: {}".format(len(videos_)))
