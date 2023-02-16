@@ -23,7 +23,7 @@ URL_PINGS_NUMBER = 200 # delete process which use this URL after that pings
 delete_expired_streams_interval = 200 #secs
 update_urls_from_stream_interval = 100 #secs
 clean_up_service_interval = 3600*24 #secs
-
+NUMBER_OF_THREADS = 1 # thread per Detector  
 
 args = {}
 #imagesQueue = {}

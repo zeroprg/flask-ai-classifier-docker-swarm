@@ -58,7 +58,7 @@ def initialize_video_streams(url=None, videos=[]):
                 arg = prod.args.get('video_file' + str(i), None)
                 i += 1 
                 logging.info(arg)
-    videos_ = db.select_all_active_urls_olderThen_secs(5)
+    videos_ = db.select_all_active_urls_olderThen_secs(60)
     """ Update all videos as mine , start greeding algorithm here ..."""
     """ Updation """
     logging.info( "Total number of videos ready for update: {}".format(len(videos_)))
@@ -138,7 +138,7 @@ def update_urls_from_stream():
         db.update_urls(params)
         logging.debug("url update with params: {}".format(params))
     # consider if URL was not updated buy Detection process more then 3 intervals of processing time
-    videos_ = db.select_old_urls_which_not_mine_olderThen_secs(os,update_urls_from_stream_interval)
+    videos_ = db.select_old_urls_which_not_mine_olderThen_secs(os,2*update_urls_from_stream_interval)
     for params in videos_:
         if len(detectors)  >= prod.MAXIMUM_VIDEO_STREAMS: break
         cam = params['id']
