@@ -68,17 +68,17 @@ class Detection:
                     frame = self.read_video_stream(self.video_s)
                 if frame is None:
                     self.errors += 1
-                    return False
+                    
             except Exception as ex:
                 logging.critical("Exception occurred when connected to URL: {}, {}".format(self.video_url,ex))
                 self.errors += 1
-                return False
+                
             else:
                 self.errors = 0
             result = call_classifier_locally(self, frame, self.cam, self.confidence, self.model)
             with self._objects_counted.get_lock():
                 self._objects_counted.value += result['objects_counted']
-            self.frame_counter += 1
+            
                     # Check if time threshold has passed
             current_time = time.time()*1000
             time_threshold = update_urls_from_stream_interval # Threshold in seconds
