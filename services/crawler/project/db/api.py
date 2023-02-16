@@ -249,7 +249,7 @@ class Sql:
         conn = self.getConn()
         try:
             if 'id' in params:
-                query = sql.update(self.urls).where(self.urls.c.id == params['id']).values(params)
+                query = sql.update(self.urls).where(self.urls.c.id == str(params['id'])).values(params)
             else:    
                 query = sql.update(self.urls).where(self.urls.c.url == params['url']).values(params)
             ResultProxy = conn.execute(query, params)

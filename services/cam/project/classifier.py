@@ -39,7 +39,7 @@ class Detection:
         self.hashes = {}
         self.topic_label = 'no data'
         self.net = self.video_s = None
-        self.cam = video['id']
+        self.cam = str(video['id'])
         self.classify_server = classify_server
         self.errors = 0
         self.created_time = time.time() * 1000
