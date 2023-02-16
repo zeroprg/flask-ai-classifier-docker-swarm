@@ -64,7 +64,7 @@ def initialize_video_streams(url=None, videos=[]):
     logging.info( "Total number of videos ready for update: {}".format(len(videos_)))
     for video in videos_:
         
-        params = { 'id': video['id'], 'url': video['url'], 'cam': video['cam'], 'os': comp_node(), 'currentime':time.time()*1000 }
+        params = { 'id': str(video['id']), 'url': video['url'], 'cam': video['cam'], 'os': comp_node(), 'currentime':time.time()*1000 }
         populate_lat_long(params)
         try:
             logging.info("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
@@ -141,13 +141,13 @@ def update_urls_from_stream():
     videos_ = db.select_old_urls_which_not_mine_olderThen_secs(os,2*update_urls_from_stream_interval)
     for params in videos_:
         if len(detectors)  >= prod.MAXIMUM_VIDEO_STREAMS: break
-        cam = params['id']
+        cam = str(params['id'])
         params['os'] = os
         params['idle_in_mins'] = 0
         populate_lat_long(params)
         try:
             if cam not in detectors:          
-                logging.info("p_classifiers for cam: {}  re-started by {} ".format(params['id'], os ))
+                logging.info("p_classifiers for cam: {}  re-started by {} ".format(cam, os ))
                 detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)
                 detectors[cam] = detection
                 params['last_time_updated'] = currenttime
