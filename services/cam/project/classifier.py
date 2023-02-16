@@ -44,6 +44,7 @@ class Detection:
         self.errors = 0
         self.created_time = time.time() * 1000
         self.last_update_time = self.created_time
+        self.idle_time = 0
         self.processes = []
         self._objects_counted = Value('i', 0)
         self.frame_counter = 0
@@ -69,7 +70,7 @@ class Detection:
                     self.errors += 1
                     return False
             except Exception as ex:
-                logging.critical(f"Exception occurred when connected to URL: {self.video_url}, {ex}")
+                logging.critical("Exception occurred when connected to URL: {}, {}".format(self.video_url,ex))
                 self.errors += 1
                 return False
             else:
@@ -96,7 +97,8 @@ class Detection:
             'id': self.cam,
         }
         if self._objects_counted.value == 0 or self.errors > URL_PINGS_NUMBER:
-            params['idle_in_mins'] = (time.time() * 1000 - self.created_time) / 60000
+            self.idle_time += (time.time() * 1000 - self.last_update_time) / 60000
+            params['idle_in_mins'] = self.idle_time
         params['objects_counted'] = self._objects_counted.value
         db.update_urls(params)
         logging.debug("URL {}, ID: {} updated with objects counted: {}".format(self.video_url, self.cam, self._objects_counted.value))
