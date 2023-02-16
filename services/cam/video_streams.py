@@ -134,10 +134,10 @@ def update_urls_from_stream():
     for cam in detectors:
         detection = detectors[cam]
         params['last_time_updated'] = currenttime        
-        params['id'] = cam
+        params['id'] = str(cam)
         db.update_urls(params)
         logging.debug("url update with params: {}".format(params))
-    # consider if URL was not updated buy Detection process more then 3 intervals of processing time
+    # consider if URL was not updated buy Detection process more then 2 intervals of processing time
     videos_ = db.select_old_urls_which_not_mine_olderThen_secs(os,2*update_urls_from_stream_interval)
     for params in videos_:
         if len(detectors)  >= prod.MAXIMUM_VIDEO_STREAMS: break
