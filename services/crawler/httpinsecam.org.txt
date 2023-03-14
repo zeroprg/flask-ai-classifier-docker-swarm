@@ -1,4 +1,4 @@
-last_visit_url=http://insecam.org/cn/bycity/Tanabe
+last_visit_url=http://insecam.org/cn/view/522542
 http://insecam.org/cn/view/1009407
 http://insecam.org/ru/bytype/Defeway
 http://insecam.org/cn/bytype/ChannelVision
@@ -323,6 +323,7 @@ http://insecam.org/en/view/567625
 http://insecam.org/cn/bycity/Seoul
 http://insecam.org/en/view/1009599
 http://insecam.org/en/bytype/DLink
+http://insecam.org/cn/bycity/Tanabe
 http://insecam.org/en/view/552
 http://insecam.org/en/bycity/Kumamoto
 http://insecam.org/cn/view/1001428
@@ -336,6 +337,7 @@ http://insecam.org/cn/view/264221
 http://insecam.org/en/view/985003
 http://insecam.org/cn/bytimezone/+09:00
 http://insecam.org/cn/view/448474
+http://insecam.org/cn/view/840372
 http://insecam.org/en/bytype/StarDot
 http://insecam.org/cn/view/992419
 http://insecam.org/en/byregion/JP/Hiroshima
@@ -513,6 +515,7 @@ http://insecam.org/en/view/991761
 http://insecam.org/cn/view/417598
 http://insecam.org/cn/bytype/Axis2
 http://insecam.org/cn/bytype/TPLink
+http://insecam.org/cn/view/515853
 http://insecam.org/en/byregion/KR/Seoul-T'Ukpyolsi
 http://insecam.org/en/view/266769
 http://insecam.org/cn/view/376608
