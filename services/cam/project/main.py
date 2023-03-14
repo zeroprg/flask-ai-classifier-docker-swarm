@@ -5,7 +5,7 @@ import json
 import logging
 
 from project.config import  ProductionConfig as prod
-from project import db, populate_lat_long, comp_node, videos
+from project import db, populate_lat_long, comp_node, ping_video_url, videos
 
 
 from flask import Blueprint, Response, request, send_from_directory
@@ -99,27 +99,26 @@ def moreparams():
     params = gen_params(cam=cam, time1=hour_back1, time2=hour_back2 ,object_of_interest=object_of_interest)
     return Response(params, mimetype='text/plain')
 
+def as_array(values, delimiter=','):
+    return values.split(delimiter)
 
 @main_blueprint.route('/moreimgs')
 def moreimgs():
     """ Read list of json files or return one specific  for specific time """
-    hour_back1 = request.args.get('hour_back1', default=0, type=int)
-    hour_back2 = request.args.get('hour_back2', default=1, type=int)
-    object_of_interest = request.args.get('object_of_interest', type=None)
+    hour_back1 = request.args.get('hour_back1', default=None, type=int)
+    hour_back2 = request.args.get('hour_back2', default=None, type=int)
+    hashcodes = request.args.get('hashcodes', default=None,type=str)
+    object_of_interest = request.args.get('object_of_interest', default=None, type=None)
     #print("object_of_interest: " + str(object_of_interest)[1:-1])
-
+ 
     cam = request.args.get('cam', default=0, type=str)
-    if hour_back1 != '':
-        hour_back1 = int(hour_back1)
-    else:
-        hour_back1 = 0  # default value: 60 min back
-
-    if hour_back2 != '':
-        hour_back2 = int(hour_back2)
-    else:
-        hour_back2 = 1  # default value: 60 min back
     print("cam: {}, hour_back1:{}, hour_back2:{}, object_of_interest: {}".format(cam, hour_back1, hour_back2, object_of_interest))
-    rows = db.select_last_frames(cam=cam, time1=hour_back1, time2=hour_back2, obj=object_of_interest)
+    if hashcodes is not None:
+        rows = db.select_objects(cam, hashcodes)
+    elif  hour_back1 is None or hour_back2 is None :
+        rows = db.select_all_objects(cam=cam)
+    else:    
+        rows = db.select_last_frames(cam=cam, time1=hour_back1, time2=hour_back2, obj=object_of_interest)
     return Response(json.dumps(rows,default=str), mimetype='text/plain')
 
 
@@ -150,16 +149,6 @@ def gen_params(cam='', time1=0, time2=5*60*60*1000, object_of_interest=[]):
     logging.debug(ret)
     return ret
 
-
-def ping_video_url(url):
-    """ Ping url """
-    try:
-        vs = cv2.VideoCapture(url)
-        flag, _ = vs.read()
-    except Exception as e:        
-        logging.critical("Exception in ping url: {}".format(e))   
-        
-    return flag
 
 
 @main_blueprint.route('/urls', methods=['POST'])

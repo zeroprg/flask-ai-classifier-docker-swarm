@@ -3,6 +3,8 @@ import logging
 import requests
 import socket
 import cv2
+import imutils
+import re
 from urllib.parse import urlsplit
 
 #from flask_sqlalchemy import SQLAlchemy
@@ -15,7 +17,7 @@ from flask import Response
 
 #from flask import g
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 """ 'Global' variables """
 DELETE_FILES_LATER = 72 #   ( 3 days in hours)
@@ -77,12 +79,17 @@ def read_info(filename):
 
 def ping_video_url(url):
     """ Ping url """
+    flag = False
     try:
+        if "/cgi-bin/" not in url and  bool(re.search(r'.*\.(?!mjpg)(jpg|jpeg|png|gif|bmp)\b|\b[jJ][pP][eE]?[gG]\b|shot|/image/', url, re.IGNORECASE)):
+            imutils.url_to_image(url)
+            return True
+          
         vs = cv2.VideoCapture(url)
+        #vs.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         flag, _ = vs.read()
     except Exception as e:        
-        logging.critical("Exception in ping url: {}".format(e))   
-        
+        logging.debug("Exception in ping url: {}".format(e))        
     return flag
 
 db = Sql(SQLALCHEMY_DATABASE_URI = prod.SQLALCHEMY_DATABASE_URI)
@@ -165,17 +172,22 @@ def search_with_google(query):
 
 def populate_urls_in_db(add_url):
     logging.info('adding a new video urls ' + add_url)
-    if ping_video_url(add_url):
+    if True: #ping_video_url(add_url)
         try:
-            params = { 'url': add_url }
-            populate_lat_long(params)
+            params = { 'url': add_url , 'os': comp_node()}
             db.insert_urls(params)
         except Exception as e:
             logging.critical("Exception during saving url:{} : {}".format(add_url,e))
             msg = "URL already exist it was already  added successfully"
             return Response({"message":msg}, mimetype='text/plain', status=500)           
         else:     
-            logging.info("URL {} added successfully".format(add_url))           
+            logging.info("URL {} added successfully".format(add_url)) 
+            populate_lat_long(params)
+            params['city'] = params['city'][:25]
+            params['country'] = params['country'][:25]
+            logging.debug(params)    
+            db.update_urls(params)
+            logging.info("URL {} was updated successfully with lattitude and longitude".format(add_url)) 
             return Response('{"message":"URL added successfully"}', mimetype='text/plain',status=200)
     else:
         logging.info("URL {} has no video".format(add_url))

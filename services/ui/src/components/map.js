@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { YMaps, Map, Placemark, ZoomControl, FullscreenControl } from '@pbe/react-yandex-maps';
 
 const MarkersMap = ({markers}) => {
   const [loading, setLoading] = useState(true);
+  const [center, setCenter] = useState([55.75, 37.57]);
   const is_counted = (count) =>{
     return count >= 0 ? 'Founded '+count+ ' objects per minute<br/>': '';
   }
-
   const handleMarkerClick = (cam) => {
     const stream = document.getElementById(`stream${cam}`);
     const div= document.getElementById(cam);
@@ -18,17 +18,28 @@ const MarkersMap = ({markers}) => {
     }
   }
 
+  useEffect(() => {
+    if (markers.length > 0) {
+      const center = markers.reduce((acc, cur) => [acc[0] + cur.lat, acc[1] + cur.lng], [0, 0]);
+      setCenter([center[0] / markers.length, center[1] / markers.length]);
+    }
+  }, [markers]);
+  
   return (
+    
     <div>
       {loading && (
         <p>... Loading video stream locations on map...</p>
       )}
 
-
       <YMaps>
-        <Map width="100%" height="350px" onLoad={() => { setLoading(false); }}
-          defaultState={{ center: [55.75, 37.57], zoom: 3 }}
-          
+        <Map width="100%" height="350px" 
+          onLoad={() => {
+           setLoading(false); 
+           
+          }}
+          defaultState={{ center: (loading ? center : [55.75, 37.57]), zoom: 6 }}
+           
         >
           {markers.map((url) => (
             <Placemark

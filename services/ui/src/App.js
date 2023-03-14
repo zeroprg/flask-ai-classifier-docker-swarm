@@ -1,4 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios'
+//import { groupBy } from 'lodash';
+
 import { SnackbarProvider } from './snackbarContext';
 
 import URLlist from './components/urls'
@@ -10,6 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import green from '@material-ui/core/colors/green';
 import amber from '@material-ui/core/colors/amber';
 import MarkersMap from './components/map'
+import countries from './countries';
 
 const useStyles = makeStyles((theme) => ({
     success: {
@@ -30,60 +34,99 @@ const useStyles = makeStyles((theme) => ({
   const App = (props) => {
     const classes = useStyles();
     const [state, setState] = useState({
-        urls: [],
         videoalignment: 'video',
         open: false,
         message: '',
         variant: 'success'
-    });
+    }); 
 
-    const isVideoAndStatistic = state.videoalignment === 'statistic';  
-    const { open, message, variant } = state;
+    const [initialUrls, setInitialUrls] = useState([]);
+    const [urls, setUrls] = useState([]);
+    const [videoAlignment, setVideoAlignment] = useState('video');
+    const [open, setOpen] = useState(false);
+    const [isLoading, setLoading] = useState(false)
+    const [message, setMessage] = useState('');
+    const [variant, setVariant] = useState('success');
+
+    const [countryFilter, setcountryFilter] = useState('RU');
+    const [interestFilter, setinterestFilter] = useState('none');
+    const isVideoAndStatistic = videoAlignment === 'statistic';  
+    // State to hold grouped urls
+    const [groupedUrls, setGroupedUrls] = useState({});
     const snackbarRef = useRef(null);
 
     const handleOpen = (message, variant) => {
-        setState({ ...state, open: true, message, variant });
+        setMessage(message);
+        setVariant(variant);
+        setOpen(true);
     };
 
-    const handleClose = () => {
-        setState({ ...state, open: false });
+    const handlecountryFilterChange = (event) => {
+        const selectedCountry = event.target.value;
+        setcountryFilter(selectedCountry);
+        setinterestFilter('none');
+        setUrls(selectedCountry === 'all' ? initialUrls : initialUrls.filter((url) => url.country === selectedCountry));
     };
    
-    const  updateurls = (urls)=>{
-     //convert from one format [[1,'url1'], [1,'url2']] to another [{cam:0, url:url}, {{cam:1, url:ur2}}] 
-     //const urls_ = urls.map( data => { var l = {cam:data[0], url:data[1] }; return l; }); 
-     setState({...state, urls});
-  }
+    const handleinterestFilterChange = (event) => {
+      const selectedInterest = event.target.value;
+      setinterestFilter(selectedInterest);
+      setUrls(selectedInterest === 'all' ? initialUrls : initialUrls.filter((url) => url.objects_counted >= 0));
+  };
+    
+    const handleClose = () => {
+        setOpen(false);
+    };
+   
+    const  updateurls = (initialUrls)=>{        
+        setUrls( (countryFilter === 'all' ? initialUrls : initialUrls.filter((url) => url.country === countryFilter)) );
+    }
 
   const updateparams = (param) => {
       setState({...state, ...param}); 
   }
 
-  const loadData = () => {  
-    const DEFAULT_QUERY = global.config.API + "urls?list=true"
-   
-    //const deleteURL = URL + "?delete="
-    setState({...state, isLoading: true });
-   
-    fetch(DEFAULT_QUERY)
-        .then(response => {
-            //console.log(" response:" + response)
-            if (response.ok) {
-                //console.log(" response:" + JSON.stringify(response, null, 2) )
-                setState({...state, isLoading: false })
-                return response.json();
-            } else {
-                console.log(" error:")
-                throw new Error('Something went wrong ...');
-            }
-        })
-        .then(data => {
-             setState({ ...state, data, isLoading: false })
-             updateurls(data);
-             return data;
-            })
-        .catch(error => setState({...state, error, isLoading: false }));
-    }
+  
+
+
+  const loadData = () => {
+    const DEFAULT_QUERY = global.config.API + 'urls?list=true';
+  
+    setLoading(true);
+  
+    axios
+      .get(DEFAULT_QUERY)
+      .then(response => {
+        if (response.status === 200) {
+          setLoading(false);
+          return response.data;
+        } else {
+          console.log('error:');
+          throw new Error('Something went wrong ...');
+        }
+      })
+      .then(data => {
+        setLoading(false);
+        setInitialUrls(data)
+        updateurls(data);
+        const groupedUrls = groupUrlsByCountry(data);
+        setGroupedUrls(groupedUrls);
+      })
+      .catch(error => setLoading(false));
+    };
+ 
+    // Function to group urls by country
+    const groupUrlsByCountry = (urls) => {
+        return urls.reduce((acc, cur) => {
+        if (cur.country in acc) {
+            acc[cur.country].push(cur);
+        } else {
+            acc[cur.country] = [cur];
+        }
+        return acc;
+        }, {});
+    };
+    
     useEffect(() => {
         console.log(props.req);
         loadData()
@@ -93,7 +136,24 @@ const useStyles = makeStyles((theme) => ({
         <div className="App"> 
           <SnackbarProvider value={{ handleOpen, handleClose }}>
           <header className="App-header">
-                <MarkersMap markers={state.urls}/>      
+          {!isLoading && (
+                <div>
+                    <label htmlFor="countryFilter">Filter by:</label>
+                    <select id="interestFilter" value={interestFilter} onChange={handleinterestFilterChange}>                        
+                        <option key='interest' value='none'></option> 
+                        <option key='rating' value='rating'>Rating</option>                                            
+                    </select>
+                    <label htmlFor="countryFilter">Filter by country:</label>
+                    <select id="countryFilter" value={countryFilter} onChange={handlecountryFilterChange}>                        
+                        {Object.keys(groupedUrls).sort().map((countryCode) => (
+                        <option key={countryCode} value={countryCode}>
+                            {countries.find((c) => c.cc === countryCode) ? countries.find((c) => c.cc === countryCode).name : countryCode}
+                        </option>
+                        ))}                        
+                    </select>                    
+                </div>
+          )}
+                <MarkersMap key={countryFilter} markers={urls}/>      
                 <div className="container">
                    <div className="row nav-wrapper"/> 
                    <div className="col-md-12">
@@ -104,8 +164,7 @@ const useStyles = makeStyles((theme) => ({
                                 onClose={handleClose} 
                                 autoHideDuration={6000} 
                                 ref={snackbarRef}
-                                className={classes[variant]}/>
-    
+                                className={classes[variant]}/>   
                             
                             <p> The smart cloud storage solution for video streams from public cameras. Our platform is powered by 5 ODROID ARM computers running 100% Python and 100% React, ensuring optimal performance and user experience.
 
@@ -116,15 +175,14 @@ With AIcams.info, you have the ability to enter the URL of any public IP camera 
 Enhance your surveillance capabilities with AIcams.info - try us today! <a href="http://aicams.info" className="arrow-btn">aicams.info</a> 
 </p>
     
-                            <InputURL updateparams={updateparams} /> 
-    
-                            {isVideoAndStatistic && <URLlist updateparams={updateparams} updateurls={updateurls} data={state.urls}/> }
+                            <InputURL updateparams={updateparams} />    
+                            {isVideoAndStatistic && <URLlist updateparams={updateparams} updateurls={updateurls} data={urls}/> }
                     </div>
                 </div>
      
            </header>
         
-            <VideoStreamers param={state} urls={state.urls} />
+            <VideoStreamers param={state} urls={urls} />
      
             <div className="feature-bg">
                 <div className="row">

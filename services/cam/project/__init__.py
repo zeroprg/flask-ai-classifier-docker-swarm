@@ -3,6 +3,9 @@ import uuid
 import logging
 import requests
 import socket
+import cv2
+import imutils
+import re
 from urllib.parse import urlsplit
 
 #from flask_sqlalchemy import SQLAlchemy
@@ -19,9 +22,9 @@ logging.basicConfig(level=logging.INFO)
 
 """ 'Global' variables """
 DELETE_FILES_LATER = 72 #   ( 3 days in hours)
-URL_PINGS_NUMBER = 800 # delete process which use this URL after that pings in update_urls_from_stream_interval
-delete_expired_streams_interval = 200 #secs
-update_urls_from_stream_interval = 60 #secs
+URL_PINGS_NUMBER = 1 # deny process from serice after that pings in update_urls_from_stream_interval
+delete_expired_streams_interval = 600 #secs
+update_urls_from_stream_interval = 120 #secs
 clean_up_service_interval = 3600*24 #secs
 NUMBER_OF_THREADS = 1 # thread per Detector  
 
@@ -61,7 +64,7 @@ def create_app(script_info=None):
     app.register_blueprint(main_blueprint)
     # shell context for flask cli   
     app.shell_context_processor({"app": app , "db": db})
-    
+     
     return app
 
 
@@ -138,5 +141,19 @@ def search_with_google(query):
         return urls
     else:
         return []
-  
-
+    
+image_check = r'(?<!/cgi-bin/).*\.(?!mjpg)(?!mjpeg)(jpg|jpeg|png|gif|bmp)\b|\b[jJ][pP][eE]?[gG]\b|shot|/image/'
+simple_decode = r'.*\.(cgi|mjpg|mjpeg)$|\b/cgi-bin/'
+def ping_video_url(url):
+    """ Ping url """
+    flag = False
+    try:
+        if "/cgi-bin/" not in url and  bool(re.search(r'.*\.(?!mjpg)(jpg|jpeg|png|gif|bmp)\b|\b[jJ][pP][eE]?[gG]\b|shot|/image/', url, re.IGNORECASE)):
+            imutils.url_to_image(url)
+            flag = True
+        else:                
+            vs = cv2.VideoCapture(url)
+            flag, _ = vs.read()
+    except Exception as e:        
+        logging.debug("Exception in ping url: {}".format(e))        
+    return flag

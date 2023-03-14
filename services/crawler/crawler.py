@@ -2,6 +2,8 @@
 from bs4 import BeautifulSoup
 import re
 import logging
+from urllib.parse import urlparse
+
 
 from project import db, populate_urls_in_db, geSession, read_info, url_to_filename, store_info
 
@@ -35,34 +37,55 @@ def search_and_traverse_urls(file_name):
 domain = None
 def traverse_internal_urls(url, visited, regex_dict):
     visited.add(url)
+    print("visited:{}".format(visited))
     logging.info(url)   
     global domain
     global urls
-    if( domain is None): domain = url
+    if( domain is None):
+        parsed_url = urlparse(url)
+        scheme = parsed_url.scheme
+        domain = scheme + "://" + parsed_url.netloc        
+        logging.info("domain: " +domain)
+    print("url: {}".format(url))
     res = geSession().get(url)
         
     soup = BeautifulSoup(res.text, "html.parser")
     internal_urls = [ domain + a["href"] for a in soup.select("* a[href^='/']")]
     images = [img["src"] for img in soup.select("* img[src]")]
-   
+    #print("internal_urls {}".format(internal_urls))
     for operator, regex in regex_dict.items():
        
         if operator == "inurl":
             # search for URLs that contain the pattern
-            found_urls = [img for img in images if any(re.search(regex_pattern, img) for regex_pattern in regex)]            
-            for found_url in found_urls: 
-                if( found_url not in urls): populate_urls_in_db(found_url)
+            found_urls = [img for img in images if any(re.search(regex_pattern, img) for regex_pattern in regex)]
+            #print("found_urls: {}".format(found_urls))
+            
+            for found_url in found_urls:
+                parsed_found_url = urlparse(found_url)
+                found_domain = parsed_found_url.netloc.split(':')[0]
+                if not any(found_domain == urlparse(url).netloc.split(':')[0] for url in urls):
+                    populate_urls_in_db(found_url)
+
        
         # uncodiionally search for URLs that contain the IP pattern
-        found_ips = [img for img in images if re.search(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", img)]
-        for found_ip in found_ips:
-            if( found_ip not in urls): populate_urls_in_db(found_ip)
+        found_ips = [img for img in images if bool(re.search(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", img))]
+        #print("found_ips: {}".format(found_ips))
+        for found_url in found_ips:
+            parsed_found_url = urlparse(found_url)
+            #print("parsed_found_url: {}".format(parsed_found_url))
+            #print("urls {}".format(urls))
+            found_domain = parsed_found_url.netloc.split(':')[0]
+            print(found_domain)
+            if not any(found_domain == urlparse(url).netloc.split(':')[0] for url in urls):
+                #print(found_url)
+                populate_urls_in_db(found_url)
         
     
-#    print(image_urls)
+    print(internal_urls)
     for internal_url in internal_urls:
         if internal_url.endswith("/"):
             internal_url = internal_url[:-1]
+        print("internal_url: {} ".format(internal_url))
         if internal_url not in visited:
             store_info(url_to_filename(domain) , internal_url, visited)
             traverse_internal_urls(internal_url, visited, regex_dict)

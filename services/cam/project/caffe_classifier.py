@@ -5,6 +5,7 @@ from PIL import Image
 import time
 import datetime
 import json
+import math
 
 from project import db
 from  project.objCountByTimer import ObjCountByTimer
@@ -89,7 +90,9 @@ def classify_frame( frame, params, net=classify_init()):
             # otherwise, extract the index of the class label from
             # the `detections`, then compute the (x, y)-coordinates
             # of the bounding box for the object
-            idx = int(detections[0, 0, i, 1])
+            idx = detections[0, 0, i, 1]
+            if math.isnan(idx): continue
+            idx = int(idx)
             if idx > len(CLASSES) - 1:
                 continue
             key = CLASSES[idx]
@@ -98,7 +101,7 @@ def classify_frame( frame, params, net=classify_init()):
                 continue
             dims = np.array([fW, fH, fW, fH])
             box = detections[0, 0, i, 3:7] * dims
-            (startX, startY, endX, endY) = box.astype("int")
+            (startX, startY, endX, endY) = box.astype("float")
 
             # draw the prediction on the frame
             if idx > len(CLASSES) - 1:
@@ -106,10 +109,11 @@ def classify_frame( frame, params, net=classify_init()):
             key = CLASSES[idx]
             # if not key in IMAGES: continue
             # use 20 pixels from the top for labeling
-            crop_img_data = frame[startY - 20:endY, startX:endX]
-            # label = "Unknown"
-            hash = 0
             try:
+                crop_img_data = frame[int(startY) - 20:int(endY), int(startX):int(endX)]
+                # label = "Unknown"
+                hash = 0
+            
                 crop_img = Image.fromarray(crop_img_data)
                 hash = dhash(crop_img)
             except:
@@ -118,12 +122,12 @@ def classify_frame( frame, params, net=classify_init()):
             if key not in LOOKED1:
                 continue
             probability = detections[0, 0, i, 2] 
-            label1 = "{}: {:.2f}%".format(key, int(probability * 100))
+            label1 = "{}: {:.2f}%".format(key, probability * 100)
             # Draw rectangles
 
             #cv2.rectangle(frame, (startX - 25, startY - 25), (endX + 25, endY + 25), (255, 0, 0), 1)
             #cv2.putText(frame, label1, (startX - 25, startY - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
-            rectangle = {"startX": startX, "endX": endX, "startY": startY, "endY": endY, "text": label1}
+            rectangle = {"startX": int(startX), "endX": int(endX), "startY": int(startY), "endY": int(endY), "text": label1}
             rectangles.append(rectangle)
             if hashes.get(key, None) is None:
                 # count objects for last sec, last 5 sec and last minute
@@ -149,8 +153,8 @@ def classify_frame( frame, params, net=classify_init()):
 
             # process further only  if image is really different from other ones
             if key in subject_of_interes:
-                x_dim = endX - startX
-                y_dim = endY - startY
+                x_dim = int(endX) - int(startX)
+                y_dim = int(endY) - int(startY)
                 #font_scale = min(y_dim, x_dim) / 300
                 #if font_scale > 0.12:
                 #    cv2.putText(crop_img_data, str(datetime.datetime.now().strftime('%H:%M %d/%m/%y')), (1, 15),
@@ -158,7 +162,7 @@ def classify_frame( frame, params, net=classify_init()):
 
                 now = datetime.datetime.now()
                 day = "{date:%Y-%m-%d}".format(date=now)
-                db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, startX, startY, x_dim, y_dim, cam)
+                db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, int(startX), int(startY), x_dim, y_dim, cam)
                 
             do_statistic(cam,  hashes)
             #db.getConn().commit()
@@ -170,7 +174,7 @@ def classify_frame( frame, params, net=classify_init()):
         result["topic_label"] = topic_label
         result["rectangles"] = rectangles
         result["objects_counted"] = objects_counted
-    return result #frame
+    return result
 
 
 

@@ -2,6 +2,7 @@ import cv2
 import base64
 import time
 import logging
+import re
 import sqlalchemy as sql
 from sqlalchemy import text
 # import psycopg2
@@ -16,10 +17,11 @@ class Sql:
         :return: Connection object or None
         """
         self.engine = None
-        self.limit = 70
+        self.limit = 50
         metadata = sql.MetaData()
-
-        self.engine = sql.create_engine('postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME), pool_pre_ping=True)
+        postgres_str= 'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME)
+        print("DB Connection uri: {}".format(postgres_str)) 
+        self.engine = sql.create_engine(postgres_str, pool_pre_ping=True)
 
         self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
         self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
@@ -35,7 +37,7 @@ class Sql:
         self.limit = 70
         metadata = sql.MetaData()
 
-        self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI)
+        self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI, pool_pre_ping=True )
 
         self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
         self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
@@ -77,13 +79,13 @@ class Sql:
         conn.close()
         return rows
 
-    def update_urls_by_os(self, os):
+    def update_urls_by_os(self, params):
         _time = int(time.time()*1000)
-        params = {'os': os, 'last_time_updated': _time}
+        params['last_time_updated'] =  _time
         conn = self.getConn()
         try:
-            if os is not None:
-                query = sql.update(self.urls).where(self.urls.c.os == str(os))
+            if params['os'] is not None:
+                query = sql.update(self.urls).where(self.urls.c.os == str(params['os']))
             else:    
                 raise Exception('No value defined for parameter os')
             ResultProxy = conn.execute(query,params)
@@ -100,7 +102,7 @@ class Sql:
         :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).order_by(text("objects_counted desc, last_time_updated desc, cam asc"))
+        query = sql.select([self.urls]).order_by(text("objects_counted desc, last_time_updated desc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -113,7 +115,7 @@ class Sql:
         :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).where(self.urls.c.objects_counted >= 0).order_by(text("objects_counted desc, os asc, last_time_updated asc, cam asc"))
+        query = sql.select([self.urls]).where(self.urls.c.objects_counted >= 0).order_by(text("objects_counted desc, last_time_updated desc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -131,7 +133,7 @@ class Sql:
                                             sql.and_(
                                                 self.urls.c.objects_counted >= 0,
                                                 self.urls.c.last_time_updated < _time - secs*1000)
-                                        ).order_by(text("objects_counted desc, os asc, last_time_updated asc, cam asc"))
+                                        ).order_by(text("objects_counted desc, last_time_updated desc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -147,7 +149,7 @@ class Sql:
         conn = self.getConn()
         query = sql.select([self.urls]).where( sql.and_(
                                                 self.urls.c.os != str(os),
-                                                self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, os asc, last_time_updated asc,cam asc"))
+                                                self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -163,7 +165,7 @@ class Sql:
         conn = self.getConn()
         query = sql.select([self.urls]).where( sql.and_(
                                                 self.urls.c.os == str(os),
-                                                self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, os asc, last_time_updated asc, cam asc"))
+                                                self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -178,7 +180,7 @@ class Sql:
         """
         conn = self.getConn()
         query = sql.select([self.urls]).where( 
-                                                self.urls.c.os != str(os)).order_by(text("objects_counted desc, os asc, last_time_updated asc, cam asc"))
+                                                self.urls.c.os != str(os)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -193,7 +195,7 @@ class Sql:
         conn = self.getConn()
         query = sql.select([self.urls]).where( sql.or_(
                                                 self.urls.c.os == '',
-                                                self.urls.c.os == None)).order_by(text("objects_counted desc, last_time_updated asc, cam asc"))
+                                                self.urls.c.os == None)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -210,6 +212,7 @@ class Sql:
         
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
+        
         return len(cursor)
 
 
@@ -221,7 +224,7 @@ class Sql:
         _time = int(time.time()*1000)
         conn = self.getConn()
         query = sql.select([self.urls]).where(
-                                                self.urls.c.currentime < _time - 60000).order_by(text("objects_counted desc, os asc, last_time_updated asc, cam asc")) 
+                                                self.urls.c.currentime < _time - 60000).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc")) 
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
@@ -241,19 +244,21 @@ class Sql:
             logging.debug(" insert_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
         except Exception as e:
             logging.debug(" e: {}".format( e))
+            raise e
         finally:
             conn.close()            
         return row 
 
     def update_urls(self, params):
         conn = self.getConn()
+        logging.debug(" before update_urls  params: {}".format(params))        
         try:
             if 'id' in params:
-                query = sql.update(self.urls).where(self.urls.c.id == str(params['id'])).values(params)
+                query = sql.update(self.urls).where(self.urls.c.id == params['id']).values(params)
             else:    
                 query = sql.update(self.urls).where(self.urls.c.url == params['url']).values(params)
-            ResultProxy = conn.execute(query, params)
-            logging.debug(" update_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
+            ResultProxy = conn.execute(query)
+            logging.debug(" update_urls was {} with params: {}".format(ResultProxy.is_insert ,params))
         except Exception as e:
             logging.debug(" e: {}".format( e))
             raise e
@@ -265,8 +270,8 @@ class Sql:
         try:
             query = sql.delete(self.urls).where(sql.or_( self.urls.c.id == params['id'] , 
                                                         self.urls.c.id == params['url'] ))
-            ResultProxy = conn.execute(query, params)
-            logging.debug(" delete_urls was {0} with params: {1}".format(ResultProxy.is_insert ,params))
+            ResultProxy = conn.execute(query)
+            logging.debug(" delete_urls was {}  with params: {}".format(ResultProxy.is_insert ,params))
         except Exception as e:
             logging.debug(" e: {}".format( e))
             raise e
@@ -333,31 +338,53 @@ class Sql:
                 type = record[0]
                 if(type != _type): 
                     rows.append({'label':record[0],'values': 
-                    [ {'x0':v[1], 'x':v[1] + 30000,'y':v[2]} for v in list(filter( lambda x : x[0] == type , cursor))] })
+                    [ {'x0':v[1], 'x':v[1] + 30000,'y':v[2], 'hashcodes':v[3]} for v in list(filter( lambda x : x[0] == type , cursor))] })
                 _type=type
         #logging.debug(rows)
         return rows
 
 # ####################  Objects operations ######################################## #
 
-    def select_all_objects(self):
+    def select_all_objects(self, cam):
         """
         Query all rows in the tasks table
         :param conn: the Connection object
         :return:
         """
         conn = self.getConn()
-        query = sql.select([self.objects]).limit(self.limit).all()
+        query = sql.select([self.objects]).where( self.objects.c.cam  == cam                                                          
+                                                ).order_by(text("currentime desc")).limit(self.limit).offset(0)
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
         conn.close()
         return rows
 
+    def select_objects(self, cam, hashcodes):
+        """
+        Query all rows in the tasks table
+        :param conn: the Connection object
+        :return:
+        """
+        conn = self.getConn()
+        # Remove spaces
+        hashcodes = re.sub(r'\s', '', hashcodes)
+        # Split by comma and convert to array of integers
+        hashcodes_array = list(map(int, hashcodes.split(',')))
+        
+  
+        print("hashcodes: {} ".format(hashcodes))
+        query = sql.select([self.objects]).where( self.objects.c.hashcode.in_(hashcodes_array)                                                       
+                                                ).order_by(text("currentime desc")).limit(self.limit).offset(0)
+        ResultProxy = conn.execute(query)
+        cursor = ResultProxy.fetchall()
+        rows = [dict(r) for r in cursor]
+        conn.close()
+        return rows
 
     def insert_frame(self, hashcode, date, time, type, numpy_array, startX, startY, x_dim, y_dim, cam):
         
-        if y_dim <39 or x_dim <39 or x_dim/y_dim > 4.7 or y_dim/x_dim > 4.7: return
+        if y_dim <49 or x_dim <49 or x_dim/y_dim > 4.7 or y_dim/x_dim > 4.7: return
         #cur.execute("UPDATE objects SET currentime="+self.P+" WHERE hashcode="+self.P, (time, str(hashcode)))
         #logging.debug("cam= {}, x_dim={}, y_dim={}".format(cam, x_dim, y_dim))
         buffer = cv2.imencode('.jpg', numpy_array)[1]
@@ -399,7 +426,7 @@ class Sql:
                                                               self.objects.columns.currentime < time1,                                                              
                                                               self.objects.columns.cam == cam
                                                              )
-                                                ).order_by(text("currentime desc"))
+                                                ).order_by(text("currentime desc")).limit(self.limit).offset(0)
         conn = self.getConn()
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
@@ -423,17 +450,16 @@ class Sql:
             time1=a
         #str =  "('" + obj.replace(",","','") + "')"    
         logging.debug(time2,time1, obj)
-        tuple_ =  obj.split(',')
+        #tuple_ =  obj.split(',')
         
         #cur.execute("SELECT cam, hashcode, currentdate, currentime, type, frame FROM objects filter cam="+self.P+" AND  type IN " +str+ " AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY currentime DESC LIMIT "+self.P+" OFFSET "+self.P+"", 
         #    (cam, time2, time1,n_rows,offset,))
         #fetched_rows = cur.fetchall()
-        query = sql.select([self.objects]).where(sql.and_(    self.objects.columns.currentime > time2,                                                       
-                                                              self.objects.columns.currentime < time1,
-                                                              self.objects.columns.cam == cam,
-                                                              self.objects.columns.type.in_(tuple_)
-                                                              
-                                                         )
+        query = sql.select([self.objects]).where(sql.and_(    self.objects.columns.cam == cam,
+                                                              self.objects.columns.currentime > time2,                                                       
+                                                              self.objects.columns.currentime < time1                                                             
+                                                            # do not use it now due to expansive operation:  self.objects.columns.type.in_(tuple_) 
+                                                        )
                                                 ).order_by(text("currentime desc")).limit(self.limit).offset(offset)
         conn = self.getConn()                                            
         ResultProxy = conn.execute(query)

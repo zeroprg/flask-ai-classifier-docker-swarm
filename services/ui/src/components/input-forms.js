@@ -73,15 +73,16 @@ class InputURL extends Component {
                     </div>
                 </div>
 
-                <form id="myform" className="form-horizontal">
-                        
+                {/*<form id="myform" className="form-horizontal">                        
                         <FormControl component="fieldset">
                             <RadioGroup row aria-label="videoalignment" name="videoalignment" value={this.state.videoalignment} onChange={this.handleInputChange}>
                                 <FormControlLabel value="video" control={<Radio />} label="Show only video" />
-                                <FormControlLabel disabled value="objects" control={<Radio />} label="Show captured objects only" />
+                                <FormControlLabel value="statistic" control={<Radio />} label="Show captured objects only" />
                             </RadioGroup>
                         </FormControl>                           
                 </form>
+            */}
+                
             </div>
             )}</SnackbarConsumer> )
         };

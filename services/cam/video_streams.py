@@ -1,7 +1,8 @@
 import time
 import logging
 import threading
-
+import asyncio
+from typing import Any
 
 from project.config import  ProductionConfig as prod
 from project.classifier import Detection
@@ -10,7 +11,7 @@ from project import db, populate_lat_long, detectors, comp_node, DELETE_FILES_LA
 
 
 logging.basicConfig(level=logging.INFO)
-
+ 
 
 def start():
     time.sleep(1)
@@ -25,7 +26,7 @@ def start():
     initialize_video_streams()
     
     threading.Timer(clean_up_service_interval, clean_up_service).start() # in  3 days 
-    threading.Timer(delete_expired_streams_interval, delete_expired_streams).start()
+   # threading.Timer(delete_expired_streams_interval, delete_expired_streams).start()
     threading.Timer(update_urls_from_stream_interval, update_urls_from_stream).start()
 
 # initialize the video stream, allow the cammera sensor to warmup,
@@ -58,37 +59,7 @@ def initialize_video_streams(url=None, videos=[]):
                 arg = prod.args.get('video_file' + str(i), None)
                 i += 1 
                 logging.info(arg)
-    videos_ = db.select_all_active_urls_olderThen_secs(2*update_urls_from_stream_interval)
-    """ Update all videos as mine , start greeding algorithm here ..."""
-    """ Updation """
-    logging.info( "Total number of videos ready for update: {}".format(len(videos_)))
-    for video in videos_:
-        
-        params = { 'id': str(video['id']), 'url': video['url'], 'cam': video['cam'], 'os': comp_node(), 'currentime':time.time()*1000 }
-        populate_lat_long(params)
-        try:
-            logging.info("trying to update where id:{} with cam:{} ,url:{} , os {}".format(params['id'], params['cam'], params['url'], params['os']))
-            logging.debug("detectors: " + str(detectors) ) 
-            if params['id'] not in detectors:
-                """ Make external call ( to Docker gateway if its present) to delegate this video processing to different node"""
-                db.update_urls(params)
-                detection = Detection(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args["model"], params)             
-                
-                detectors[params['id']] = detection
-                logging.info("A new detection  process was created." + str(detection))                 
-                logging.info("p_classifiers for cam: {} started by {} ".format(params['id'], comp_node() ))
-             
-            
-            #url = 'http://{}:{}{}'.format(IP_ADDRESS,port,deny_service_url)
-            #p_deny_service = Process(target=deny_service_call, args = (url,params)) #imagesQueue,detectors,prod,IMAGES_BUFFER))
-            #p_deny_service.daemon=False
-            #p_deny_service.start()
-            
-            if len(detectors) >= prod.MAXIMUM_VIDEO_STREAMS: break
-             
-        except Exception as e:
-            logging.critical("Exception {}".format(e))
-
+ 
 
 
 """Delete old images later then DELETE_FILES_LATER milliseconds every 24 hours"""  
@@ -159,5 +130,56 @@ def update_urls_from_stream():
     threading.Timer(update_urls_from_stream_interval, update_urls_from_stream).start()            
 
 
+class VideoStreamProcessor:
+    def __init__(self):
+        self.queue = []
+        self.thread = None
+
+    def start(self):
+        self.queue = []
+        self.thread = threading.Thread(target=self._process_queue)
+        self.thread.start()
+
+    def stop(self):
+        self.queue = []
+        self.thread.join()
+
+    def add_item(self, item):
+        self.queue.append(item)
+
+    def _process_queue(self):
+        while True:
+            if len(self.queue) == 0:
+                continue
+            item = self.queue.pop(0)
+            t = threading.Thread(target=item.classify)
+            t.start()
+
+async def main():
+    initialize_video_streams()
+    threading.Timer(clean_up_service_interval, clean_up_service).start() # in  3 days 
+   # threading.Timer(delete_expired_streams_interval, delete_expired_streams).start()
+    threading.Timer(update_urls_from_stream_interval, update_urls_from_stream).start()
+    processor = VideoStreamProcessor()
+    processor.start()
+    videos_ = db.select_all_active_urls_olderThen_secs(update_urls_from_stream_interval)
+    """ Update all videos as mine , start greeding algorithm here ..."""
+    """ Updation """
+    logging.info("Total number of videos ready for update: {}".format(len(videos_)))
+    for video in videos_:
+        params = { 'id': str(video['id']), 'url': video['url'], 'cam': int(video['cam']), 'os': str(comp_node()), 'currentime':time.time()*1000 }
+        if video['country'] is None : populate_lat_long(params)
+        try:
+            logging.debug("trying to update where id:{} with cam: {} , url: {} , os: {}".format(params['id'], params['cam'], params['url'], params['os']))
+            logging.debug("detectors: " + str(detectors) )
+            detection = Detection.create(prod.CLASSIFIER_SERVER, float(prod.CONFIDENCE), prod.args['model'], params)
+            processor.add_item(detection)
+        except Exception as e:
+            logging.error("Error processing item {}: {}".format(video['id'], e))
+
+    await asyncio.sleep(10)
+    #await processor.stop()
+
 if __name__ == "__main__":
-    start()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())

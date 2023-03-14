@@ -19,10 +19,11 @@ CREATE TABLE objects (
 );
 
 CREATE INDEX index_cam ON objects USING btree (cam);
-CREATE UNIQUE INDEX objects_hashcode_idx ON public.objects USING btree (hashcode)
-CREATE INDEX index_cam_hashcode ON objects USING btree (cam, hashcode);
+CREATE UNIQUE INDEX objects_hashcode_idx ON public.objects USING btree (hashcode);
 CREATE INDEX index_currentime ON objects USING btree (currentime DESC);
 CREATE INDEX index_type ON objects USING btree (type);
+CREATE INDEX objects_cam_idx ON public.objects (cam,currentime);
+
 
 drop  table  statistic;
 
@@ -53,21 +54,19 @@ drop  table  urls;
 CREATE TABLE urls (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	url varchar NOT NULL,
-	cam int2 NULL DEFAULT nextval('url_cam_seq'::regclass),
+	cam int4 NULL DEFAULT nextval('url_cam_seq'::regclass),
 	email varchar NULL,
 	os varchar(36) NULL,
 	last_time_updated int8 NOT NULL DEFAULT 0,
-    objects_counted int4,
+    objects_counted int4  NOT NULL DEFAULT -1,
 	lat float4,
 	lng float4,
-	city varchar(20) NULL
-	postalcode varchar(10) NULL
-	region varchar(20) NULL
-	country varchar(20) NULL
-
+	city varchar(25) null,
+	postalcode varchar(10) null,
+	region varchar(25) null,
+	country varchar(25) null,
 	currentime int8 NOT NULL DEFAULT currentime_gen(),
-	last_time_updated int8,
-	idle_in_mins int4,
+	idle_in_mins int4  DEFAULT 0,
 	CONSTRAINT urls_pkey PRIMARY KEY (id),
 	CONSTRAINT urls_un UNIQUE (url)
 );

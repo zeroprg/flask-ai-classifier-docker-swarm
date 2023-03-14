@@ -5,28 +5,29 @@ services:
   cam:
     image: zeroprg/flask-docker-swarm_cam:latest
     deploy:
-      replicas: 1
-      #max_replicas_per_node: 1 doesn't work
+      replicas: 5
+#      max_replicas_per_node: 2 # doesn't work
       restart_policy:
         condition: on-failure
-      placement:
-        constraints:
-          - node.role==worker
-          #- node.hostname!=odr2
+#      placement:
+#        constraints:
+#          - node.role==worker
     environment:
       - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
-      - CONFIDENCE=0.33678
+      - CONFIDENCE=0.49678
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_IP_ADDRESS=192.168.0.100
       - DB_USERNAME=odroid
       - DB_PASSWORD=vist2508
       - DB_NAME=streamer
-      - MAXIMUM_VIDEO_STREAMS = 10 #maimum streams processed per node
+      - MAXIMUM_VIDEO_STREAMS=100 #maimum streams processed per node
     networks:
       - flask
     ports:
       - 3020:3020
+
+
 
   #web:
   #  image: zeroprg/flask-docker-swarm_web:latest
@@ -42,8 +43,8 @@ services:
   #    - FLASK_ENV=production
   #    - APP_SETTINGS=/home/app/web/config.txt
   #    - DB_USERNAME=odroid
-  #    - DB_IP_ADDRESS=192.168.0.100
-  #    - DB_PASSWORD=vist2508
+  #    - DB_IP_ADDRESS=192.168.0.77
+  #    - DB_PASSWORD=12345
   #    - DB_NAME=streamer
   #  networks:
   #    - flask
@@ -53,35 +54,35 @@ services:
   #    timeout: 5s
   #    retries: 5
 
-#  db:
-#    hostname: 'primary'
-#    container_name: pg_container
-#    image: arm32v7/postgres
-#    restart: always
-#    deploy:
-#      replicas: 1
-#      restart_policy:
-#        condition: on-failure
-#      placement:
-#        constraints:
-#          - node.role == manager
-#    volumes:
-#       - data-volume:./
-#       - ./services/db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
-#    ports:
-#      - 5432:5432
+  #db:
+  #  hostname: 'primary'
+  #  container_name: pg_container
+  #  image: arm32v7/postgres
+  #  restart: always
+  #  deploy:
+  #    replicas: 1
+  #    restart_policy:
+  #      condition: on-failure
+  #    placement:
+  #      constraints:
+  #        - node.role == worker
+  #  volumes:
+  #     - data-volume:./
+  #     - ./services/db/create.sql:/docker-entrypoint-initdb.d/create_tables.sql
+  #  ports:
+  #    - 5432:5432
 
-#    environment:
-#       - PGHOST=/tmp
-#       - POSTGRES_USER=postgres
-#       - POSTGRES_PASSWORD=postgres
-#       - POSTGRES_DB=streamer
-#       - PGDATA=./
-#       - MAX_CONNECTIONS=60
-#       - MAX_WAL_SENDERS=5
-#       - PG_MODE=primary
-#    networks:
-#      - flask
+  #  environment:
+  #     - PGHOST=/tmp
+  #     - POSTGRES_USER=streamer
+  #     - POSTGRES_PASSWORD=12345
+  #     - POSTGRES_DB=streamer
+  #     - PGDATA=./
+  #     - MAX_CONNECTIONS=100
+  #     - MAX_WAL_SENDERS=5
+  #     - PG_MODE=primary
+  #  networks:
+  #    - flask
 
 #  db_replica:
 #    image: arm32v7/postgres
@@ -121,9 +122,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-      #   - node.hostname != odr2
          - node.role == worker
-
     ports:
       - 80:80
     environment:
@@ -143,7 +142,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-         - node.role == worker
+         - node.hostname == rock64_1
     ports:
       - 81:81
     environment:
