@@ -1,12 +1,12 @@
 SQLAlchemy
 Flask==1.1.1
 gunicorn==19.9.0
+Jinja2==2.11.3
 psycopg2-binary
 dhash
 imutils
 requests
 Pillow
 flask_cors
-jinja2
 requests-mock
 futures
