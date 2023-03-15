@@ -7,7 +7,6 @@ import sqlalchemy as sql
 from sqlalchemy import text
 # import psycopg2
 
-logging.basicConfig(level=logging.CRITICAL)
 
 class Sql:
     def __init__ (self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):

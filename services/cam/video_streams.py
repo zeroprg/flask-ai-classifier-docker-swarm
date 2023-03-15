@@ -11,7 +11,7 @@ from project import db, populate_lat_long, detectors, comp_node,NUMBER_OF_THREAD
 
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=prod.LOGGING)
  
 
 def start():

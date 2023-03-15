@@ -168,8 +168,10 @@ const useStyles = makeStyles((theme) => ({
                             
                             <p> The smart cloud storage solution for video streams from public cameras. Our platform is powered by 5 ODROID ARM computers running 100% Python and 100% React, ensuring optimal performance and user experience.
 
-At AIcams.info, we are dedicated to providing state-of-the-art deep learning algorithms to track and analyze video streams from surveillance cameras. Our platform enables you to test multiple deep learning networks on existing video streams and receive real-time insights and analysis.
-
+At http://Bloberryconsulting.com, we are dedicated to providing state-of-the-art deep learning algorithms to track and analyze video streams from surveillance cameras. Our platform enables you to test multiple deep learning networks on existing video streams and receive real-time insights and analysis.
+- Only filtered cameras are available now. This way none of the cameras on Insecam invade anybody's private life.
+- Any private or unethical camera will be removed immediately upon e-mail complaint. Please provide a direct link to help facilitate the prompt removal of the camera.
+- If you do not want to contact us by e-mail (zeroprg@yahoo.com), you can still remove your camera from site. The only thing you need to do is to set the password of your camera.
 With AIcams.info, you have the ability to enter the URL of any public IP camera and access its video stream from our platform. However, please note that by specifying the IP address or camera URL, you will be sharing your link with all other subscribers. To make your link private, you will need to subscribe to our payable version.
 
 Enhance your surveillance capabilities with AIcams.info - try us today! <a href="http://aicams.info" className="arrow-btn">aicams.info</a> 
