@@ -7,7 +7,7 @@ import sys
 
 from project.config import  ProductionConfig as prod
 from project.classifier import Detection
-from project import db, populate_lat_long, detectors, comp_node, DELETE_FILES_LATER, clean_up_service_interval, update_urls_from_stream_interval, delete_expired_streams_interval
+from project import db, populate_lat_long, detectors, comp_node,NUMBER_OF_THREADS, DELETE_FILES_LATER, clean_up_service_interval, update_urls_from_stream_interval, delete_expired_streams_interval
 
 
 
@@ -27,7 +27,7 @@ def start():
     
     threading.Timer(clean_up_service_interval, clean_up_service).start() # in  3 days 
    # threading.Timer(delete_expired_streams_interval, delete_expired_streams).start()
-    threading.Timer(update_urls_from_stream_interval, update_urls_from_stream).start()
+   # threading.Timer(update_urls_from_stream_interval, update_urls_from_stream).start()
 
 # initialize the video stream, allow the cammera sensor to warmup,
 # and initialize the FPS counter
@@ -109,7 +109,7 @@ def update_urls_from_stream():
         db.update_urls(params)
         logging.debug("url update with params: {}".format(params))
     # consider if URL was not updated buy Detection process more then 2 intervals of processing time
-    videos_ = db.select_old_urls_which_not_mine_olderThen_secs(os,2*update_urls_from_stream_interval)
+    videos_ = db.select_old_urls_which_not_mine_olderThen_secs(os,2*update_urls_from_stream_interval)[:NUMBER_OF_THREADS]
     for params in videos_:
         if len(detectors)  >= prod.MAXIMUM_VIDEO_STREAMS: break
         cam = str(params['id'])
@@ -162,7 +162,7 @@ async def main():
     threading.Timer(update_urls_from_stream_interval, update_urls_from_stream).start()
     processor = VideoStreamProcessor()
     processor.start()
-    videos_ = db.select_all_active_urls_olderThen_secs(update_urls_from_stream_interval)
+    videos_ = db.select_all_active_urls_olderThen_secs(update_urls_from_stream_interval)[:NUMBER_OF_THREADS]
     """ Update all videos as mine , start greeding algorithm here ..."""
     """ Updation """
     logging.info("Total number of videos ready for update: {}".format(len(videos_)))

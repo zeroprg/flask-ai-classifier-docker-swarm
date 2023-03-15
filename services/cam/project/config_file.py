@@ -1,11 +1,11 @@
 
-def configure(FILE):
+def configure(file):
     # construct the argument parse and parse the arguments
     # I named config file as  file config.txt and stored it
     # in the same directory as the script
     separator = '='
     args = {}
-    with open(FILE) as f:
+    with open(file) as f:
         for line in f:
             if separator in line:
                 # Find the name and value by splitting the string
