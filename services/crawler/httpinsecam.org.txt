@@ -1,4 +1,4 @@
-last_visit_url=http://insecam.org/en/bycity/Taoyuan City
+last_visit_url=http://insecam.org/en/view/389565
 http://insecam.org/en/view/1000096
 http://insecam.org/en/bycountry/US
 http://insecam.org/en/bytype/GK7205
@@ -611,6 +611,7 @@ http://insecam.org/en/byregion/US/Hawaii
 http://insecam.org/en/view/914655
 http://insecam.org/ru/view/535301
 http://insecam.org/en/view/242959
+http://insecam.org/en/bycity/Taoyuan City
 http://insecam.org/en/view/995934
 http://insecam.org/cn/view/509652
 http://insecam.org/en/view/337030
