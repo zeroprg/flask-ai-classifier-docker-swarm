@@ -15,7 +15,7 @@ class ProductionConfig:
     """Production configuration"""
     if os.environ.get("LOGGING") == 'DEBUG':  LOGGING = logging.DEBUG
     elif os.environ.get("LOGGING") == 'INFO': LOGGING = logging.INFO
-    else: LOGGING = None
+    else: LOGGING = logging.CRITICAL
  
     PORT = os.environ.get("PORT")
     MAXIMUM_VIDEO_STREAMS =  os.environ.get("MAXIMUM_VIDEO_STREAMS")
@@ -30,7 +30,7 @@ class ProductionConfig:
     TRACK_MODIFICATIONS = False
     # read config file from app_settings
     args = configure(app_settings)
-    if LOGGING is None:  LOGGING =  (args["LOGGING"] if ("LOGGING" in args.keys()) else logging.CRITICAL )
+    if LOGGING is None:  LOGGING = logging.CRITICAL
     if DB_USERNAME is None or DB_USERNAME =='' : DB_USERNAME =  ( args["DB_USERNAME"] if ("DB_USERNAME" in args.keys()) else "postgres")
     if DB_PASSWORD is None or DB_PASSWORD =='' : DB_PASSWORD =  ( args["DB_PASSWORD"] if ("DB_PASSWORD" in args.keys()) else "postgres")
     if DB_PORT is None or DB_PORT =='' : DB_PORT =  (  args["DB_PORT"] if ("DB_PORT" in args.keys())  else "5432")
