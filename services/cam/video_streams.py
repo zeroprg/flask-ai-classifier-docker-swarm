@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
  
 
 def start():
-    logging.info("Python version:{}".format(sys.version_info))
+
     # construct a child process *indepedent* from our main process of
     # execution
     logging.info("[INFO] starting process...")
@@ -156,6 +156,7 @@ class VideoStreamProcessor:
             t.start()
 
 async def main():
+    logging.info("Python version:{}".format(sys.version_info))
     initialize_video_streams()
     threading.Timer(clean_up_service_interval, clean_up_service).start() # in  3 days 
    # threading.Timer(delete_expired_streams_interval, delete_expired_streams).start()
