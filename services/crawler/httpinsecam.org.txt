@@ -1,4 +1,4 @@
-last_visit_url=http://insecam.org/en/view/921492
+last_visit_url=http://insecam.org/en/view/426737
 http://insecam.org/ru/view/479502
 http://insecam.org/en/view/390085
 http://insecam.org/en/view/200288
@@ -813,6 +813,7 @@ http://insecam.org/ru/view/402214
 http://insecam.org/cn/view/405269
 http://insecam.org/en/view/450133
 http://insecam.org/cn/view/514467
+http://insecam.org/en/view/921492
 http://insecam.org/cn/view/866707
 http://insecam.org/cn/view/403267
 http://insecam.org/ru/view/455548
@@ -893,6 +894,7 @@ http://insecam.org/cn/bycity/Ludwigshafen
 http://insecam.org/cn/view/413360
 http://insecam.org/cn/view/508606
 http://insecam.org/en/view/564479
+http://insecam.org/en/view/629893
 http://insecam.org/en/view/569729
 http://insecam.org/en/view/484196
 http://insecam.org/en/view/564023
