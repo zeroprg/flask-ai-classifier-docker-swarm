@@ -1,4 +1,4 @@
-last_visit_url=http://insecam.org/en/view/974614
+last_visit_url=http://insecam.org/en/view/921492
 http://insecam.org/ru/view/479502
 http://insecam.org/en/view/390085
 http://insecam.org/en/view/200288
@@ -781,6 +781,7 @@ http://insecam.org/en/bycity/Stuttgart
 http://insecam.org/cn/view/414606
 http://insecam.org/cn/view/435721
 http://insecam.org/ru/view/192679
+http://insecam.org/en/view/974614
 http://insecam.org/en/view/509572
 http://insecam.org/ru/view/217149
 http://insecam.org/en/view/388513
