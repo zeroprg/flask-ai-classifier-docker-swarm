@@ -1,4 +1,4 @@
-last_visit_url=http://insecam.org/en/view/934127
+last_visit_url=http://insecam.org/en/view/982681
 http://insecam.org/en/view/459676
 http://insecam.org/en/view/390085
 http://insecam.org/en/view/959591
@@ -135,6 +135,7 @@ http://insecam.org/en/view/414606
 http://insecam.org/en/view/457329
 http://insecam.org/en/bytype/Vivotek
 http://insecam.org/en/view/447263
+http://insecam.org/en/view/934127
 http://insecam.org/en/view/484196
 http://insecam.org/en/view/564023
 http://insecam.org/en/view/58669
