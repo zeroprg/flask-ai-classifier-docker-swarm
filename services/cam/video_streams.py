@@ -3,6 +3,7 @@ import logging
 import threading
 import asyncio
 from typing import Any
+import sys
 
 from project.config import  ProductionConfig as prod
 from project.classifier import Detection
@@ -14,8 +15,7 @@ logging.basicConfig(level=logging.INFO)
  
 
 def start():
-    time.sleep(1)
-    logging.info("[INFO] loading model...")
+    logging.info("Python version:{}".format(sys.version_info))
     # construct a child process *indepedent* from our main process of
     # execution
     logging.info("[INFO] starting process...")
