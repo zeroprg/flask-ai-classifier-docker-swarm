@@ -14,15 +14,15 @@ services:
 #          - node.role==worker
     environment:
       - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
-      - CONFIDENCE=0.49678
+      - CONFIDENCE=0.39678
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_IP_ADDRESS=192.168.0.100
       - DB_USERNAME=odroid
       - DB_PASSWORD=vist2508
       - DB_NAME=streamer
-      - LOGGING=INFO
-      - MAXIMUM_VIDEO_STREAMS=25 #maimum streams processed per node
+      - LOGGING=CRITICAL
+      - MAXIMUM_VIDEO_STREAMS=35 #maimum streams processed per node
     networks:
       - flask
     ports:
