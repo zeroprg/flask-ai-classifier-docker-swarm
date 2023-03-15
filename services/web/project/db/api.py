@@ -19,8 +19,8 @@ class Sql:
         
         self.engine = sql.create_engine('postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME))
 
-        self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
-        self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
+        self.objects = sql.Table('objects', metadata, postgresql_autoload=True, autoload_with=self.engine)
+        self.statistic = sql.Table('statistic', metadata, postgresql_autoload=True, autoload_with=self.engine)
         ##self.getConn().autocommit = False
 
     def __init__ (self, SQLALCHEMY_DATABASE_URI):
@@ -36,8 +36,8 @@ class Sql:
  
         self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI)
 
-        self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
-        self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
+        self.objects = sql.Table('objects', metadata, postgresql_autoload=True, autoload_with=self.engine)
+        self.statistic = sql.Table('statistic', metadata, postgresql_autoload=True, autoload_with=self.engine)
 
 
         #conn = self.engine.connect()

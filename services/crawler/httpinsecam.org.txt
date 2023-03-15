@@ -1,4 +1,4 @@
-last_visit_url=http://insecam.org/en/view/918353
+last_visit_url=http://insecam.org/en/view/389565
 http://insecam.org/en/view/1000096
 http://insecam.org/en/bycountry/US
 http://insecam.org/en/bytype/GK7205
@@ -183,7 +183,6 @@ http://insecam.org/cn/view/1003664
 http://insecam.org/ru/view/376447
 http://insecam.org/en/view/455548
 http://insecam.org/ru/bytimezone/+01:00
-http://insecam.org/en/view/527852
 http://insecam.org/en/view/982681
 http://insecam.org/en/view/435149
 http://insecam.org/en/view/895550
@@ -432,6 +431,7 @@ http://insecam.org/cn/view/504944
 http://insecam.org/en/view/814775
 http://insecam.org/cn/view/555014
 http://insecam.org/en/bycity/Anseong
+http://insecam.org/en/view/517532
 http://insecam.org/en/bycity/Mechelen
 http://insecam.org/ru/view/450133
 http://insecam.org/en/bytype/WIFICam
@@ -611,6 +611,7 @@ http://insecam.org/en/byregion/US/Hawaii
 http://insecam.org/en/view/914655
 http://insecam.org/ru/view/535301
 http://insecam.org/en/view/242959
+http://insecam.org/en/bycity/Taoyuan City
 http://insecam.org/en/view/995934
 http://insecam.org/cn/view/509652
 http://insecam.org/en/view/337030
@@ -654,6 +655,7 @@ http://insecam.org/en/view/1007212
 http://insecam.org/ru/bycity/Stuttgart
 http://insecam.org/en/view/921056
 http://insecam.org/en/bytype/Android-IPWebcam
+http://insecam.org/en/view/752628
 http://insecam.org/en/view/245425
 http://insecam.org/cn/view/1009322
 http://insecam.org/ru/view/425403
@@ -928,7 +930,6 @@ http://insecam.org/en/view/929266
 http://insecam.org/en/view/1009596
 http://insecam.org/en/bytype/Axis2
 http://insecam.org/en/bytype/Megapixel
-http://insecam.org/en/view/745661
 http://insecam.org/en/view/895868
 http://insecam.org/en/view/456160
 http://insecam.org/en/bytype/Hi3516
@@ -1083,7 +1084,6 @@ http://insecam.org/cn/view/235739
 http://insecam.org/en/bytimezone/-07:00
 http://insecam.org/en/view/751928
 http://insecam.org/en/view/1005807
-http://insecam.org/en/bycity/Taichung
 http://insecam.org/en/view/463649
 http://insecam.org/en/view/1002038
 http://insecam.org/en/view/432621
