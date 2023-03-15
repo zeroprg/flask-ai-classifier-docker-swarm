@@ -1,4 +1,4 @@
-last_visit_url=http://insecam.org/en/bycity/Imola
+last_visit_url=http://insecam.org/en/view/521267
 http://insecam.org/en/view/459676
 http://insecam.org/en/view/390085
 http://insecam.org/en/view/959591
