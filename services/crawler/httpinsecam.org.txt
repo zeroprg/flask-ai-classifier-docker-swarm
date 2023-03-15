@@ -1,4 +1,4 @@
-last_visit_url=http://insecam.org/en/view/918353
+last_visit_url=http://insecam.org/en/bycity/Taoyuan City
 http://insecam.org/en/view/1000096
 http://insecam.org/en/bycountry/US
 http://insecam.org/en/bytype/GK7205
@@ -57,7 +57,6 @@ http://insecam.org/en/bytimezone/+08:00
 http://insecam.org/en/bycountry/TW
 http://insecam.org/en/view/459924
 http://insecam.org/en/view/827006
-http://insecam.org/en/byregion/TW/Taichung
 http://insecam.org/en/view/952859
 http://insecam.org/en/view/549170
 http://insecam.org/en/view/413453
@@ -338,7 +337,6 @@ http://insecam.org/en/view/213336
 http://insecam.org/en/view/564480
 http://insecam.org/cn/view/554278
 http://insecam.org/en/view/443067
-http://insecam.org/en/view/999635
 http://insecam.org/en/view/444545
 http://insecam.org/en/view/451707
 http://insecam.org/en/view/168483
@@ -656,6 +654,7 @@ http://insecam.org/en/view/1007212
 http://insecam.org/ru/bycity/Stuttgart
 http://insecam.org/en/view/921056
 http://insecam.org/en/bytype/Android-IPWebcam
+http://insecam.org/en/view/752628
 http://insecam.org/en/view/245425
 http://insecam.org/cn/view/1009322
 http://insecam.org/ru/view/425403
@@ -929,7 +928,6 @@ http://insecam.org/en/view/929266
 http://insecam.org/en/view/1009596
 http://insecam.org/en/bytype/Axis2
 http://insecam.org/en/bytype/Megapixel
-http://insecam.org/en/view/745661
 http://insecam.org/en/view/895868
 http://insecam.org/en/view/456160
 http://insecam.org/en/bytype/Hi3516
@@ -1084,7 +1082,6 @@ http://insecam.org/cn/view/235739
 http://insecam.org/en/bytimezone/-07:00
 http://insecam.org/en/view/751928
 http://insecam.org/en/view/1005807
-http://insecam.org/en/bycity/Taichung
 http://insecam.org/en/view/463649
 http://insecam.org/en/view/1002038
 http://insecam.org/en/view/432621
