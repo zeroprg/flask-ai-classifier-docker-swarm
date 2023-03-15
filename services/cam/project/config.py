@@ -7,7 +7,8 @@ from project.config_file import configure
 
 # set config
 app_settings = os.getenv("APP_SETTINGS")
-if app_settings is None or app_settings =='' :app_settings = "./config.txt"
+if app_settings is None or app_settings == '':
+    app_settings = "./config.txt"
 
 
 class ProductionConfig:
