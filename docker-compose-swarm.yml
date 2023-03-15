@@ -16,7 +16,7 @@ services:
       - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
       - CONFIDENCE=0.49678
       - FLASK_ENV=production
-      - APP_SETTINGS=/home/app/web/config.txt
+      - APP_SETTINGS=/home/app/web/config .txt
       - DB_IP_ADDRESS=192.168.0.100
       - DB_USERNAME=odroid
       - DB_PASSWORD=vist2508
