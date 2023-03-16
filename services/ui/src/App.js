@@ -168,7 +168,7 @@ const useStyles = makeStyles((theme) => ({
                             
                             <p> The smart cloud storage solution for video streams from public cameras. Our platform is powered by 5 ODROID ARM computers running 100% Python and 100% React, ensuring optimal performance and user experience.
 
-At http://Bloberryconsulting.com, we are dedicated to providing state-of-the-art deep learning algorithms to track and analyze video streams from surveillance cameras. Our platform enables you to test multiple deep learning networks on existing video streams and receive real-time insights and analysis.
+At <a href="http://Bloberryconsulting.com">Bloberry Consulting </a>, we are dedicated to providing state-of-the-art deep learning algorithms to track and analyze video streams from surveillance cameras. Our platform enables you to test multiple deep learning networks on existing video streams and receive real-time insights and analysis.
 - Only filtered cameras are available now. This way none of the cameras on Insecam invade anybody's private life.
 - Any private or unethical camera will be removed immediately upon e-mail complaint. Please provide a direct link to help facilitate the prompt removal of the camera.
 - If you do not want to contact us by e-mail (zeroprg@yahoo.com), you can still remove your camera from site. The only thing you need to do is to set the password of your camera.
