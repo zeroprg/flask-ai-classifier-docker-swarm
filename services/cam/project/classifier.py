@@ -112,7 +112,7 @@ class Detection:
             if current_time - self.last_update_time >= time_threshold:
                 record_locked = not self.update_urls_db()
                 with self._objects_counted.get_lock(): 
-                    self._objects_counted.value = -1 if self.errors >= URL_PINGS_NUMBER else 0 
+                    self._objects_counted.value = -1 if self.errors >= URL_PINGS_NUMBER or self.idle_time > 28800 else 0 
                 self.last_update_time = current_time
                 idle = self.idle_time > 100 or self.errors >= URL_PINGS_NUMBER
                 if(record_locked or idle ):
