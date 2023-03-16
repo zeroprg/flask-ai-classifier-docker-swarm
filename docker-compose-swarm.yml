@@ -5,7 +5,7 @@ services:
   cam:
     image: zeroprg/flask-docker-swarm_cam:latest
     deploy:
-      replicas: 4
+      replicas: 5
 #      max_replicas_per_node: 2 # doesn't work
       restart_policy:
         condition: on-failure
@@ -20,8 +20,7 @@ services:
       - DB_IP_ADDRESS=192.168.0.100
       - DB_USERNAME=odroid
       - DB_PASSWORD=vist2508
-      - DB_NAME=streamer
-      - LOGGING=CRITICAL
+      - DB_NAME=streamer     
       - MAXIMUM_VIDEO_STREAMS=35 #maimum streams processed per node
     networks:
       - flask
