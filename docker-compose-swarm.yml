@@ -118,7 +118,7 @@ services:
   ui:
     image: zeroprg/flask-docker-swarm_ui:latest
     deploy:
-      replicas: 2
+      replicas: 3
       restart_policy:
         condition: on-failure
       placement:
