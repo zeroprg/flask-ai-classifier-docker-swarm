@@ -109,7 +109,7 @@ def update_urls_from_stream():
         db.update_urls(params)
         logging.debug("url update with params: {}".format(params))
     # consider if URL was not updated buy Detection process more then 2 intervals of processing time
-    videos_ = db.select_old_urls_which_not_mine_olderThen_secs(os,2*update_urls_from_stream_interval)[:NUMBER_OF_THREADS]
+    videos_ = db.select_old_urls_which_not_mine_olderThen_secs(os,2*update_urls_from_stream_interval)[:prod.MAXIMUM_VIDEO_STREAMS]
     for params in videos_:
         if len(detectors)  >= prod.MAXIMUM_VIDEO_STREAMS: break
         cam = str(params['id'])
@@ -163,7 +163,7 @@ async def main():
     threading.Timer(update_urls_from_stream_interval, update_urls_from_stream).start()
     processor = VideoStreamProcessor()
     processor.start()
-    videos_ = db.select_all_active_urls_olderThen_secs(update_urls_from_stream_interval)[:NUMBER_OF_THREADS]
+    videos_ = db.select_all_active_urls_olderThen_secs(update_urls_from_stream_interval)[:prod.MAXIMUM_VIDEO_STREAMS]
     """ Update all videos as mine , start greeding algorithm here ..."""
     """ Updation """
     logging.info("Total number of videos ready for update: {}".format(len(videos_)))
