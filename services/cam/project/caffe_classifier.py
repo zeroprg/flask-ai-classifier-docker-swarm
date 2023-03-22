@@ -2,250 +2,185 @@ import numpy as np
 import cv2
 
 from PIL import Image
-import time
-import datetime
-import json
 import math
 
-from project import db
-from  project.objCountByTimer import ObjCountByTimer
-from  project.config import ProductionConfig as prod
+from project.config import ProductionConfig as prod
+from project.statistic import dhash
+
 
 # initialize the list of class labels MobileNet SSD was trained to
 # detect, then generate a set of bounding box colors for each class
-CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
-           "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
-           "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
-           "sofa", "train", "tvmonitor"]
-LOOKED1 = {"person": []}
 
-subject_of_interes = ["person"]
+CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow",
+           "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train",
+           "tvmonitor", "cellphone", "backpack", "umbrella", "book", "traffic light", "stop sign", "fire hydrant",
+           "parking meter", "bench", "flower", "tree", "building", "elephant", "bear", "zebra", "giraffe",
+           "pizza", "donut", "cake", "couch", "bed", "table", "toilet", "sink", "oven", "microwave", "refrigerator",
+           "blender", "toaster", "scissors", "teddy bear", "hair drier", "toothbrush"]
+
+
 DNN_TARGET_MYRIAD = False
 
 HASH_DELTA = 8  # how many bits difference between 2 hashcodes
 DIMENSION_X = 300
 DIMENSION_Y = 300
-piCameraResolution = (640, 480)  # (1024,768) #(640,480)  #(1920,1080) #(1080,720) # (1296,972)
-piCameraRate = 16
-
-#SECRET_CODE = open("/run/secrets/secret_code", "r").read().strip()
 
 # static variable
-net = None
 
-def classify_init():
-    global net
-# Read configuration parameters
-    if( net is None ) : # Call it once
-        proto = prod.args['prototxt']
-        model = prod.args['model']
-        print("Network parameters: " + proto + ", " + model)
-        if(model.find('caffe')>0): 
-            net = cv2.dnn.readNetFromCaffe(proto, model)
-        else:
-            print("provide only caffe model network")   
-        # specify the target device as the Myriad processor on the NCS
-        if "DNN_TARGET_MYRIAD" in prod.args:
-            net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
-        else:
-            net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
-        print("Net was setuped: " + str(net)) 
-            
+proto = None
+model = None
+confidence = None
+fH = None
+fW = None
+dims = None
+net_target = None
+
+def read_configuration():
+    global proto, model, confidence, net_target
+    proto = prod.args['prototxt']
+    model = prod.args['model']
+    print("Network parameters: " + proto + ", " + model)
+    if model.find('caffe') > 0:
+        net_target = cv2.dnn.DNN_TARGET_CPU
+    else:
+        print("provide only caffe model network")
+    # specify the target device as the Myriad processor on the NCS
+    if "DNN_TARGET_MYRIAD" in prod.args:
+        net_target = cv2.dnn.DNN_TARGET_MYRIAD
+    confidence = prod.args.get('confidence', 0.5)
+
+def classify_init():   
+    read_configuration()
+
+    net = cv2.dnn.readNetFromCaffe(proto, model)
+    net.setPreferableTarget(net_target)
+    print("Net was setuped: " + str(net))
     return net
-
 
 hashes = {}
 
-def classify_frame( frame, params, net=classify_init()):
-    topic_label = 'No data'
-    objects_counted = 0
-    result = {}
-    cam = params['cam']
-    confidence = params['confidence']
-    rectangles = []
-    # print(" Classify frame ... --->")
-    #_frame = cv2.resize(frame, (DIMENSION_X, DIMENSION_Y))
-    # _frame = imutils.resize(frame,DIMENSION_X)
+def process_detections(detections, frame, fW, fH, looked_for_classes, confidence):
+    rectangles = {}
+    counted_objects = {}
+    cropped_images = {}
+
+    for i in range(detections.shape[2]):
+        confidence_score = detections[0, 0, i, 2]
+
+        if confidence_score >= confidence:
+            class_index = int(detections[0, 0, i, 1])
+            
+            if math.isnan(class_index):
+                continue
+
+            class_name = CLASSES[class_index]
+
+            #if class_name not in looked_for_classes:
+            #    continue
+
+            dims = np.array([fW, fH, fW, fH])
+            box = detections[0, 0, i, 3:7] * dims
+            (start_x, start_y, end_x, end_y) = box.astype("int")
+
+
+                        
+            if class_name in looked_for_classes:
+                if start_x < 0 or end_x < 0 or start_y < 20 or end_y < 0:
+                    continue
+                print("class_name: {}, class_index: {}".format(class_name, class_index))
+
+                crop_img_data = frame[start_y - 20:end_y, start_x:end_x]
+                crop_img = Image.fromarray(crop_img_data)
+
+                rectangle = {"start_x": start_x, "end_x": end_x, "start_y": start_y, "end_y": end_y, "text": "{}: {:.2f}%".format(class_name, confidence_score * 100)}
+                if class_name not in rectangles:
+                    rectangles[class_name] = []
+                rectangles[class_name].append(rectangle)
+                if class_name not in counted_objects:
+                    cropped_images[class_name] = [crop_img]
+                else:
+                    cropped_images[class_name].append(crop_img)
+
+
+            if class_name not in counted_objects:
+                counted_objects[class_name] = 1
+            else:
+                counted_objects[class_name] += 1
+
+    return rectangles, counted_objects, cropped_images
+
+def classify_topic(object_labels, topic_rules):
+    """
+    Classify the topic based on the detected objects using a set of topic rules.
+
+    Args:
+    - object_labels: a list of labels of detected objects.
+    - topic_rules: a dictionary of topic rules, with the key being the topic name and the value being a tuple of the form
+      (list of object labels that belong to that topic, minimum number of objects required to match the topic rule).
+
+    Returns:
+    - topic_label: the label of the topic that the detected objects belong to.
+    """
+
+    # initialize the topic label and maximum number of matched objects as None
+    topic_label = None
+    max_matched_objects = 0
+
+    # loop through the topic rules
+    for topic, (rule, min_objects) in topic_rules.items():
+        # check if the minimum number of objects required to match the rule is less than or equal to the number of detected objects
+        if min_objects <= len(object_labels):
+            # check if all the object labels in the rule are in the detected object labels
+            matched_objects = sum(1 for label in rule if label in object_labels)
+            if matched_objects >= min_objects and matched_objects > max_matched_objects:
+                topic_label = topic
+                max_matched_objects = matched_objects
+
+    return topic_label
+
+
+
+def classify_frame(frame, params, net=classify_init()):
+    # preprocess the frame 
     blob = cv2.dnn.blobFromImage(frame, 0.007843,
                                     (DIMENSION_X, DIMENSION_Y), (127.5, 127.5, 127.5), True)
     # set the blob as input to our deep learning object
     # detector and obtain the detections
         # loop over the detections
     (fH, fW) = frame.shape[:2]
- 
+
+
+    # set the input to the neural network and perform a forward pass
     net.setInput(blob)
     detections = net.forward()
+    # process the detections and count objects
+    looked_for_classes = params['classes']
+    confidence = params['confidence']
+    rectangles, counted_objects, cropped_images = process_detections(detections, frame, fW, fH, looked_for_classes, confidence)
 
-    # logger.debug(detections)
-    if detections is not None:
-        # loop over the detections
-        for i in np.arange(0, detections.shape[2]):
-            # extract the confidence (i.e., probability) associated
-            # with the prediction
-            # filter out weak detections by ensuring the `confidence`
-            # is greater than the minimum confidence
-            if detections[0, 0, i, 2] < confidence:
-                continue
-
-            # otherwise, extract the index of the class label from
-            # the `detections`, then compute the (x, y)-coordinates
-            # of the bounding box for the object
-            idx = detections[0, 0, i, 1]
-            if math.isnan(idx): continue
-            idx = int(idx)
-            if idx > len(CLASSES) - 1:
-                continue
-            key = CLASSES[idx]
-
-            if key not in LOOKED1:
-                continue
-            dims = np.array([fW, fH, fW, fH])
-            box = detections[0, 0, i, 3:7] * dims
-            (startX, startY, endX, endY) = box.astype("float")
-
-            # draw the prediction on the frame
-            if idx > len(CLASSES) - 1:
-                continue
-            key = CLASSES[idx]
-            # if not key in IMAGES: continue
-            # use 20 pixels from the top for labeling
-            try:
-                crop_img_data = frame[int(startY) - 20:int(endY), int(startX):int(endX)]
-                # label = "Unknown"
-                hash = 0
-            
-                crop_img = Image.fromarray(crop_img_data)
-                hash = dhash(crop_img)
-            except:
-                continue  # pass
-
-            if key not in LOOKED1:
-                continue
-            probability = detections[0, 0, i, 2] 
-            label1 = "{}: {:.2f}%".format(key, probability * 100)
-            # Draw rectangles
-
-            #cv2.rectangle(frame, (startX - 25, startY - 25), (endX + 25, endY + 25), (255, 0, 0), 1)
-            #cv2.putText(frame, label1, (startX - 25, startY - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
-            rectangle = {"startX": int(startX), "endX": int(endX), "startY": int(startY), "endY": int(endY), "text": label1}
-            rectangles.append(rectangle)
-            if hashes.get(key, None) is None:
-                # count objects for last sec, last 5 sec and last minute
-
-                hashes[key] = ImageHashCodesCountByTimer()
-                if not hashes[key].add(hash):
-                    continue
-
-            else:
-                # if not is_hash_the_same(hash,hashes[key]): hashes[key].add(hash)
-                if not hashes[key].add(hash):
-                    continue
-                label = ''
-                for key in hashes:
-                    if hashes[key].getCountedObjects() == 0:
-                        continue
-                    label += ' ' + key + ':' + str(hashes[key].getCountedObjects())
-                    result[key] = hashes[key].getCountedObjects()
-                    objects_counted += result[key] 
-                topic_label = label
-                
+    object_hashes = {}
+    for class_name, cropped_images_ in cropped_images.items():
+        # Assuming cropped_images is an array of images
+        object_hashes[class_name] = []
+        for cropped_image in cropped_images_:
+            object_hash = dhash(cropped_image)
+            object_hashes[class_name].append(object_hash)
 
 
-            # process further only  if image is really different from other ones
-            if key in subject_of_interes:
-                x_dim = int(endX) - int(startX)
-                y_dim = int(endY) - int(startY)
-                #font_scale = min(y_dim, x_dim) / 300
-                #if font_scale > 0.12:
-                #    cv2.putText(crop_img_data, str(datetime.datetime.now().strftime('%H:%M %d/%m/%y')), (1, 15),
-                #                cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 0), 1)
+    
+    result = {}
 
-                now = datetime.datetime.now()
-                day = "{date:%Y-%m-%d}".format(date=now)
-                db.insert_frame( hash, day, int(time.time()*1000), key, crop_img_data, int(startX), int(startY), x_dim, y_dim, cam)
-                
-            do_statistic(cam,  hashes)
-            #db.getConn().commit()
+    result["rectangles"] = rectangles
+    result["counted_objects"] = counted_objects
+    result["object_hashes"] = object_hashes
 
-        # draw at the top left corner of the screen
-        #cv2.putText(frame, topic_label, (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-        # print(" Classify frame ... <---")
-        # place frame in queue for further processing
-        result["topic_label"] = topic_label
-        result["rectangles"] = rectangles
-        result["objects_counted"] = objects_counted
+    # label the frame based on the detected objects
+    result["objects_labels"] = list(counted_objects.keys())
+    topic_label = classify_topic(result["objects_labels"], params['topic_rules'])
+    if topic_label is not None: print(topic_label)
+    result["topic_label"] = topic_label  
+    result["oject_images"] = cropped_images
+  
     return result
 
 
-
-class ImageHashCodesCountByTimer(ObjCountByTimer):
-    def bitdiff(self, a, b):
-        d = a ^ b
-        return self.countSetBits(d)
-
-    def countSetBits(self, n):
-        count =0
-        while(n):
-            count += n&1
-            n >>=1
-        return count
-
-    def equals(self, hash1, hash2):
-        delta = self.bitdiff(hash1, hash2)
-        return delta < HASH_DELTA
-
-
-def do_statistic(cam, hashes):
-    # Do some statistic work here
-    params = get_parameters_json(hashes, cam)
-    db.insert_statistic(params)
-    return params
-
-
-def get_parameters_json(hashes, cam):
-    ret = []
-    for key in hashes:
-        # logging.debug(images[key])
-        trace = Trace()
-        trace.name = key.split()[0]
-        trace.cam = cam       
-        tm = int(time.time()*1000)  # strftime("%H:%M:%S", localtime())
-        trace.hashcodes = hashes[key].toString()
-        trace.x = tm
-        # last = len(hashes[key].counted) -1
-        trace.y = hashes[key].getCountedObjects()
-        # trace.text = str(trace.y) + ' ' + key + '(s)'
-        ret.append(trace.__dict__)  # used for proper JSON generation (dictionary)
-        # ret.append(trace)
-        # logging.debug( trace.__dict__ )
-    return ret
-
-
-class Trace(dict):
-    def __init__(self):
-        dict.__init__(self)
-        self.cam = ''
-        self.x = 0
-        self.y = 0
-        self.name = ''
-        self.text = ''
-        self.filenames = []
-
-    def to_json(self):
-        return json.dumps(self, default=lambda o: o.__dict__,
-                          sort_keys=True, indent=4)
-
-
-def dhash(image_data, hashSize=8):
-    image_out = np.array(image_data).astype(np.uint8)
-
-    # convert the image to grayscale and compute the hash
-
-    image = cv2.cvtColor(image_out, cv2.COLOR_BGR2GRAY)
-
-    # resize the input image, adding a single column (width) so we
-    # can compute the horizontal gradient
-    resized = cv2.resize(image, (hashSize, hashSize), interpolation=cv2.INTER_LINEAR)
-    diff = resized[:, 1:] > resized[:, :-1]
-    # convert the difference image to a hash
-    return sum([2 ** i for (i, v) in enumerate(diff.flatten()) if v])

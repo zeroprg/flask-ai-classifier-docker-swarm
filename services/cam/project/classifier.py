@@ -10,17 +10,21 @@ import base64
 import time
 import json
 import numpy as np
+import time
+import datetime
+
 from multiprocessing import Value
 from concurrent.futures import ThreadPoolExecutor
 
+
 from project import db
-from project.caffe_classifier import classify_frame
-from project import URL_PINGS_NUMBER, NUMBER_OF_THREADS, update_urls_from_stream_interval, ping_video_url, image_check, simple_decode
+from project.caffe_classifier import classify_frame, classify_init
+from project import URL_PINGS_NUMBER, update_urls_from_stream_interval, ping_video_url, image_check, simple_decode,topic_rules
+from project.statistic import do_statistic
 
 subject_of_interest = ["person", "car"]
 DNN_TARGET_MYRIAD = False
 executor = ThreadPoolExecutor()
-HASH_DELTA = 70  # bigger number  more precise object's count
 DIMENSION_X = 300
 DIMENSION_Y = 300
 piCameraResolution = (640, 480)  # (1024,768) #(640,480)  #(1920,1080) #(1080,720) # (1296,972)
@@ -34,8 +38,9 @@ class Detection:
         self.model = model
         self.video_url = params['url']
         self.hashes = {}
-        self.topic_label = 'no data'
-        self.net = self.video_s = None
+        self.topic_label = None
+        self.net = classify_init() 
+        self.video_s = None
         self.cam = str(params['id'])
         self.classify_server = classify_server
         self.errors = 0
@@ -166,6 +171,8 @@ class Detection:
             'last_time_updated': time.time() * 1000,
             'id': self.cam,
         }
+        if self.topic_label is not None: params['desc'] = self.topic_label
+        
         if( self._objects_counted.value <= 0 ):
             self.idle_time += (time.time() * 1000 - self.last_update_time) / 60000
             params['idle_in_mins'] = self.idle_time
@@ -233,12 +240,43 @@ class Detection:
     '''
    
     def call_classifier_locally(self, frame, cam, confidence, model):
-        parameters = {'cam': cam, 'confidence': confidence , 'model': model} 
-        logging.debug("------------ call_classifier (local) for cam: {} -------".format(cam))
-        result = classify_frame(frame, parameters)
-        self.topic_label = result['topic_label'] if 'topic_label' in result else 'no data'
-        logging.debug("... frame classified: {}".format(result))
+        parameters = {'cam': cam, 'confidence': confidence , 'model': model, 'classes': ['person'] , 'topic_rules':  topic_rules} 
+        logging.debug("------------ call_classifier (local) for cam: {} -------".format(cam))         
+        result = classify_frame(frame, parameters, self.net)
+        self.topic_label = result['topic_label']       
+        if result['oject_images']:
+            populate_db(result, cam)            
+            logging.debug("... frame classified: {}".format(result))
         return result   
+
+def populate_db(result, cam):
+    now = datetime.datetime.now()
+    day = "{date:%Y-%m-%d}".format(date=now)
+
+    print(result)
+    
+    for object_label, cropped_images in result["oject_images"].items():
+        for i in range(len(cropped_images)): 
+            # Assuming `image` is a PIL Image object            
+            object_image = np.asarray(cropped_images[i])
+            object_hash = result["object_hashes"][object_label][i]            
+            object_coordinates = result["rectangles"][object_label][i]
+
+        db.insert_frame(
+            object_hash,
+            day,
+            int(time.time()*1000),
+            object_label,
+            object_image,
+            object_coordinates['start_x'],
+            object_coordinates['start_y'],
+            object_coordinates['end_x'] - object_coordinates['start_x'],
+            object_coordinates['end_y'] - object_coordinates['start_y'],
+            cam
+        )
+
+    do_statistic(cam, result["object_hashes"],  result["counted_objects"])
+
 
 
 def call_classifier(classify_server, frame, cam, confidence, model):

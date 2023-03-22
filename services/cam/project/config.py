@@ -13,10 +13,8 @@ if app_settings is None or app_settings == '':
 
 class ProductionConfig:
     """Production configuration"""
-    if os.environ.get("LOGGING") == 'DEBUG':  LOGGING = logging.DEBUG
-    elif os.environ.get("LOGGING") == 'INFO': LOGGING = logging.INFO
-    else: LOGGING = logging.CRITICAL
- 
+
+    LOGGING = os.environ.get("LOGGING") 
     PORT = os.environ.get("PORT")
     MAXIMUM_VIDEO_STREAMS =  os.environ.get("MAXIMUM_VIDEO_STREAMS")
     DB_USERNAME = os.environ.get("DB_USERNAME")

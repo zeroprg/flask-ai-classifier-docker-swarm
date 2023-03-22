@@ -41,6 +41,7 @@ const useStyles = makeStyles((theme) => ({
     }); 
 
     const [initialUrls, setInitialUrls] = useState([]);
+    const [descUrls, setDescUrls] = useState({});
     const [urls, setUrls] = useState([]);
     const [videoAlignment, setVideoAlignment] = useState('video');
     const [open, setOpen] = useState(false);
@@ -106,11 +107,11 @@ const useStyles = makeStyles((theme) => ({
         }
       })
       .then(data => {
-        setLoading(false);
+        setLoading(false);       
         setInitialUrls(data)
         updateurls(data);
-        const groupedUrls = groupUrlsByCountry(data);
-        setGroupedUrls(groupedUrls);
+        setGroupedUrls(groupUrlsByCountry(data));
+        setDescUrls(groupUrlsByDesc(data));
       })
       .catch(error => setLoading(false));
     };
@@ -126,7 +127,20 @@ const useStyles = makeStyles((theme) => ({
         return acc;
         }, {});
     };
+        // Function to group urls by country
+    const groupUrlsByDesc = (urls) => {
+        return urls.reduce((acc, cur) => {
+        if (cur.desc in acc) {
+            acc[cur.desc].push(cur);
+        } else {
+            acc[cur.desc] = [cur];
+        }
+        return acc;
+        }, {});
+      };
     
+
+
     useEffect(() => {
         console.log(props.req);
         loadData()
@@ -138,10 +152,15 @@ const useStyles = makeStyles((theme) => ({
           <header className="App-header">
           {!isLoading && (
                 <div>
-                    <label htmlFor="countryFilter">Filter by:</label>
-                    <select id="interestFilter" value={interestFilter} onChange={handleinterestFilterChange}>                        
+                    <label htmlFor="interestFilter">Filter by:</label>
+                    <select id="interestFilter" value={interestFilter} onChange={handleinterestFilterChange}>
                         <option key='interest' value='none'></option> 
-                        <option key='rating' value='rating'>Rating</option>                                            
+                        <option key='rating' value='rating'>Rating</option>
+                        {Object.keys(descUrls).sort().map((desc) => (
+                          <option key={desc} value={desc}>
+                            {desc}
+                          </option>
+                         ))}
                     </select>
                     <label htmlFor="countryFilter">Filter by country:</label>
                     <select id="countryFilter" value={countryFilter} onChange={handlecountryFilterChange}>                        
@@ -169,7 +188,7 @@ const useStyles = makeStyles((theme) => ({
                             <p> The smart cloud storage solution for video streams from public cameras. Our platform is powered by 5 ODROID ARM computers running 100% Python and 100% React, ensuring optimal performance and user experience.
 
 At <a href="http://Bloberryconsulting.com">Bloberry Consulting </a>, we are dedicated to providing state-of-the-art deep learning algorithms to track and analyze video streams from surveillance cameras. Our platform enables you to test multiple deep learning networks on existing video streams and receive real-time insights and analysis.
-Only filtered cameras are available now. This way none of the cameras on Insecam invade anybody's private life.
+Only filtered cameras are available now. This way none of the cameras on this site invade anybody's private life.
 Any private or unethical camera will be removed immediately upon e-mail complaint. Please provide a direct link to help facilitate the prompt removal of the camera.
 If you do not want to contact us by e-mail (zeroprg@yahoo.com), you can still remove your camera from site. The only thing you need to do is to set the password of your camera.
 With AIcams.info, you have the ability to enter the URL of any public IP camera and access its video stream from our platform. However, please note that by specifying the IP address or camera URL, you will be sharing your link with all other subscribers. To make your link private, you will need to subscribe to our payable version.

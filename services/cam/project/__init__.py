@@ -18,7 +18,39 @@ from project.db.api import Sql
 
 #from flask import g
 
-logging.basicConfig(level=logging.INFO)
+
+''' Rules specify topic of the frame based by founded objects '''
+
+topic_rules = {
+    "traffic": (["car", "road","traffic light"],2),
+    "office":  (["person", "tvmonitor","chair", "sofa", "table"],3),
+    "animals": (["cat", "dog", "horse", "cow", "sheep"], 2),
+    "vehicles": (["car", "bus", "train", "motorbike", "bicycle"], 3),
+    "furniture": (["chair", "sofa", "bed", "table", "diningtable"], 3),
+    "bedroom":  (["person", "sofa", "bed"],  2),
+    "kitchen": (["oven", "microwave", "refrigerator", "sink", "blender"], 2),
+    "outdoor": (["tree", "flower", "building", "sky", "grass"], 3),
+    "indoor": (["lamp", "book", "clock", "vase", "painting"], 2),
+    "food": (["pizza", "donut", "cake", "bread", "fruit"], 2),
+    "electronics": (["tvmonitor", "laptop", "cellphone", "mouse", "keyboard"], 2),
+    "people": (["person"], 1),
+    "tools": (["hammer", "screwdriver", "wrench", "scissors", "knife"], 2),
+    "toys": (["ball", "teddy bear", "frisbee", "kite", "bicycle"], 2),
+    "pets": (["cat", "dog", "bird", "fish", "turtle"], 2),
+    "sports": (["ball", "tennis racket", "baseball glove", "ski", "skateboard"], 2),
+    "water": (["boat", "swimming pool", "beach", "surfboard", "umbrella"], 2),
+    "tools_and_electronics": (["hammer", "screwdriver", "wrench", "scissors", "knife", "tvmonitor", "laptop", "cellphone", "mouse", "keyboard"], 3),
+    "indoor_and_furniture": (["lamp", "book", "clock", "vase", "painting", "chair", "sofa", "bed", "table", "diningtable"], 4),
+    "outdoor_and_nature": (["tree", "flower", "grass", "mountain", "waterfall"], 3),
+    "vehicles_and_traffic": (["car", "bus", "train", "motorbike", "bicycle", "traffic light", "stop sign", "parking meter"], 3),
+    "construction": (["crane", "tractor", "construction vehicle", "hard hat", "safety vest"], 2),
+    "music": (["guitar", "piano", "drums", "microphone", "violin"], 2),
+    "medical": (["stethoscope", "syringe", "medicine", "doctor", "nurse"], 2),
+    "technology": (["robot", "drone", "computer", "server", "chip"], 2),
+    "science": (["test tube", "microscope", "telescope", "atom", "planet"], 2),
+    "space": (["astronaut", "spaceship", "planet", "star", "galaxy"], 2),
+}
+
 
 """ 'Global' variables """
 DELETE_FILES_LATER = 72 #   ( 3 days in hours)
@@ -143,7 +175,7 @@ def search_with_google(query):
         return []
     
 image_check = r'(?<!/cgi-bin/).*\.(?!mjpg)(?!mjpeg)(jpg|jpeg|png|gif|bmp)\b|\b[jJ][pP][eE]?[gG]\b|shot|/image/'
-simple_decode = r'.*\.(cgi|mjpg|mjpeg)$|\b/cgi-bin/'
+simple_decode = r'.*\.(cgi|mjpg|mjpeg)$|\b/cgi-bin/|\baction=stream'
 def ping_video_url(url):
     """ Ping url """
     flag = False

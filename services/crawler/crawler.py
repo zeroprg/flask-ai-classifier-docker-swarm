@@ -103,7 +103,7 @@ def test_traverse_internal_urls():
 
     visited = set()
    
-    traverse_internal_urls("http://insecam.org", visited, regex_dict)
+    traverse_internal_urls("http://www.insecam.org", visited, regex_dict)
     
 
 

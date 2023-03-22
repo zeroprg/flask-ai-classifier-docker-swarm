@@ -13,7 +13,6 @@ override or change self.equals(hash1, hash2) method
 from collections import deque
 
 import threading
-import time
 
 class ObjCountByTimer:
     ''' This class count different objects ( by hashcode) by using timer  '''

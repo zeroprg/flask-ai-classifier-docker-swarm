@@ -281,6 +281,7 @@ class Sql:
 # ####################  Statistic operations ######################################## #
 
     def insert_statistic(self, params):
+        #print(params)
         conn = self.getConn()
         for param in params:
             hashcodes = ''
@@ -372,7 +373,7 @@ class Sql:
         hashcodes_array = list(map(int, hashcodes.split(',')))
         
   
-        print("hashcodes: {} ".format(hashcodes))
+        #print("hashcodes: {} ".format(hashcodes))
         query = sql.select([self.objects]).where( self.objects.c.hashcode.in_(hashcodes_array)                                                       
                                                 ).order_by(text("currentime desc")).limit(self.limit).offset(0)
         ResultProxy = conn.execute(query)

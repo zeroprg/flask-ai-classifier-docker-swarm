@@ -67,6 +67,7 @@ CREATE TABLE urls (
 	country varchar(25) null,
 	currentime int8 NOT NULL DEFAULT currentime_gen(),
 	idle_in_mins int4  DEFAULT 0,
+	desc varchar(30) null,
 	CONSTRAINT urls_pkey PRIMARY KEY (id),
 	CONSTRAINT urls_un UNIQUE (url)
 );
