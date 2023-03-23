@@ -74,8 +74,8 @@ const useStyles = makeStyles((theme) => ({
       const selectedInterest = event.target.value;
       setinterestFilter(selectedInterest);
       setcountryFilter('all');
-      //setUrls(selectedInterest === 'all' ? initialUrls : initialUrls.filter((url) => url.objects_counted >= 0));
-      setUrls(selectedInterest === 'all' ? initialUrls : descUrls[selectedInterest])
+      if( selectedInterest === 'rating' ) setUrls( initialUrls.filter((url) => url.objects_counted >= 0));
+      else setUrls(selectedInterest === 'all' ? initialUrls : descUrls[selectedInterest])
   };
     
     const handleClose = () => {
@@ -133,9 +133,8 @@ const useStyles = makeStyles((theme) => ({
         // Function to group urls by country
     const groupUrlsByDesc = (urls) => {
         return urls.reduce((acc, cur) => {
-        if( cur.desc === null || cur.desc === 'null' ) return acc;  
-        if (cur.desc in acc) {
-          
+        if( cur.desc === null || cur.desc === 'null' ) return acc;        
+        if (cur.desc in acc) {          
             acc[cur.desc].push(cur);
         } else {
             acc[cur.desc] = [cur];
@@ -160,7 +159,7 @@ const useStyles = makeStyles((theme) => ({
                     <label htmlFor="interestFilter">Filter by videos classified as:</label>
                     <select id="interestFilter" value={interestFilter} onChange={handleinterestFilterChange}>
                         <option key='interest' value='none'></option> 
-                        <option key='rating' value='rating'>Rating</option>
+                        <option key='rating' value='rating'>Rated</option>
                         {Object.keys(descUrls).sort().map((desc) => (
                           <option key={desc} value={desc}>
                             {desc}
