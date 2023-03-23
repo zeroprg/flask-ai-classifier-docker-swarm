@@ -40,7 +40,7 @@ prototxt=./models/caffemodel/MobileNetSSD/MobileNetSSD_deploy.prototxt
 model=./models/caffemodel/MobileNetSSD/MobileNetSSD_deploy.caffemodel
 
 
-confidence=0.35
+confidence=0.369
 
 #server for object classifications
 CLASSIFIER_SERVER = http://192.168.0.191:4000/classify
@@ -49,5 +49,5 @@ CLASSIFIER_SERVER = http://192.168.0.191:4000/classify
 DB_IP_ADDRESS=192.168.0.100
 
 DB_NAME=streamer
-MAXIMUM_VIDEO_STREAMS = 25
+MAXIMUM_VIDEO_STREAMS = 55
 LOGGING=CRITICAL

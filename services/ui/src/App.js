@@ -63,16 +63,19 @@ const useStyles = makeStyles((theme) => ({
     };
 
     const handlecountryFilterChange = (event) => {
-        const selectedCountry = event.target.value;
+        const selectedCountry = event.target.value;        
         setcountryFilter(selectedCountry);
         setinterestFilter('none');
-        setUrls(selectedCountry === 'all' ? initialUrls : initialUrls.filter((url) => url.country === selectedCountry));
+        //setUrls(selectedCountry === 'all' ? initialUrls : initialUrls.filter((url) => url.country === selectedCountry));
+        setUrls(selectedCountry === 'all' ? initialUrls : groupedUrls[selectedCountry])        
     };
    
     const handleinterestFilterChange = (event) => {
       const selectedInterest = event.target.value;
       setinterestFilter(selectedInterest);
-      setUrls(selectedInterest === 'all' ? initialUrls : initialUrls.filter((url) => url.objects_counted >= 0));
+      setcountryFilter('all');
+      //setUrls(selectedInterest === 'all' ? initialUrls : initialUrls.filter((url) => url.objects_counted >= 0));
+      setUrls(selectedInterest === 'all' ? initialUrls : descUrls[selectedInterest])
   };
     
     const handleClose = () => {
@@ -130,7 +133,9 @@ const useStyles = makeStyles((theme) => ({
         // Function to group urls by country
     const groupUrlsByDesc = (urls) => {
         return urls.reduce((acc, cur) => {
+        if( cur.desc === null || cur.desc === 'null' ) return acc;  
         if (cur.desc in acc) {
+          
             acc[cur.desc].push(cur);
         } else {
             acc[cur.desc] = [cur];
@@ -152,7 +157,7 @@ const useStyles = makeStyles((theme) => ({
           <header className="App-header">
           {!isLoading && (
                 <div>
-                    <label htmlFor="interestFilter">Filter by:</label>
+                    <label htmlFor="interestFilter">Filter by videos classified as:</label>
                     <select id="interestFilter" value={interestFilter} onChange={handleinterestFilterChange}>
                         <option key='interest' value='none'></option> 
                         <option key='rating' value='rating'>Rating</option>
@@ -185,7 +190,7 @@ const useStyles = makeStyles((theme) => ({
                                 ref={snackbarRef}
                                 className={classes[variant]}/>   
                             
-                            <p> The smart cloud storage solution for video streams from public cameras. Our platform is powered by 5 ODROID ARM computers running 100% Python and 100% React, ensuring optimal performance and user experience.
+                            <p> The smart cloud storage is experimental solution for video streams from public cameras. Our platform is powered by 5 ODROID ARM computers running 100% Python and 100% React, ensuring optimal performance and user experience.
 
 At <a href="http://Bloberryconsulting.com">Bloberry Consulting </a>, we are dedicated to providing state-of-the-art deep learning algorithms to track and analyze video streams from surveillance cameras. Our platform enables you to test multiple deep learning networks on existing video streams and receive real-time insights and analysis.
 Only filtered cameras are available now. This way none of the cameras on this site invade anybody's private life.
