@@ -4,4 +4,4 @@
 sql_commands="DELETE FROM statistic WHERE currentime < extract(epoch from now() - interval '120 hours') * 1000; DELETE FROM objects WHERE currentime < extract(epoch from now() - interval '120 hours') * 1000;"
 
 # Execute the commands using the psql command line tool
-psql -U postgres -d database_name -c "$sql_commands"
+psql -U odroid -d streams -c "$sql_commands"
