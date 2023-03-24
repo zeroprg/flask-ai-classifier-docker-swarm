@@ -25,7 +25,7 @@ def start():
     
     initialize_video_streams()
     
-    threading.Timer(clean_up_service_interval, clean_up_service).start() # in  3 days 
+   # threading.Timer(clean_up_service_interval, clean_up_service).start() # in  3 days 
    # threading.Timer(delete_expired_streams_interval, delete_expired_streams).start()
    # threading.Timer(update_urls_from_stream_interval, update_urls_from_stream).start()
 
