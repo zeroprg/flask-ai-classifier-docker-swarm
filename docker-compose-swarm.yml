@@ -161,7 +161,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.role == manager
+         - node.hostname == rock64_1
     ports:
       - 8080:8080
     volumes:
