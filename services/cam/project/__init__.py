@@ -38,7 +38,7 @@ topic_rules = {
     "tools_and_electronics": (["hammer", "screwdriver", "wrench", "scissors", "knife", "tvmonitor", "laptop", "cellphone", "mouse", "keyboard"], 2),
     "indoor_and_furniture": (["lamp", "book", "clock", "vase", "painting", "chair", "sofa", "bed", "table", "diningtable"], 2),
     "outdoor_and_nature": (["tree", "flower", "grass", "mountain", "waterfall"], 1),
-    "vehicles_and_traffic": (["car", "bus", "train", "motorbike", "bicycle", "traffic light", "stop sign", "parking meter"], 2),
+    "vehicles_and_traffic": (["car", "bus", "train", "motorbike", "bicycle", "traffic light", "stop sign"], 2),
     "construction": (["crane", "tractor", "construction vehicle", "hard hat", "safety vest"], 2),
     "music": (["guitar", "piano", "drums", "microphone", "violin"], 2),
     "medical": (["stethoscope", "syringe", "medicine", "doctor", "nurse"], 2),
