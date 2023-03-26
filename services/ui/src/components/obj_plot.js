@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import TimeRange from './time_range'
 import { makeStyles } from '@material-ui/core/styles';
 //import {XYPlot, XAxis, YAxis, HorizontalGridLines, VerticalGridLines, VerticalBarSeries} from 'react-vis';
-import SelectObj from './obj_select';
+
 import Plotter from './plotter';
 
 
@@ -72,12 +72,13 @@ import Plotter from './plotter';
       props.onTimeChanged(timerange);
     }
 
-    
+
+    /*
     function onParamsChanged(object_of_interest ){
       setObjectOfInterest(object_of_interest);
       props.onParamsChanged(object_of_interest);
     }
-    /* <SelectObj onParamsChanged={onParamsChanged} 
+     <SelectObj onParamsChanged={onParamsChanged} 
                  object_of_interest={props.object_of_interest}
                  selected_object_of_interest={props.object_of_interest}/>
      */

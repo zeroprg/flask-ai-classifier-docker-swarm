@@ -1,0 +1,59 @@
+{
+    "en": {
+        "site_desc":"At <a href='http://Bloberryconsulting.com'>Bloberry Consulting </a> , we are dedicated to providing state-of-the-art deep learning algorithms to track and analyze video streams from surveillance cameras. Our platform enables you to test multiple deep learning networks on existing video streams and receive real-time insights and analysis. Only filtered cameras are available now. This way none of the cameras on this site invade anybodys private life. Any private or unethical camera will be removed immediately upon e-mail complaint. Please provide a direct link to help facilitate the prompt removal of the camera. If you do not want to contact us by e-mail (zeroprg@yahoo.com), you can still remove your camera from site. The only thing you need to do is to set the password of your camera. With AIcams, you have the ability to enter the URL of any public IP camera and access its video stream from our platform. However, please note that by specifying the IP address or camera URL, you will be sharing your link with all other subscribers. To make your link private, you will need to subscribe to our payable version.",
+        "enter_url":"Enter IP Camera url at this box", 
+        "warning": "By specifying IP Address or camera URL bellow you will share your link with all other subscribers. To make this link private your have to subscribe to payable version", 
+        "enter_url_inbox": "Enter Camera ip or URL address here (process will start after 100 secs, just refresh the screen)",
+        
+        "loading_stream_locns": " ...Loading video stream locations on map...",
+        "filter_class": "Show only videos classified as: ",
+        "filter_country": "Filter by country"
+
+    },
+    "ru": {
+     "site_desc":"В компании <a href='http://Bloberryconsulting.com'>Bloberry Consulting </a>, мы посвящены созданию передовых алгоритмов глубокого обучения для отслеживания и анализа видеопотоков с камер наблюдения. Наша платформа позволяет тестировать несколько сетей глубокого обучения на существующих видеопотоках и получать реальные инсайты и анализ в режиме реального времени. На сайте доступны только отфильтрованные камеры, таким образом ни одна камера на этом сайте не нарушает частную жизнь людей. Любая частная или неэтичная камера будет немедленно удалена по жалобе по электронной почте. Пожалуйста, предоставьте прямую ссылку, чтобы облегчить быстрое удаление камеры. Если вы не хотите связываться с нами по электронной почте (zeroprg@yahoo.com), вы все равно можете удалить свою камеру со сайта. Единственное, что вам нужно сделать, это установить пароль для своей камеры. С помощью AIcams вы можете вводить URL любой общедоступной IP-камеры и получать доступ к ее видеопотоку с нашей платформы. Однако, обратите внимание, что указывая IP-адрес или URL камеры, вы будете делиться своей ссылкой со всеми другими абонентами. Чтобы сделать свою ссылку частной, вам нужно подписаться на нашу платную версию.",   
+     "enter_url": "Введите URL-адрес IP-камеры в это поле",
+     "warning": "Указывая IP-адрес или URL-адрес камеры ниже, вы будете делиться своей ссылкой со всеми другими подписчиками. Чтобы сделать эту ссылку частной, вам необходимо подписаться на платную версию",
+     "enter_url_inbox": "Введите IP-адрес или URL-адрес камеры здесь (процесс начнется через 100 секунд, просто обновите экран)",
+     "loading_stream_locns": " ...Загрузка местоположений видеопотока на карте...",
+     "filter_class": "Показать только видео, классифицированные как: ",
+     "filter_country": "Фильтр по стране"
+     
+    },
+    "es": {
+        "site_desc": "En <a href='http://Bloberryconsulting.com'>Bloberry Consulting </a>, estamos dedicados a proporcionar algoritmos de aprendizaje profundo de última generación para rastrear y analizar flujos de video de cámaras de vigilancia. Nuestra plataforma le permite probar múltiples redes de aprendizaje profundo en flujos de video existentes y recibir información y análisis en tiempo real. Actualmente solo hay cámaras filtradas disponibles. De esta manera, ninguna de las cámaras en este sitio invade la vida privada de nadie. Cualquier cámara privada o poco ética será eliminada inmediatamente después de una queja por correo electrónico. Proporcione un enlace directo para facilitar la eliminación rápida de la cámara. Si no desea contactarnos por correo electrónico (zeroprg@yahoo.com), aún puede eliminar su cámara del sitio. Lo único que debe hacer es establecer la contraseña de su cámara. Con AIcams, tiene la capacidad de ingresar la URL de cualquier cámara IP pública y acceder a su flujo de video desde nuestra plataforma. Sin embargo, tenga en cuenta que al especificar la dirección IP o la URL de la cámara, compartirá su enlace con todos los demás suscriptores. Para hacer que su enlace sea privado, deberá suscribirse a nuestra versión de pago.",
+        "enter_url": "Ingrese la URL de la cámara IP en este cuadro",
+        "warning": "Al especificar la dirección IP o la URL de la cámara a continuación, compartirá su enlace con todos los demás suscriptores. Para hacer que este enlace sea privado, debe suscribirse a la versión de pago",
+        "enter_url_inbox": "Ingrese la dirección IP o URL de la cámara aquí (el proceso comenzará después de 100 segundos, simplemente actualice la pantalla)",
+        "loading_stream_locns": "...Cargando ubicaciones de transmisión de video en el mapa...",
+        "filter_class": "Mostrar solo videos clasificados como: ",
+        "filter_country": "Filtrar por país"       
+    },
+    "zh": {
+        "site_desc":"在  <a href='http://Bloberryconsulting.com'>Bloberry Consulting </a>, 我们致力于提供最先进的深度学习算法，以跟踪和分析来自监控摄像头的视频流。我们的平台使您可以在现有视频流上测试多个深度学习网络并获得实时见解和分析。现在只有过滤相机可用。这样就不会有任何相机侵犯任何人的私人生活。任何私人或不道德的相机都将立即在电子邮件投诉后被删除。请提供直接链接以帮助促进相机的及时删除。如果您不想通过电子邮件与我们联系（zeroprg@yahoo.com），您仍然可以将相机从网站上删除。您需要做的唯一一件事就是设置相机的密码。使用AIcams，您可以输入任何公共IP相机的URL并从我们的平台访问其视频流。但是，请注意，通过指定IP地址或相机URL，您将与所有其他订阅者共享您的链接。要使您的链接私有，您需要订阅我们的付费版本。",
+        "enter_url": "在此框中输入IP相机网址",
+        "warning": "通过在下面指定IP地址或相机URL，您将与所有其他订阅者分享您的链接。 要使此链接私人，您需要订阅我们的付费版本",
+        "enter_url_inbox": "在此处输入相机IP或URL地址（100秒后将开始处理，请刷新屏幕）",
+        "loading_stream_locns": "加载地图上的视频流位置...",
+        "filter_class": "仅显示分类为的视频：",
+        "filter_country": "按国家筛选"       
+    },
+    "ar": {
+        "site_desc":"في  <a href='http://Bloberryconsulting.com'>Bloberry Consulting </a> ، نحن ملتزمون بتوفير خوارزميات تعلم عميق متطورة لتتبع وتحليل تدفقات الفيديو من كاميرات المراقبة. تمكّن منصتناك من اختبار عدة شبكات تعلم عميق على تدفقات الفيديو الحالية وتلقي رؤى وتحليلات فورية. تتوفر الآن فقط الكاميرات المصفاة. بهذه الطريقة لا يغتصب أي من الكاميرات على هذا الموقع حياة أي شخص. سيتم إزالة أي كاميرا خاصة أو غير أخلاقية فورًا بناءً على شكوى البريد الإلكتروني. يرجى تقديم رابط مباشر للمساعدة في تسهيل إزالة الكاميرا بشكل سريع. إذا لم ترغب في الاتصال بنا عبر البريد الإلكتروني (zeroprg@yahoo.com) ، يمكنك لا يزال إزالة الكاميرا من الموقع. الشيء الوحيد الذي تحتاج إلى القيام به هو تعيين كلمة مرور الكاميرا. مع AIcams ، لديك القدرة على إدخال عنوان URL لأي كاميرا IP عامة والوصول إلى تدفق الفيديو الخاص بها من منصتنا. ومع ذلك ، يرجى ملاحظة أنه عن طريق تحديد عنوان IP أو عنوان URL للكاميرا ، فستقوم بمشاركة رابطك مع جميع المشتركين الآخرين. لجعل رابطك خاصًا ، ستحتاج إلى الاشتراك في الإصدار القابل للدفع لدينا.",
+        "enter_url": "أدخل عنوان URL لكاميرا IP في هذا المربع",
+        "warning": "عند تحديد عنوان IP أو عنوان URL للكاميرا أدناه، ستشارك رابطك مع جميع المشتركين الآخرين. لجعل هذا الرابط خاصًا، ستحتاج إلى الاشتراك في الإصدار المدفوع",
+        "enter_url_inbox": "أدخل عنوان IP أو عنوان URL للكاميرا هنا (سيبدأ العملية بعد 100 ثانية، ما عليك سوى تحديث الشاشة)",
+        "loading_stream_locns": "...جاري تحميل مواقع تدفق الفيديو على الخريطة...",
+        "filter_class": "عرض الفيديوهات المصنفة فقط كـ: ",
+        "filter_country": "فلترة حسب البلد"
+        },
+    "fr": {
+        "site_desc":"À  <a href='http://Bloberryconsulting.com'>Bloberry Consulting</a>, nous sommes dédiés à fournir des algorithmes de deep learning de pointe pour suivre et analyser des flux vidéo provenant de caméras de surveillance. Notre plateforme vous permet de tester plusieurs réseaux de deep learning sur des flux vidéo existants et de recevoir des insights et des analyses en temps réel. Seules les caméras filtrées sont actuellement disponibles. De cette manière, aucune des caméras sur ce site n'envahit la vie privée de quiconque. Toute caméra privée ou non éthique sera immédiatement supprimée sur plainte par e-mail. Veuillez fournir un lien direct pour faciliter la suppression rapide de la caméra. Si vous ne souhaitez pas nous contacter par e-mail (zeroprg@yahoo.com), vous pouvez quand même retirer votre caméra du site. La seule chose que vous avez à faire est de définir le mot de passe de votre caméra. Avec AIcams, vous avez la possibilité d'entrer l'URL de n'importe quelle caméra IP publique et d'accéder à son flux vidéo depuis notre plateforme. Cependant, veuillez noter que en spécifiant l'adresse IP ou l'URL de la caméra, vous partagerez votre lien avec tous les autres abonnés. Pour rendre votre lien privé, vous devrez souscrire à notre version payante.",
+        "enter_url": "Entrez l'URL de la caméra IP dans cette case",
+        "warning": "En spécifiant l'adresse IP ou l'URL de la caméra ci-dessous, vous partagerez votre lien avec tous les autres abonnés. Pour rendre ce lien privé, vous devrez souscrire à notre version payante",
+        "enter_url_inbox": "Entrez l'adresse IP ou l'URL de la caméra ici (le processus commencera après 100 secondes, il suffit de rafraîchir l'écran)",
+        "loading_stream_locns": " ...Chargement des emplacements de flux vidéo sur la carte...",
+        "filter_class": "Afficher uniquement les vidéos classées comme: ",
+        "filter_country": "Filtrer par pays"      
+    }
+}

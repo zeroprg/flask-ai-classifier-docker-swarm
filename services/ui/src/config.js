@@ -1,15 +1,8 @@
 import process from 'process';
 
 const config = {
-    i18n: {
-        welcome: {
-            en: "Welcome",
-            fa: "خوش آمدید"
-        }
-        // rest of your translation object
-    },
     // other global config variables you wish
-    API: "http://192.168.0.100:3020/",
+    API: "http://aicams.ca:3020/",
     // API: "http://127.0.0.1:5000/",
     //API:    "//localhost:5000/", // use it for local debuging
 };

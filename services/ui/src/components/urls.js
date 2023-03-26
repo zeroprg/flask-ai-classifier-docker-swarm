@@ -1,58 +1,50 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 
-class URLlist extends Component {
+const URLlist = (props) => {
+  const [data, setData] = useState(props.data);
 
-buttonClickHide(arg1, arg2) {
-    let elem = document.getElementById("section"+arg2)
-    if(elem) elem.style.display ='none';
-}
- constructor(){
-     super();
-     this.state = {data : []};
- }
+  const buttonClickHide = (arg1, arg2) => {
+    let elem = document.getElementById("section" + arg2)
+    if (elem) elem.style.display = 'none';
+  };
 
- updateparams(param) {
-    this.props.updateparams(param);
-  }
+  const updateparams = (param) => {
+    props.updateparams(param);
+  };
 
- updateurls( data ) {
-    this.setState( data )    
-    this.props.updateurls(data);
- }
+  const updateurls = (data) => {
+    setData(data);
+    props.updateurls(data);
+  };
 
-buttonClickShow(cam) {
-    this.updateparams({ videoalignment: 'both' });
-    let elem = document.getElementById("section"+cam);
-    
-    if (elem ) {
-        elem.scrollIntoView();
-    }    
+  const buttonClickShow = (cam) => {
+    updateparams({ videoalignment: 'both' });
+    let elem = document.getElementById("section" + cam);
 
-}
-
-render() {
-    const { data } = this.props;
-
-    if(data && data.length>0)    
-    return (
-        <ul>
-            {data.map(data =>
-                <li key={data.cam}>
-                    <a href={data.url}>{data.url}</a>
-                    &nbsp;
-                    <a onClick={() => this.buttonClickShow( data.url )} className="btn btn-primary a-btn - slide - text">
-                        <span className="glyphicon" aria-hidden="true"></span>
-                        <span>
-                            <strong>Show</strong>
-                        </span>
-                    </a>
-                </li>
-            )}
-        </ul>
-    );
-    else {
-        return <p className= "loading"> ...  Loading ...</p>
+    if (elem) {
+      elem.scrollIntoView();
     }
-  }
+  };
+
+  return (
+    data && data.length > 0 ?
+      <ul>
+        {data.map(data =>
+          <li key={data.cam}>
+            <a href={data.url}>{data.url}</a>
+            &nbsp;
+            <a onClick={() => buttonClickShow(data.url)} className="btn btn-primary a-btn - slide - text">
+              <span className="glyphicon" aria-hidden="true"></span>
+              <span>
+                <strong>Show</strong>
+              </span>
+            </a>
+          </li>
+        )}
+      </ul>
+      :
+      <p className="loading"> ...  Loading ...</p>
+  );
 }
-export default URLlist
+
+export default URLlist;

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { XYPlot, XAxis, YAxis, VerticalGridLines,  HorizontalGridLines,  VerticalBarSeries} from 'react-vis';
-import axios from 'axios';
 const Plotter = (props) => {
   const [width, setWidth] = useState(window.innerWidth);
 

@@ -14,14 +14,14 @@ services:
 #          - node.role==worker
     environment:
       - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
-      - CONFIDENCE=0.36967
+      - CONFIDENCE=0.37967
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/web/config.txt
       - DB_IP_ADDRESS=192.168.0.100
       - DB_USERNAME=odroid
       - DB_PASSWORD=vist2508
       - DB_NAME=streamer     
-      - MAXIMUM_VIDEO_STREAMS=10 #maximum streams processed per node
+      - MAXIMUM_VIDEO_STREAMS=15 #maximum streams processed per node
     networks:
       - flask
     ports:
@@ -153,21 +153,21 @@ services:
       - flask
 
 
-  visualizer:
-    image: alexellis2/visualizer-arm
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-         - node.hostname == rock64_1
-    ports:
-      - 8080:8080
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    networks:
-      - flask
+#  visualizer:
+#    image: alexellis2/visualizer-arm
+#    deploy:
+#      replicas: 1
+#      restart_policy:
+#        condition: on-failure
+#      placement:
+#        constraints:
+#         - node.hostname == rock64_1
+#    ports:
+#      - 8080:8080
+#    volumes:
+#      - "/var/run/docker.sock:/var/run/docker.sock"
+#    networks:
+#      - flask
 
 
 networks:

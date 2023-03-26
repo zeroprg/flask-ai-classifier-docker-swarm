@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { YMaps, Map, Placemark, ZoomControl, FullscreenControl } from '@pbe/react-yandex-maps';
+import t from '../translator';
 
 const MarkersMap = ({markers}) => {
   const [loading, setLoading] = useState(true);
@@ -29,11 +30,11 @@ const MarkersMap = ({markers}) => {
     
     <div>
       {loading && (
-        <p>... Loading video stream locations on map...</p>
+        <p dangerouslySetInnerHTML={t("loading_stream_locns")}/> 
       )}
 
-      <YMaps>
-        <Map width="100%" height="350px" 
+      <YMaps  query={{ lang: navigator.language }}>
+        <Map width="100%" height="350px"
           onLoad={() => {
            setLoading(false); 
            
