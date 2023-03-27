@@ -39,7 +39,7 @@ const MarkersMap = ({markers}) => {
            setLoading(false); 
            
           }}
-          defaultState={{ center: (loading ? center : [55.75, 37.57]), zoom: 6 }}
+          defaultState={{ center, zoom: 4 }}
            
         >
           {markers.map((url) => (

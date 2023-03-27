@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
     }); 
 
     const [initialUrls, setInitialUrls] = useState([]);
-    const [descUrls, setDescUrls] = useState({});
+   
     const [urls, setUrls] = useState([]);
     const [videoAlignment] = useState('video');
     const [open, setOpen] = useState(false);
@@ -55,10 +55,14 @@ const useStyles = makeStyles((theme) => ({
     const [variant, setVariant] = useState('success');
 
     const [countryFilter, setcountryFilter] = useState('RU');
+    const [cityFilter, setcityFilter] = useState('none');
     const [interestFilter, setinterestFilter] = useState('none');
     const isVideoAndStatistic = videoAlignment === 'statistic';  
     // State to hold grouped urls
     const [groupedUrls, setGroupedUrls] = useState({});
+    const [cityUrls, setCityUrls] = useState({});
+    const [descUrls, setDescUrls] = useState({});
+    
     const snackbarRef = useRef(null);
 
     const handleOpen = (message, variant) => {
@@ -66,22 +70,39 @@ const useStyles = makeStyles((theme) => ({
         setVariant(variant);
         setOpen(true);
     };
+    const rated = initialUrls.filter((url) => url.objects_counted >= 0);
 
     const handlecountryFilterChange = (event) => {
-        const selectedCountry = event.target.value;        
+        if( countryFilter ==='none' && interestFilter === 'none' ) return
+        const selectedCountry = event.target.value;
+        if( interestFilter === 'rating' ){          
+          setUrls(countryFilter ==='none' ?  rated: groupedUrls[selectedCountry].filter((url) => url.objects_counted >= 0));        }
+        else {  
+          setUrls(selectedCountry === 'none' ? descUrls[interestFilter]:  (interestFilter === 'none'? groupedUrls[selectedCountry]:  groupedUrls[selectedCountry].filter(item=>item.desc===interestFilter)))        
+        }
+        setcityFilter('none')
         setcountryFilter(selectedCountry);
-        setinterestFilter('none');
-        //setUrls(selectedCountry === 'all' ? initialUrls : initialUrls.filter((url) => url.country === selectedCountry));
-        setUrls(selectedCountry === 'all' ? initialUrls : groupedUrls[selectedCountry])        
     };
+
+    const handlecityFilterChange = (event) => {
+      if( countryFilter ==='none' && cityFilter === 'none' ) return
+      const selectedCity = event.target.value;      
+      setUrls(selectedCity === 'none' ? groupedUrls[countryFilter]: cityUrls[selectedCity])        
+      setcityFilter(selectedCity);
+  };
    
     const handleinterestFilterChange = (event) => {
-      const selectedInterest = event.target.value;
+      if( countryFilter ==='none' && interestFilter === 'none' ) return
+      const selectedInterest = event.target.value;    
+      if( selectedInterest === 'rating' ){       
+        setUrls(countryFilter ==='none' ?  rated: rated.filter(item=>item.country===countryFilter) );
+      }
+      else{
+        setUrls( countryFilter ==='none' ? descUrls[selectedInterest] : (selectedInterest === 'none'? groupedUrls[countryFilter]:  groupedUrls[countryFilter].filter(item=>item.desc===selectedInterest)));
+      }
+      setcityFilter('none')
       setinterestFilter(selectedInterest);
-      setcountryFilter('all');
-      if( selectedInterest === 'rating' ) setUrls( initialUrls.filter((url) => url.objects_counted >= 0));
-      else setUrls(selectedInterest === 'all' ? initialUrls : descUrls[selectedInterest])
-  };
+    };
     
     const handleClose = () => {
         setOpen(false);
@@ -119,6 +140,7 @@ const useStyles = makeStyles((theme) => ({
         setInitialUrls(data)
         updateurls(data);
         setGroupedUrls(groupUrlsByCountry(data));
+        setCityUrls(groupUrlsByCity(data));
         setDescUrls(groupUrlsByDesc(data));
       })
       .catch(error => setLoading(false));
@@ -135,7 +157,21 @@ const useStyles = makeStyles((theme) => ({
         return acc;
         }, {});
     };
-        // Function to group urls by country
+
+    // Function to group urls by city
+    const groupUrlsByCity = (urls) => {
+        return urls.reduce((acc, cur) => {
+        //const city_code =  cur.city + ','+ cur.country;
+        if (cur.city in acc) {
+            acc[cur.city].push(cur);
+        } else {
+            acc[cur.city] = [cur];
+        }
+        return acc;
+        }, {});
+    };
+
+        // Function to group urls by scene description
     const groupUrlsByDesc = (urls) => {
         return urls.reduce((acc, cur) => {
         if( cur.desc === null || cur.desc === 'null' ) return acc;        
@@ -161,9 +197,9 @@ const useStyles = makeStyles((theme) => ({
           <header className="App-header">
           {!isLoading && (
                 <div>
-                    <label htmlFor="interestFilter">{t("filter_class").__html}</label>
+                    <label htmlFor="interestFilter">{t("filter_class").__html}&nbsp;</label>&nbsp;
                     <select id="interestFilter" value={interestFilter} onChange={handleinterestFilterChange}>
-                        <option key='interest' value='none'></option> 
+                        <option key='none' value='none'></option> 
                         <option key='rating' value='rating'>Rated</option>
                         {Object.keys(descUrls).sort().map((desc) => (
                           <option key={desc} value={desc}>
@@ -171,18 +207,28 @@ const useStyles = makeStyles((theme) => ({
                           </option>
                          ))}
                     </select>
-                    <label htmlFor="countryFilter">{t("filter_country").__html}</label>
+                    &nbsp;<label htmlFor="countryFilter">{t("filter_country").__html}&nbsp;</label>&nbsp;
                     <select id="countryFilter" value={countryFilter} onChange={handlecountryFilterChange}>                        
-                        <option key='none' value=''/>
+                        <option key='none' value='none'></option>
                         {Object.keys(groupedUrls).sort().map((countryCode) => (
                         <option key={countryCode} value={countryCode}>
                             {countries.find((c) => c.cc === countryCode) ? countries.find((c) => c.cc === countryCode).name : countryCode}
                         </option>
                         ))}                        
-                    </select>                    
+                    </select>
+                    &nbsp;<label htmlFor="cityFilter">{t("filter_city").__html}&nbsp;</label>&nbsp;
+                    <select key={handlecountryFilterChange} id="cityFilter" value={cityFilter} onChange={handlecityFilterChange}>                        
+                        <option key='none' value='none'></option>                       
+                         {groupedUrls[countryFilter] && groupedUrls[countryFilter].map((url) => (
+                          <option key={url.id} value={url.city}>
+                            {url.city}
+                          </option>                          
+                         ))}       
+                                                                
+                    </select>                     
                 </div>
           )}
-                <MarkersMap key={countryFilter} markers={urls}/>      
+                <MarkersMap markers={urls}/>      
                 <div className="container">
                    <div className="row nav-wrapper"/> 
                    <div className="col-md-12">

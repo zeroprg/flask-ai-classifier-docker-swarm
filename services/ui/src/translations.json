@@ -7,7 +7,8 @@
         
         "loading_stream_locns": " ...Loading video stream locations on map...",
         "filter_class": "Show only videos classified as: ",
-        "filter_country": "Filter by country"
+        "filter_country": "Filter by country",
+        "filter_city": "Filter by city"
 
     },
     "ru": {
