@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Picker, StyleSheet, View, Text, ScrollView  } from 'react-native';
+
 import axios from 'axios'
 //import { groupBy } from 'lodash';
 
@@ -56,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
 
     const [countryFilter, setcountryFilter] = useState('RU');
     const [cityFilter, setcityFilter] = useState('none');
-    const [interestFilter, setinterestFilter] = useState('people');
+    const [interestFilter, setinterestFilter] = useState('person');
     const isVideoAndStatistic = videoAlignment === 'statistic';  
     // State to hold grouped urls
     const [groupedUrls, setGroupedUrls] = useState({});
@@ -188,99 +190,100 @@ const useStyles = makeStyles((theme) => ({
 
     useEffect(() => {
         console.log(props.req);
-        loadData()
-    }, []);
+        Promise.resolve().then(() => {
+          return loadData();
+        });
+    });
+    return (
+    <View style={styles.container}> 
+    <SnackbarProvider value={{ handleOpen, handleClose }}>
+      <View style={styles.filterContainer}>
+      {!isLoading && (
+        <View style={styles.filterContent}>
+          <Text>{t("filter_class").__html}&nbsp;</Text>
+          <Picker
+            style={styles.picker}
+            selectedValue={interestFilter}
+            onValueChange={handleinterestFilterChange}
+          >
+            <Picker.Item key='none' value='none' label='' />
+            <Picker.Item key='rating' value='rating' label='Rated' />
+            {Object.keys(descUrls)
+              .sort()
+              .map((desc) => (
+                <Picker.Item key={desc} value={desc} label={desc} />
+              ))}
+          </Picker>
+          <Text>{t("filter_country").__html}&nbsp;</Text>
+          <Picker
+            style={styles.picker}
+            selectedValue={countryFilter}
+            onValueChange={handlecountryFilterChange}
+          >
+            <Picker.Item key='none' value='none' label='' />
+            {Object.keys(groupedUrls)
+              .sort()
+              .map((countryCode) => (
+                <Picker.Item
+                  key={countryCode}
+                  value={countryCode}
+                  label={
+                    countries.find((c) => c.cc === countryCode)
+                      ? countries.find((c) => c.cc === countryCode).name
+                      : countryCode
+                  }
+                />
+              ))}
+          </Picker>
+          <Text>{t("filter_city").__html}&nbsp;</Text>
+          <Picker
+            key={handlecountryFilterChange}
+            style={styles.picker}
+            selectedValue={cityFilter}
+            onValueChange={handlecityFilterChange}
+          >
+            <Picker.Item key='none' value='none' label='' />
+            {groupedUrls[countryFilter] &&
+              groupedUrls[countryFilter].map((url) => (
+                <Picker.Item key={url.id} value={url.city} label={url.city} />
+              ))}
+          </Picker>
+        </View>
+      )}
+      </View>
+      <View style={{ flex: 1 }}>
+        <MarkersMap markers={urls}/>
+        <View style={{ flex: 1 }}>
+          <Snackbar 
+            visible={open} 
+            onDismiss={handleClose} 
+            duration={6000}
+            style={variant === "error" ? {backgroundColor: "red"} : {backgroundColor: "green"}}
+          >
+            {message}
+          </Snackbar>
+          <Text>{t("site_desc")}</Text>
+          <InputURL updateparams={updateparams} />    
+          {isVideoAndStatistic && <URLlist updateparams={updateparams} updateurls={updateurls} data={urls}/> }
+        </View>
+      </View>
 
-    return (  
-        <div className="App">
-         <SnackbarProvider value={{ handleOpen, handleClose }}>
-          <header className="App-header">
-            <h1>{t("welcome").__html}</h1>
-          {!isLoading && (
-                <div>
-                    <label htmlFor="interestFilter">{t("filter_class").__html}&nbsp;</label>&nbsp;
-                    <select id="interestFilter" value={interestFilter} onChange={handleinterestFilterChange}>
-                        <option key='none' value='none'></option> 
-                        <option key='rating' value='rating'>Rated</option>
-                        {Object.keys(descUrls).sort().map((desc) => (
-                          <option key={desc} value={desc}>
-                            {desc}
-                          </option>
-                         ))}
-                    </select>
-                    &nbsp;<label htmlFor="countryFilter">{t("filter_country").__html}&nbsp;</label>&nbsp;
-                    <select id="countryFilter" value={countryFilter} onChange={handlecountryFilterChange}>                        
-                        <option key='none' value='none'></option>
-                        {Object.keys(groupedUrls).sort().map((countryCode) => (
-                        <option key={countryCode} value={countryCode}>
-                            {countries.find((c) => c.cc === countryCode) ? countries.find((c) => c.cc === countryCode).name : countryCode}
-                        </option>
-                        ))}                        
-                    </select>
-                    &nbsp;<label htmlFor="cityFilter">{t("filter_city").__html}&nbsp;</label>&nbsp;
-                    <select key={handlecountryFilterChange} id="cityFilter" value={cityFilter} onChange={handlecityFilterChange}>                        
-                        <option key='none' value='none'></option>                       
-                         {groupedUrls[countryFilter] && groupedUrls[countryFilter].map((url) => (
-                          <option key={url.id} value={url.city}>
-                            {url.city}
-                          </option>                          
-                         ))}       
-                                                                
-                    </select>                     
-                </div>
-          )}
-                {!isLoading && (<MarkersMap  markers={urls}/>)}   
-                <div className="container">
-                   <div className="row nav-wrapper"/> 
-                   <div className="col-md-12">
-                            <Snackbar 
-                                open={open} 
-                                message={message} 
-                                variant={variant} 
-                                onClose={handleClose} 
-                                autoHideDuration={6000} 
-                                ref={snackbarRef}
-                                className={classes[variant]}/>   
-                            
-                            <p dangerouslySetInnerHTML={t("site_desc")}/> 
-                            <InputURL updateparams={updateparams} />    
-                            {isVideoAndStatistic && <URLlist updateparams={updateparams} updateurls={updateurls} data={urls}/> }
-                    </div>
-                </div>
-     
-           </header>
-        
-            <VideoStreamers param={state} urls={urls} />
-     
-            <div className="feature-bg">
-                <div className="row">
-                    <div className="col-md-12 nopadding">
-                        <div className="features-slider">
-                            <ul className="slides" id="featuresSlider">
-                                <li>
-                                    <h1>Counting objects</h1>
-                                    <p>
-                                        Appling existing  <a href="https://www.pyimagesearch.com/2020/01/27/yolo-and-tiny-yolo-object-detection-on-the-raspberry-pi-and-movidius-ncs/">YOLO Tiny V3</a>
-                                        Model network to surveillance cameras live video streams <a href="http://aicams.ca" className="arrow-btn">aicams.ca</a> to
-                                        calculate occupancy number on video screen
-                                    </p>
-                                </li>
-    
-                                <li>
-                                    <h1>Check Objects behaviour :</h1>
-                                    <p>
-                                    Check if object of interest behave accordingly. 
-                        Check if object of interest was found  notify immediatly by eMail, SMS or voice call
-                        You can buy full source code version of our cloud solution plus hardware (ARM computer) from our store : <a href="//aicams.info" target="_blank" rel="noreferrer">http://aicams.info</a>.                                </p>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-    
-        </SnackbarProvider>           
-        </div>
-      );}
+      <VideoStreamers param={state} urls={urls} />
+
+      <View style={styles.featureBg}>
+        <ScrollView horizontal={true}>
+          <View style={styles.featureSlide}>
+            <Text style={styles.featureHeader}>{t("bottom_word1_header").__html}</Text>
+            <Text style={styles.featureText}>{t("bottom_word1").__html}</Text>
+          </View>
+          <View style={styles.featureSlide}>
+            <Text style={styles.featureHeader}>{t("bottom_word2_header").__html}</Text>
+            <Text style={styles.featureText}>{t("bottom_word2").__html}</Text>
+          </View>
+        </ScrollView>
+      </View>
+      </SnackbarProvider>
+   </View>);}
+
     
 export default App;
