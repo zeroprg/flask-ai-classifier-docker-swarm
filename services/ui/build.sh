@@ -1,7 +1,7 @@
 git pull  --no-edit
 npm install
 sudo -S -k rm -rf build
-npm run build && npm install -g build
+npm run build 
 rm -rf build_prepered
 mv build build_prepered
 #rm -rf static
