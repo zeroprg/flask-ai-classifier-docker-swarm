@@ -21,14 +21,8 @@ const MarkersMap = ({ markers, zoom, center }) => {
     }
   }
 
-  /*
-  useEffect(() => {
-    if (mapRef.current && center) {
-      // Update the map center using mapRef when center prop changes
-      mapRef.current.setCenter(center);
-    }
-  }, [center]);
-  */
+
+ 
 
   return (
     <div>
@@ -38,7 +32,6 @@ const MarkersMap = ({ markers, zoom, center }) => {
 
       <YMaps query={{ lang: navigator.language }}>
         <Map
-          //ref={mapRef} // Assign mapRef to the ref prop of Map component
           width="100%"
           height="350px"
           onLoad={() => {

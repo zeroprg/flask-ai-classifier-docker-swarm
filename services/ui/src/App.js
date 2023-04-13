@@ -241,7 +241,7 @@ const useStyles = makeStyles((theme) => ({
                     </select>                     
                 </div>
           )}
-                {!isLoading && (<MarkersMap  markers={urls} zoom={zoom} center={position} />)}   
+                {!isLoading && (<MarkersMap  markers={urls} zoom={zoom} center={position} key={JSON.stringify(position)} />)}   
                 <div className="container">
                    <div className="row nav-wrapper"/> 
                    <div className="col-md-12">
