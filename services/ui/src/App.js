@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
 
     const [countryFilter, setcountryFilter] = useState('RU');
     const [cityFilter, setcityFilter] = useState('none');
-    const [interestFilter, setinterestFilter] = useState(null);
+    const [interestFilter, setinterestFilter] = useState('rating');
     const isVideoAndStatistic = videoAlignment === 'statistic';  
     // State to hold grouped urls
     const [groupedUrls, setGroupedUrls] = useState({});
