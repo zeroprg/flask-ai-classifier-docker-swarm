@@ -2,10 +2,12 @@ import uuid
 import logging
 import requests
 import socket
-import cv2
+#import cv2
 import imutils
 import re
 from urllib.parse import urlsplit
+
+
 
 #from flask_sqlalchemy import SQLAlchemy
 #from flask_migrate import Migrate
@@ -85,7 +87,7 @@ def ping_video_url(url):
             imutils.url_to_image(url)
             return True
           
-        vs = cv2.VideoCapture(url)
+        # vs = cv2.VideoCapture(url)
         #vs.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         flag, _ = vs.read()
     except Exception as e:        
@@ -98,13 +100,21 @@ db = Sql(SQLALCHEMY_DATABASE_URI = prod.SQLALCHEMY_DATABASE_URI)
 def populate_lat_long(params):
     if( 'lat' in params ): return  
     data = get_geolocation_by_ip(convert_url_to_ip(params['url']))
-    if(data is not None and 'location' in data ):
-        params['lat'] = data['location']['lat']
-        params['lng'] = data['location']['lng']
-        params['city'] =  data['location']['city']
-        params['postalcode'] =  data['location']['postalCode']
-        params['country'] =  data['location']['country']
-    
+    if(data is not None ):
+        #params['lat'] = data['location']['lat']
+        #params['lng'] = data['location']['lng']
+        #params['city'] =  data['location']['city']
+        #params['postalcode'] =  data['location']['postalCode']
+        #params['country'] =  data['location']['country']
+        
+        # Different https://get.geojs.io  API
+        print("Geolocation data: {}".format(data))
+        params['lat'] = data['latitude']
+        params['lng'] = data['longitude']
+        params['city'] = data.get('city', None)
+        #params['postalcode'] = data['postalCode']
+        params['region']  = data.get('region', None)
+        params['country'] =  data['country_code']    
 
 ip_geolocation_key = None
 def get_geolocation_by_ip(ip): 
@@ -122,9 +132,10 @@ def get_geolocation_by_ip(ip):
         "X-RapidAPI-Host": "whoisapi-ip-geolocation-v1.p.rapidapi.com"
     }
     json_response = None
-    url = "https://whoisapi-ip-geolocation-v1.p.rapidapi.com/api/v1?ipAddress={}".format(ip)
+    #url = "https://whoisapi-ip-geolocation-v1.p.rapidapi.com/api/v1?ipAddress={}".format(ip)
+    url = "https://get.geojs.io/v1/ip/geo/{}.json".format(ip)
     try:
-        response = requests.get(url=url, headers=headers)
+        response = requests.get(url=url) #, headers=headers)
         response.raise_for_status()
         json_response = response.json()
         logging.debug("Entire JSON response: {}".format(json_response))
@@ -133,6 +144,8 @@ def get_geolocation_by_ip(ip):
     except Exception as err:
         logging.critical("Failed to get geolocation by IP: {}".format(err))
     return json_response
+
+
 
 def get_hostname(url):
     result = urlsplit(url)
@@ -183,8 +196,9 @@ def populate_urls_in_db(add_url):
         else:     
             logging.info("URL {} added successfully".format(add_url)) 
             populate_lat_long(params)
-            params['city'] = params['city'][:25]
-            params['country'] = params['country'][:25]
+            params['region'] = params['region'] [:25] if params.get('region', None) is not None else None
+            params['city'] = params['city'] [:25] if params.get('city', None) is not None else None
+            params['country'] = params['country'][:25] if params.get('country', None) is not None else None
             logging.debug(params)    
             db.update_urls(params)
             logging.info("URL {} was updated successfully with lattitude and longitude".format(add_url)) 

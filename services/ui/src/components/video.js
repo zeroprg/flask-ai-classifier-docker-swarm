@@ -78,9 +78,13 @@ const Video = ({camera, showBoxesAroundObjects, showVideoSectionOnly, showvideos
                 <i className={ !showvideosection ? "fa fa-bar-chart" : "fa fa-play"} onClick={()=>{scrollToCamera()}}></i>
             </span>         
             }  
-            <span  className="menu-item" onClick={()=>{window.scrollTo(0, 0)}}> 
-                <i className="fa fa-map"></i>
-            </span>             
+            <SnackbarConsumer>            
+                {({handleMapPoint}) => ( 
+                <span  className="menu-item" onClick={()=>{handleMapPoint([camera.lat,camera.lng])}}> 
+                    <i className="fa fa-map"></i>
+                </span>
+                )}
+            </SnackbarConsumer>           
             
         </nav>
         :<span/>

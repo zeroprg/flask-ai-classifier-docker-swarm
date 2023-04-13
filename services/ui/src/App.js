@@ -54,9 +54,14 @@ const useStyles = makeStyles((theme) => ({
     const [message, setMessage] = useState('');
     const [variant, setVariant] = useState('success');
 
+    
+    const [zoom, setZoom] = useState(8);
+    const [position, setPosition] = useState([55.75, 37.57]);
+    
+
     const [countryFilter, setcountryFilter] = useState('RU');
     const [cityFilter, setcityFilter] = useState('none');
-    const [interestFilter, setinterestFilter] = useState('people');
+    const [interestFilter, setinterestFilter] = useState(null);
     const isVideoAndStatistic = videoAlignment === 'statistic';  
     // State to hold grouped urls
     const [groupedUrls, setGroupedUrls] = useState({});
@@ -106,6 +111,13 @@ const useStyles = makeStyles((theme) => ({
     
     const handleClose = () => {
         setOpen(false);
+    };
+
+    const handleMapPoint = (position) => {
+      setPosition(position);      
+      setZoom(12);      
+      window.scrollTo(0, 0);
+      console.log(position);
     };
    
     const  updateurls = (initialUrls)=>{        
@@ -193,7 +205,7 @@ const useStyles = makeStyles((theme) => ({
 
     return (  
         <div className="App">
-         <SnackbarProvider value={{ handleOpen, handleClose }}>
+         <SnackbarProvider value={{ handleOpen, handleClose, handleMapPoint }}>
           <header className="App-header">
             <h1>{t("welcome").__html}</h1>
           {!isLoading && (
@@ -229,7 +241,7 @@ const useStyles = makeStyles((theme) => ({
                     </select>                     
                 </div>
           )}
-                {!isLoading && (<MarkersMap  markers={urls}/>)}   
+                {!isLoading && (<MarkersMap  markers={urls} zoom={zoom} center={position} />)}   
                 <div className="container">
                    <div className="row nav-wrapper"/> 
                    <div className="col-md-12">

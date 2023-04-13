@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { YMaps, Map, Placemark, ZoomControl, FullscreenControl } from '@pbe/react-yandex-maps';
 import t from '../translator';
 
-const MarkersMap = ({markers}) => {
-  const [loading, setLoading] = useState(true);
-  const [center, setCenter] = useState([55.75, 37.57]);
-  const is_counted = (count) =>{
-    return count >= 0 ? 'Founded '+count+ ' objects per minute<br/>': '';
+const MarkersMap = ({ markers, zoom, center }) => {
+  const [loading, setLoading] = useState(true); 
+
+
+  const is_counted = (count) => {
+    return count >= 0 ? 'Founded ' + count + ' objects per minute<br/>' : '';
   }
+
   const handleMarkerClick = (cam) => {
     const stream = document.getElementById(`stream${cam}`);
-    const div= document.getElementById(cam);
-     
+    const div = document.getElementById(cam);
+
     if (stream) {
       stream.scrollIntoView({ behavior: 'smooth' });
       stream.focus();
@@ -19,36 +21,37 @@ const MarkersMap = ({markers}) => {
     }
   }
 
+  /*
   useEffect(() => {
-    if (markers.length > 0) {
-      const center = markers.reduce((acc, cur) => [acc[0] + cur.lat, acc[1] + cur.lng], [0, 0]);
-      setCenter([center[0] / markers.length, center[1] / markers.length]);
+    if (mapRef.current && center) {
+      // Update the map center using mapRef when center prop changes
+      mapRef.current.setCenter(center);
     }
-  }, [markers]);
-  
+  }, [center]);
+  */
+
   return (
-    
     <div>
       {loading && (
-        <p dangerouslySetInnerHTML={t("loading_stream_locns")}/> 
+        <p dangerouslySetInnerHTML={t("loading_stream_locns")} />
       )}
 
-      <YMaps  query={{ lang: navigator.language }}>
-        <Map width="100%" height="350px"
+      <YMaps query={{ lang: navigator.language }}>
+        <Map
+          //ref={mapRef} // Assign mapRef to the ref prop of Map component
+          width="100%"
+          height="350px"
           onLoad={() => {
-           setLoading(false); 
-           
+            setLoading(false);
           }}
-          defaultState={{ center, zoom: 4 }}
-           
+          defaultState={{ center: center, zoom }}
         >
           {markers.map((url) => (
             <Placemark
               key={url.cam}
               geometry={[url.lat, url.lng]}
-              modules={['geoObject.addon.balloon']}            
+              modules={['geoObject.addon.balloon']}
               onClick={() => handleMarkerClick(url.cam)}
-
               properties={{
                 balloonContentHeader: '',
                 balloonContentBody: `${url.city}:<br/>${is_counted(url.objects_counted)}Idle in mins: ${url.idle_in_mins}<br/>`,
@@ -61,13 +64,11 @@ const MarkersMap = ({markers}) => {
                 openHintOnHover: true,
               }}
             >
-
             </Placemark>
           ))}
           <ZoomControl options={{ float: "right" }} />
           <FullscreenControl />
         </Map>
-
       </YMaps>
     </div>
   );

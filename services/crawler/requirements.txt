@@ -1,0 +1,11 @@
+# requirements.txt
+uuid
+logging
+requests
+socket
+imutils
+re
+bs4
+logging
+urllib3
+collections

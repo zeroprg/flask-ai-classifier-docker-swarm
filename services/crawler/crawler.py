@@ -8,7 +8,7 @@ from collections import deque
 
 from project import db, populate_urls_in_db, geSession, read_info, url_to_filename, store_info
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 from reg_express import accumulate_regexes
 
 # global list of urls which store info from db
@@ -81,8 +81,8 @@ def traverse_internal_urls(url, visited_urls, regex_dict):
             if internal_url.endswith("/"):
                 internal_url = internal_url[:-1]
             print("internal_url: {} ".format(internal_url))
-            if internal_url not in visited:
-                store_info(url_to_filename(domain), internal_url, visited)
+            if internal_url not in visited:                
+                #store_info(url_to_filename(domain), internal_url, visited)
                 stack.append((internal_url, visited.copy()))
     
     

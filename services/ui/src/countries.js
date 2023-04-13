@@ -9,6 +9,9 @@ const countries = [
     { cc: 'AG', name: 'Antigua and Barbuda' },
     { cc: 'AR', name: 'Argentina' },
     // more countries...
+    {cc: 'PK', name: 'Pakistan'},
+    {cc: 'NP', name: 'Nepal'},
+    {cc: 'JO', name: 'Jordan'},
     {cc: 'RU', name: 'Russia'},
     {cc: 'US', name: 'United States'},
     {cc: 'CA', name: 'Canada'},
