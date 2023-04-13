@@ -283,7 +283,7 @@ const useStyles = makeStyles((theme) => ({
                                     <p>
                                     Check if object of interest behave accordingly. 
                         Check if object of interest was found  notify immediatly by eMail, SMS or voice call
-                        You can buy full source code version of our cloud solution plus hardware (ARM computer) from our store : <a href="//aicams.info" target="_blank" rel="noreferrer">http://aicams.info</a>.                                </p>
+                        You can buy full source code version of our cloud solution plus hardware (ARM computer) from our store : <a href="https://bloberryconsulting.com/embedded-computers-sale-1" target="_blank" rel="noreferrer">https://bloberryconsulting.com/embedded-computers-sale-1</a>.                                </p>
                                 </li>
                             </ul>
                         </div>

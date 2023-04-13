@@ -53,7 +53,7 @@ import Plotter from './plotter';
 
 
     useEffect(() => {
-      const interval = setInterval(() => setTime(new Date().getTime()), 6000000);
+      const interval = setInterval(() => setTime(new Date().getTime()), 12000000);
       return () => {
         clearInterval(interval);
       };
