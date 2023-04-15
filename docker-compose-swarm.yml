@@ -27,15 +27,15 @@ services:
     ports:
       - 3020:3020
 
-  crawler:
-    image: zeroprg/flask-docker-swarm_crawler:latest
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - node.role==worker
+#  crawler:
+#    image: zeroprg/flask-docker-swarm_crawler:latest
+#    deploy:
+#      replicas: 1
+#      restart_policy:
+#        condition: on-failure
+#      placement:
+#        constraints:
+#          - node.role==worker
 
   #web:
   #  image: zeroprg/flask-docker-swarm_web:latest
@@ -142,23 +142,23 @@ services:
       - flask
 
 
-  aicams:
-    image: zeroprg/flask-docker-swarm_aicams:latest
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-         - node.hostname == rock64_1
-    ports:
-      - 81:81
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    depends_on:
-      - cam
-    networks:
-      - flask
+#  aicams:
+#    image: zeroprg/flask-docker-swarm_aicams:latest
+#    deploy:
+#      replicas: 1
+#      restart_policy:
+#        condition: on-failure
+#      placement:
+#        constraints:
+#         - node.hostname == rock64_1
+#    ports:
+#      - 81:81
+#    environment:
+#      - CHOKIDAR_USEPOLLING=true
+#    depends_on:
+#      - cam
+#    networks:
+#      - flask
 
 
 #  visualizer:
