@@ -1,4 +1,4 @@
-git pull  --no-edit
+nvm install --lts=erbium
 npm install
 sudo -S -k rm -rf build
 npm run build 
