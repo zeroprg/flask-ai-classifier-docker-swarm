@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
     };
     const rated = initialUrls.filter((url) => url.objects_counted >= 0);
 
-    const handlecountryFilterChange = (event) => {
+    const handleCountryFilterChange = (event) => {
         if( countryFilter ==='none' && interestFilter === 'none' ) return
         const selectedCountry = event.target.value;
         if( interestFilter === 'rating' ){          
@@ -87,16 +87,18 @@ const useStyles = makeStyles((theme) => ({
         }
         setcityFilter('none')
         setcountryFilter(selectedCountry);
+        setZoom(8);
+        setPosition(countries.find((c) => c.cc === selectedCountry).position);
     };
 
-    const handlecityFilterChange = (event) => {
+    const handleCityFilterChange = (event) => {
       if( countryFilter ==='none' && cityFilter === 'none' ) return
       const selectedCity = event.target.value;      
       setUrls(selectedCity === 'none' ? groupedUrls[countryFilter]: cityUrls[selectedCity])        
       setcityFilter(selectedCity);
   };
    
-    const handleinterestFilterChange = (event) => {
+    const handleInterestFilterChange = (event) => {
       if( countryFilter ==='none' && interestFilter === 'none' ) return
       const selectedInterest = event.target.value;    
       if( selectedInterest === 'rating' ){       
@@ -211,7 +213,7 @@ const useStyles = makeStyles((theme) => ({
           {!isLoading && (
                 <div>
                     <label htmlFor="interestFilter">{t("filter_class").__html}&nbsp;</label>&nbsp;
-                    <select id="interestFilter" value={interestFilter} onChange={handleinterestFilterChange}>
+                    <select id="interestFilter" value={interestFilter} onChange={handleInterestFilterChange}>
                         <option key='none' value='none'></option> 
                         <option key='rating' value='rating'>Rated</option>
                         {Object.keys(descUrls).sort().map((desc) => (
@@ -221,16 +223,20 @@ const useStyles = makeStyles((theme) => ({
                          ))}
                     </select>
                     &nbsp;<label htmlFor="countryFilter">{t("filter_country").__html}&nbsp;</label>&nbsp;
-                    <select id="countryFilter" value={countryFilter} onChange={handlecountryFilterChange}>                        
-                        <option key='none' value='none'></option>
-                        {Object.keys(groupedUrls).sort().map((countryCode) => (
-                        <option key={countryCode} value={countryCode}>
-                            {countries.find((c) => c.cc === countryCode) ? countries.find((c) => c.cc === countryCode).name : countryCode}
-                        </option>
-                        ))}                        
+                    <select id="countryFilter" value={countryFilter} onChange={handleCountryFilterChange}>
+                      <option key='none' value='none'></option>
+                      {Object.keys(groupedUrls).sort().map((countryCode) => {
+                        const country = countries.find(c => c.cc === countryCode);
+                        const countryName = country ? country.name : countryCode;
+                        return (
+                          <option key={countryCode} value={countryCode}>
+                            {countryName}
+                          </option>
+                        );
+                      })}
                     </select>
                     &nbsp;<label htmlFor="cityFilter">{t("filter_city").__html}&nbsp;</label>&nbsp;
-                    <select key={handlecountryFilterChange} id="cityFilter" value={cityFilter} onChange={handlecityFilterChange}>                        
+                    <select key={handleCountryFilterChange} id="cityFilter" value={cityFilter} onChange={handleCityFilterChange}>                        
                         <option key='none' value='none'></option>                       
                          {groupedUrls[countryFilter] && groupedUrls[countryFilter].map((url) => (
                           <option key={url.id} value={url.city}>
