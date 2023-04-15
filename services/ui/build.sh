@@ -1,3 +1,5 @@
+# Source nvm
+source ~/.nvm/nvm.sh
 nvm install --lts=erbium
 npm install
 sudo -S -k rm -rf build
