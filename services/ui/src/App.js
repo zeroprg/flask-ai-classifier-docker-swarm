@@ -4,6 +4,7 @@ import axios from 'axios'
 
 import { SnackbarProvider } from './snackbarContext';
 
+import Popup from './components/pop-up'
 import URLlist from './components/urls'
 import InputURL from './components/input-forms'
 import VideoStreamers from './components/video-streamers'
@@ -37,7 +38,8 @@ const useStyles = makeStyles((theme) => ({
 
   
   const App = (props) => {
-    const classes = useStyles();
+    const classes = useStyles();  
+
     const [state, setState] = useState({
         videoalignment: 'video',
         open: false,
@@ -45,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
         variant: 'success'
     }); 
 
+    const [showPopup, setShowPopup] = useState(false);
     const [initialUrls, setInitialUrls] = useState([]);
    
     const [urls, setUrls] = useState([]);
@@ -69,6 +72,14 @@ const useStyles = makeStyles((theme) => ({
     const [descUrls, setDescUrls] = useState({});
     
     const snackbarRef = useRef(null);
+
+    const handleOpenPopup = () => {
+      setShowPopup(true);
+    }
+
+    const handleClosePopup = () => {
+      setShowPopup(false);
+    }
 
     const handleOpen = (message, variant) => {
         setMessage(message);
@@ -207,9 +218,20 @@ const useStyles = makeStyles((theme) => ({
 
     return (  
         <div className="App">
+          <div>
+            <a href="#" onClick={handleOpenPopup}>Show IP Cameras staistics</a>
+            {showPopup && (
+              <div className="popup-container">
+                <div className="popup-content">
+                  <Popup onClose={handleClosePopup} />
+                </div>
+             </div>
+            )}
+          </div>
          <SnackbarProvider value={{ handleOpen, handleClose, handleMapPoint }}>
           <header className="App-header">
             <h1>{t("welcome").__html}</h1>
+
           {!isLoading && (
                 <div>
                     <label htmlFor="interestFilter">{t("filter_class").__html}&nbsp;</label>&nbsp;
@@ -260,7 +282,8 @@ const useStyles = makeStyles((theme) => ({
                                 ref={snackbarRef}
                                 className={classes[variant]}/>   
                             
-                            <p dangerouslySetInnerHTML={t("site_desc")}/> 
+                            <p dangerouslySetInnerHTML={t("site_desc")}/>                            
+
                             <InputURL updateparams={updateparams} />    
                             {isVideoAndStatistic && <URLlist updateparams={updateparams} updateurls={updateurls} data={urls}/> }
                     </div>
