@@ -10,6 +10,8 @@ export NPM_CONFIG_PREFIX=~/.npm-global
 # Add npm global bin directory to PATH
 export PATH="$NPM_CONFIG_PREFIX/bin:$PATH"
 
+nvm install --lts=erbium
+
 npm install
 sudo -S -k rm -rf build
 npm run build 
