@@ -98,7 +98,7 @@ const useStyles = makeStyles((theme) => ({
         }
         setcityFilter('none')
         setcountryFilter(selectedCountry);
-        setZoom(8);
+        setZoom(6);
         setPosition(countries.find((c) => c.cc === selectedCountry).position);
     };
 
@@ -219,7 +219,7 @@ const useStyles = makeStyles((theme) => ({
     return (  
         <div className="App">
           <div>
-            <a href="#" onClick={handleOpenPopup}>Show IP Cameras staistics</a>
+            <a href="#" onClick={handleOpenPopup}>{t("show_statistic").__html}</a>
             {showPopup && (
               <div className="popup-container">
                 <div className="popup-content">
@@ -296,30 +296,11 @@ const useStyles = makeStyles((theme) => ({
             <div className="feature-bg">
                 <div className="row">
                     <div className="col-md-12 nopadding">
-                        <div className="features-slider">
-                            <ul className="slides" id="featuresSlider">
-                                <li>
-                                    <h1>Counting objects</h1>
-                                    <p>
-                                        Appling existing  <a href="https://www.pyimagesearch.com/2020/01/27/yolo-and-tiny-yolo-object-detection-on-the-raspberry-pi-and-movidius-ncs/">YOLO Tiny V3</a>
-                                        Model network to surveillance cameras live video streams <a href="http://aicams.ca" className="arrow-btn">aicams.ca</a> to
-                                        calculate occupancy number on video screen
-                                    </p>
-                                </li>
-    
-                                <li>
-                                    <h1>Check Objects behaviour :</h1>
-                                    <p>
-                                    Check if object of interest behave accordingly. 
-                        Check if object of interest was found  notify immediatly by eMail, SMS or voice call
-                        You can buy full source code version of our cloud solution plus hardware (ARM computer) from our store : <a href="https://bloberryconsulting.com/embedded-computers-sale-1" target="_blank" rel="noreferrer">https://bloberryconsulting.com/embedded-computers-sale-1</a>.                                </p>
-                                </li>
-                            </ul>
+                        <div className="features-slider" dangerouslySetInnerHTML={t("features")}> 
                         </div>
                     </div>
                 </div>
-            </div>
-    
+            </div>    
         </SnackbarProvider>           
         </div>
       );}

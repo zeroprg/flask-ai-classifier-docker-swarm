@@ -9,8 +9,9 @@
         "loading_stream_locns": " ...Loading video stream locations on map...",
         "filter_class": "Show only videos classified as: ",
         "filter_country": "Filter by country",
-        "filter_city": "Filter by city"
-
+        "filter_city": "Filter by city",
+        "show_statistic": "Show IP Cameras staistics",
+        "features": "<ul className='slides' id='featuresSlider'><li><h1>Counting objects</h1><p>Appling existing  <a href='https://www.pyimagesearch.com/2020/01/27/yolo-and-tiny-yolo-object-detection-on-the-raspberry-pi-and-movidius-ncs/'> YOLO Tiny V3 </a>Model network to surveillance cameras live video streams <a href='http://aicams.ca' className='arrow-btn'>aicams.ca</a> to calculate occupancy number on video screen</p></li><li><h1>Check Objects behaviour :</h1><p>Check if object of interest behave accordingly. Check if object of interest was found notify immediatly by eMail, SMS or voice call. You can buy full source code version of our cloud solution plus hardware (ARM computer) from our store: <a href='https://bloberryconsulting.com/embedded-computers-sale-1' target='_blank' rel='noreferrer'>https://bloberryconsulting.com/embedded-computers-sale-1</a>.</p></li></ul>"
     },
     "ru": {
      "welcome": "Добро пожаловать на нашу платформу для обмена видеопотоками IP-камер, где вы можете наслаждаться широким выбором видеопотоков IP-камер со всего мира. Исследуйте нашу коллекцию и откройте для себя новый контент, который вам понравится. Делитесь своими любимыми потоками видео с вашими друзьями и семьей, и присоединяйтесь к нашему сообществу страстных любителей видеопотоков IP-камер. Начните смотреть и обмениваться потоками IP-камер уже сегодня. Больше 5130 потоков в наличии.",
@@ -21,7 +22,9 @@
      "loading_stream_locns": " ...Загрузка местоположений видеопотока на карте...",
      "filter_class": "Показать только видео, классифицированные как: ",
      "filter_country": "Фильтр по стране",
-     "filter_city": "Фильтровать по городу"
+     "filter_city": "Фильтровать по городу",
+     "show_statistic":"Показать статистику IP-камер",
+     "features": "<ul className='slides' id='featuresSlider'><li><h1>Подсчет объектов</h1><p>Применение существующей <a href='https://www.pyimagesearch.com/2020/01/27/yolo-and-tiny-yolo-object-detection-on-the-raspberry-pi-and-movidius-ncs/'>YOLO Tiny V3</a> модели нейронной сети к потокам видео в режиме реального времени наблюдения за камерами видеонаблюдения <a href='http://aicams.ca' className='arrow-btn'>aicams.ca</a> для подсчета числа занятых мест на экране видео</p></li><li><h1>Проверка поведения объектов:</h1><p>Проверка соответствующего поведения объекта интереса. Если объект интереса найден, производится немедленное уведомление по электронной почте, SMS или голосовому вызову. Вы можете купить полную версию исходного кода нашего облачного решения плюс оборудование (ARM-компьютер) в нашем магазине: <a href='https://bloberryconsulting.com/embedded-computers-sale-1' target='_blank' rel='noreferrer'>https://bloberryconsulting.com/embedded-computers-sale-1</a>.</p></li></ul>"
      
     },
     "es": {
@@ -33,7 +36,9 @@
         "loading_stream_locns": "...Cargando ubicaciones de transmisión de video en el mapa...",
         "filter_class": "Mostrar solo videos clasificados como: ",
         "filter_country": "Filtrar por país",
-        "filter_city": "Filtrar por ciudad"       
+        "filter_city": "Filtrar por ciudad",
+        "show_statistic":"Mostrar estadísticas de cámaras IP",
+        "features": "<ul className='slides' id='featuresSlider'><li><h1>Conteo de objetos</h1><p>Aplicación de la red del modelo <a href='https://www.pyimagesearch.com/2020/01/27/yolo-and-tiny-yolo-object-detection-on-the-raspberry-pi-and-movidius-ncs/'>YOLO Tiny V3</a> existente a los flujos de video en tiempo real de las cámaras de vigilancia <a href='http://aicams.ca' className='arrow-btn'>aicams.ca</a> para calcular el número de ocupación en la pantalla de video</p></li><li><h1>Verificación del comportamiento de los objetos:</h1><p>Verifique si el objeto de interés se comporta adecuadamente. Si se encuentra el objeto de interés, se notifica inmediatamente por correo electrónico, SMS o llamada de voz. Puede comprar la versión de código fuente completo de nuestra solución en la nube más hardware (computadora ARM) en nuestra tienda: <a href='https://bloberryconsulting.com/embedded-computers-sale-1' target='_blank' rel='noreferrer'>https://bloberryconsulting.com/embedded-computers-sale-1</a>.</p></li></ul>"   
     },
     "zh": {
         "welcome": "欢迎来到我们的视频IP流共享平台，您可以在这里享受来自世界各地的各种IP摄像机视频流。浏览我们的选择，发现您会喜欢的新内容。与您的朋友和家人分享您最喜爱的IP视频流，并加入我们这群充满热情的IP视频流爱好者的社区。开始观看和共享IP摄像机视频流。目前有超过5130个流可供选择。",
@@ -44,7 +49,9 @@
         "loading_stream_locns": "加载地图上的视频流位置...",
         "filter_class": "仅显示分类为的视频：",
         "filter_country": "按国家筛选",
-        "filter_city": "按城市筛选"
+        "filter_city": "按城市筛选",
+        "show_statistic": "显示IP摄像机统计信息",
+        "features": "<ul className='slides' id='featuresSlider'><li><h1>物体计数</h1><p>将现有的<a href='https://www.pyimagesearch.com/2020/01/27/yolo-and-tiny-yolo-object-detection-on-the-raspberry-pi-and-movidius-ncs/'> YOLO Tiny V3 </a>模型网络应用于监控摄像机的实时视频流<a href='http://aicams.ca' className='arrow-btn'>aicams.ca</a>，以计算视频屏幕上的占用数量</p></li><li><h1>检查对象行为:</h1><p>检查对象是否按照预期行为。如果找到感兴趣的对象，请立即通过电子邮件、短信或语音电话通知。您可以从我们的商店购买我们的云解决方案完整源代码版本和硬件（ARM计算机）：<a href='https://bloberryconsulting.com/embedded-computers-sale-1' target='_blank' rel='noreferrer'>https://bloberryconsulting.com/embedded-computers-sale-1</a>。</p></li></ul>"
     },
     "ar": {
         "welcome": "مرحبًا بكم في منصتنا لمشاركة تدفقات الفيديو عبر البروتوكول الإنترنت، حيث يمكنكم الاستمتاع بمجموعة واسعة من تدفقات فيديو كاميرات الشبكة من جميع أنحاء العالم. استكشفوا تشكيلتنا واكتشفوا محتوى جديد سينال إعجابكم. شاركوا تدفقات الفيديو المفضلة لديكم مع أصدقائكم وعائلاتكم، وانضموا إلى مجتمعنا المؤلف من عشاق تدفقات الفيديو عبر البروتوكول الإنترنت. ابدؤوا بمشاهدة ومشاركة تدفقات كاميرات الشبكة اليوم. لدينا أكثر من 5130 تدفقًا الآن.",
@@ -55,7 +62,9 @@
         "loading_stream_locns": "...جاري تحميل مواقع تدفق الفيديو على الخريطة...",
         "filter_class": "عرض الفيديوهات المصنفة فقط كـ: ",
         "filter_country": "فلترة حسب البلد",
-        "filter_city": "تصفية حسب المدينة"
+        "filter_city": "تصفية حسب المدينة",
+        "show_statistic": "عرض إحصائيات كاميرات IP",
+        "features": "<ul className='slides' id='featuresSlider'><li><h1>عد الأشياء</h1><p>تطبيق الشبكة النموذجية YOLO Tiny V3 الموجودة على كاميرات المراقبة بث الفيديو المباشر<a href='http://aicams.ca' className='arrow-btn'>aicams.ca</a> لحساب عدد الاحتلال على شاشة الفيديو</p></li><li><h1>فحص سلوك الأشياء:</h1><p>التحقق من سلوك الأشياء المهمة. إذا تم العثور على الشيء المهم، فسيتم الإبلاغ عن ذلك على الفور عن طريق البريد الإلكتروني أو الرسائل القصيرة أو المكالمات الصوتية. يمكنك شراء الإصدار الكامل للشفرة المصدرية لحل السحابة الخاص بنا بالإضافة إلى الأجهزة (حاسوب ARM) من متجرنا: <a href='https://bloberryconsulting.com/embedded-computers-sale-1' target='_blank' rel='noreferrer'>https://bloberryconsulting.com/embedded-computers-sale-1</a>."
         },
     "fr": {
         "welcome": "Bienvenue sur notre plateforme de partage de streaming vidéo IP, où vous pouvez profiter d'une grande variété de flux vidéo de caméras IP du monde entier. Explorez notre sélection et découvrez de nouveaux contenus que vous allez adorer. Partagez votre flux vidéo IP préféré avec vos amis et votre famille et rejoignez notre communauté d'enthousiastes passionnés de la diffusion en continu de vidéo IP. Commencez à regarder et à partager des caméras IP dès aujourd'hui. Plus de 5130 flux disponibles maintenant.",
@@ -66,6 +75,8 @@
         "loading_stream_locns": " ...Chargement des emplacements de flux vidéo sur la carte...",
         "filter_class": "Afficher uniquement les vidéos classées comme: ",
         "filter_country": "Filtrer par pays",
-        "filter_city": "Filtrer par ville"
+        "filter_city": "Filtrer par ville",
+        "show_statistic": "Afficher les statistiques des caméras IP",
+        "features": "<ul className='slides' id='featuresSlider'><li><h1>Compter les objets</h1><p>Appliquer le modèle de réseau <a href='https://www.pyimagesearch.com/2020/01/27/yolo-and-tiny-yolo-object-detection-on-the-raspberry-pi-and-movidius-ncs/'>YOLO Tiny V3</a> existant pour les flux vidéo en direct des caméras de surveillance sur <a href='http://aicams.ca' className='arrow-btn'>aicams.ca</a> pour calculer le nombre d'occupants à l'écran vidéo</p></li><li><h1>Vérifier le comportement des objets :</h1><p>Vérifier si l'objet d'intérêt se comporte conformément aux attentes. Si l'objet d'intérêt est détecté, une notification par e-mail, SMS ou appel vocal est immédiatement envoyée. Vous pouvez acheter la version complète du code source de notre solution cloud ainsi que le matériel (ordinateur ARM) dans notre magasin : <a href='https://bloberryconsulting.com/embedded-computers-sale-1' target='_blank' rel='noreferrer'>https://bloberryconsulting.com/embedded-computers-sale-1</a>.</p></li></ul>"
     }
 }

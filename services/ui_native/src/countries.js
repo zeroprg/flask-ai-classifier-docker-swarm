@@ -9,6 +9,7 @@ const countries = [
     { cc: 'AG', name: 'Antigua and Barbuda' },
     { cc: 'AR', name: 'Argentina' },
     // more countries...
+    
     {cc: 'RU', name: 'Russia'},
     {cc: 'US', name: 'United States'},
     {cc: 'CA', name: 'Canada'},
@@ -161,7 +162,15 @@ const countries = [
   { cc: 'BY', name: 'Belarussia'},
   { cc: 'BY', name: 'Belarussia'},
   { cc: 'BR', name: 'Brasil'},
-
+  { cc: 'KR', name: 'South Korea'},
+  { cc: 'CN', name: 'China'},
+  { cc: 'GG', name: 'Guernsey'},
+  { cc: 'RE', name: 'Réunion'},
+  { cc: 'PR', name: 'Puerto Rico'},  
+  { cc: 'KR', name: 'South Korea'},
+  { cc: 'KY', name: 'Cayman Islands'},
+  { cc: 'IM', name: 'Isle of Man'},  
+  { cc: 'HK', name: 'Hong Kong SAR China'}
   ];
   
   export default countries;

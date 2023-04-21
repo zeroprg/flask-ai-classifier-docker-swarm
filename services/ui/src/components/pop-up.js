@@ -50,13 +50,13 @@ function Popup(props) {
           <button className="close-button" onClick={props.onClose}>X</button>
         </div>
         <div className="popup-content">
-          {data &&  (
+          {data ? (
             <>
-              <p>Total {data.objects} objects from {data.cams} cams</p>
-              <p>Last hour: {data.last_hour_persons} persons founded </p>
-              <p>Total {data.nodes} processes work on {data.videostreams} videostreams:</p>
+              <p style={{ color: '#07ff7f' }}>Total: <b>{data.objects}</b> objects from <b >{data.cams}</b> cams</p>
+              <p style={{ color: '#07ff7f' }}>Last hour:  <b>{data.last_hour_persons} persons founded</b> </p>
+              <p style={{ color: '#07ff7f' }}>Total: <b>{data.nodes}</b> processes work on <b>{data.videostreams}</b> videostreams:</p>
             </>
-          )}
+          ): (<img alt ="" src={'img/fancybox_loading.gif'}></img>)}
         </div>
       </div>
     </div>
