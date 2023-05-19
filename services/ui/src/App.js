@@ -258,15 +258,18 @@ const useStyles = makeStyles((theme) => ({
                       })}
                     </select>
                     &nbsp;<label htmlFor="cityFilter">{t("filter_city").__html}&nbsp;</label>&nbsp;
-                    <select key={handleCountryFilterChange} id="cityFilter" value={cityFilter} onChange={handleCityFilterChange}>                        
-                        <option key='none' value='none'></option>                       
-                         {groupedUrls[countryFilter] && groupedUrls[countryFilter].map((url) => (
-                          <option key={url.id} value={url.city}>
-                            {url.city}
-                          </option>                          
-                         ))}       
-                                                                
-                    </select>                     
+                    <select key={handleCountryFilterChange} id="cityFilter" value={cityFilter} onChange={handleCityFilterChange}>
+                    <option key="none" value="none"></option>
+                    {
+                      [...new Set(groupedUrls[countryFilter]?.map((url) => url.city || ''))]
+                        .filter((city) => city !== '') // Filter out empty cities if any
+                        .sort().map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))
+                    }
+                  </select>                   
                 </div>
           )}
                 {!isLoading && (<MarkersMap  markers={urls} zoom={zoom} center={position} key={JSON.stringify(position)} />)}   
