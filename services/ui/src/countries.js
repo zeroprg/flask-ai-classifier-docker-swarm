@@ -197,7 +197,15 @@ const countries = [
   { cc: 'VN', name: 'Vietnam', position: [14.058324, 108.277199] },
   { cc: 'YE', name: 'Yemen', position: [15.552727, 48.516388] },
   { cc: 'ZM', name: 'Zambia', position: [-13.133897, 27.849332] },
-  { cc: 'ZW', name: 'Zimbabwe', position: [-19.015438, 29.154857] }
+  { cc: 'ZW', name: 'Zimbabwe', position: [-19.015438, 29.154857] },
+  { cc: 'KR', name: 'South Korea', position: [37.5665, 126.9780] },
+  { cc: 'IM', name: 'Isle of Man', position: [54.2361, -4.5481] },
+  { cc: 'KY', name: 'Cayman Islands', position: [19.3133, -81.2546] },
+  { cc: 'GG', name: 'Guernsey', position: [49.4482, -2.5895] },
+  { cc: 'RE', name: 'Réunion', position: [-21.1151, 55.5364] },
+  { cc: 'PY', name: 'Paraguay', position: [-23.442503, -58.443832] },
+  { cc: 'HK', name: 'Hong Kong', position: [22.3193, 114.1694] },
+  { cc: 'PR', name: 'Puerto Rico', position: [18.2208, -66.5901] }
   ];
 
   export default countries;
