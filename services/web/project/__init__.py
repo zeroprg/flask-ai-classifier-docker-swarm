@@ -1,13 +1,8 @@
 import os
 import cv2
+import CaffeClassifier
 from flask import Flask
 
-
-#from flask_sqlalchemy import SQLAlchemy
-#from flask_migrate import Migrate
-# instantiate the extensions
-#db = SQLAlchemy()
-#migrate = Migrate()
 
 # Read all production configuration fro config.txt file
 from project.config import ProductionConfig as prod
@@ -15,12 +10,12 @@ from project.db.api import Sql
 
 
 def classify_init():
-# Read configuration parameters
-    
+# Read configuration parameters    
     proto = prod.args['prototxt']
     model = prod.args['model']
+    confidence_threshold = prod.args['confidence']
     if(model.find('caffe')>0): 
-        net = cv2.dnn.readNetFromCaffe(proto, model)
+        cls = CaffeClassifier(proto, model, (64, 64, 64), confidence_threshold, if "DNN_TARGET_MYRIAD" in prod.args)
     else:
         net = cv2.dnn.readNet(proto, model)    
     # specify the target device as the Myriad processor on the NCS
@@ -33,12 +28,10 @@ def classify_init():
 
 db = Sql(SQLALCHEMY_DATABASE_URI = prod.SQLALCHEMY_DATABASE_URI)
 net = classify_init()
-# instantiate the extensions
-#migrate = Migrate()
+
 
 def create_app(script_info=None):
-    # instantiate the app
-    
+    # instantiate the app    
     app = Flask(__name__)
     # Use this aproach when planning to use Models
     # set config (in flask-sqlAlchemy)    
@@ -48,7 +41,7 @@ def create_app(script_info=None):
     #migrate.init_app(app, db)
 
     # register blueprints
-    from project.api.main import main_blueprint
+    from project.main import main_blueprint
 
     app.register_blueprint(main_blueprint)
     # shell context for flask cli   

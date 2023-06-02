@@ -1,9 +1,13 @@
 import cv2
 import numpy as np
 
-class CaffeClassifier:
-    def __init__(self, prototxt, model, mean, confidence_threshold):
+import ClassifyInterface
+
+class CaffeClassifier(ClassifyInterface):
+    def __init__(self, prototxt, model, mean, confidence_threshold, DNN_TARGET_MYRIAD=True):
         self.net = cv2.dnn.readNetFromCaffe(prototxt, model)
+        if DNN_TARGET_MYRIAD: 
+             self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
         self.mean = mean
         self.confidence_threshold = confidence_threshold
     

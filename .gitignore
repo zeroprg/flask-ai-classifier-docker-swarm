@@ -3,10 +3,13 @@ __pycache__
 *.prototxt.txt
 *.pyc
 .env
+*.pt
+*.tar
 api_key.txt
 node_modules
 nohup.out
 build
+output
 node_modules
 services/crawler/httpwww.insecam.org.txt
 services/crawler/httpwww.insecam.orgrubytypeAxis2.txt

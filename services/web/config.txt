@@ -12,7 +12,7 @@ video_file0=http://93.170.4.146:85/webcapture.jpg?command=snap&channel=1?1672970
 prototxt=./models/caffemodel/MobileNetSSD/MobileNetSSD_deploy.prototxt
 model=./models/caffemodel/MobileNetSSD/MobileNetSSD_deploy.caffemodel
 
-confidence=0.85
+confidence=0.45
 
 #server for object classifications
 CLASSIFIER_SERVER = http://192.168.0.191:4000/classify

@@ -22,6 +22,7 @@ from project.caffe_classifier import classify_frame, classify_init
 from project import URL_PINGS_NUMBER, update_urls_from_stream_interval, ping_video_url, image_check, simple_decode,topic_rules
 from project.statistic import do_statistic
 
+
 subject_of_interest = ["person", "car"]
 DNN_TARGET_MYRIAD = False
 executor = ThreadPoolExecutor()
@@ -259,6 +260,8 @@ def populate_db(result, cam):
         for i in range(len(cropped_images)): 
             # Assuming `image` is a PIL Image object            
             object_image = np.asarray(cropped_images[i])
+            #try to classify image one more time
+            
             object_hash = result["object_hashes"][object_label][i]            
             object_coordinates = result["rectangles"][object_label][i]
 

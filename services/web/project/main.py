@@ -10,7 +10,7 @@ from PIL import Image
 
 
 from flask import Blueprint, Response,request
-from project.api.classifyer import classify_frame
+import CaffeClassifier,ClassifyInterface
 
 from flask_cors import cross_origin, CORS
 
@@ -75,8 +75,8 @@ def classify():
     #frame = Image.fromarray(np.asarray(decodedArrays))    
     #frame =  from_base64(base64_data)
     logging.debug("Hit /classify route: ", params)
-
-    post_array = classify_frame(net, img, params)
+    classifyI = ClassifyInterface()
+    post_array = classifyI.classify_frame(net, img, params)
     return Response(json.dumps(post_array, default=str, indent = 4),  mimetype='text/plain', status=200)
 
 

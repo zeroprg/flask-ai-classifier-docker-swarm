@@ -8,7 +8,7 @@ import json
 import logging
 
 from project import db
-from  project.api.tools.objCountByTimer import ObjCountByTimer
+from  project.tools.objCountByTimer import ObjCountByTimer
 from  project.config import ProductionConfig as prod
 
 logging.basicConfig(level=logging.INFO)

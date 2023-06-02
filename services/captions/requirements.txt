@@ -1,0 +1,4 @@
+torch
+torchvision==0.10.0
+transformers==4.9.2
+numpy==1.21.0
