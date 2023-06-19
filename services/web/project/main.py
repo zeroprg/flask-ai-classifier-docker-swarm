@@ -15,6 +15,7 @@ import CaffeClassifier,ClassifyInterface
 from flask_cors import cross_origin, CORS
 
 from project import net
+from services.web.project import YoloClassifier
 
 logging.basicConfig(level=logging.INFO)
 
@@ -74,9 +75,9 @@ def classify():
     #logging.info("decodedArrays: " + decodedArrays)
     #frame = Image.fromarray(np.asarray(decodedArrays))    
     #frame =  from_base64(base64_data)
-    logging.debug("Hit /classify route: ", params)
-    classifyI = ClassifyInterface()
-    post_array = classifyI.classify_frame(net, img, params)
+    logging.debug("Hit /classify route: ", params) 
+    classifyI = YoloClassifier(0.5)
+    post_array = classifyI.classify_and_save(img)
     return Response(json.dumps(post_array, default=str, indent = 4),  mimetype='text/plain', status=200)
 
 

@@ -5,8 +5,9 @@ import numpy as np
 from PIL import Image
 import base64
 from io import BytesIO
+import ClassifyInterface
 
-class YoloClassifier():
+class YoloClassifier(ClassifyInterface):
     def __init__(self, confidence_threshold):
         self.confidence_threshold = confidence_threshold
 
