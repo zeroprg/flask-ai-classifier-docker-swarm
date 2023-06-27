@@ -19,7 +19,8 @@ class ProductionConfig:
     DB_PASSWORD = os.environ.get("DB_PASSWORD")
     DB_PORT = os.environ.get("DB_PORT")
     DB_NAME = os.environ.get("DB_NAME")
-    CLASSIFIER_SERVER  = os.environ.get("CLASSIFIER_SERVER")
+    KAFKA_SERVER  = os.environ.get("CLASSIFIER_SERVER")
+    CLASSIFIER_SERVER  = os.environ.get("KAFKA_SERVER")
     DB_IP_ADDRESS = os.environ.get("DB_IP_ADDRESS")
     TRACK_MODIFICATIONS = False
     # read config file from app_settings

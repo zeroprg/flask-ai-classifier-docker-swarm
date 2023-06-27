@@ -1,0 +1,31 @@
+version: "2"
+
+services:
+  kafka:
+    image: wurstmeister/kafka:2.13-2.8.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092,OUTSIDE://${zookeeper_ip}:9092
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: ${zookeeper_ip}:2181
+      KAFKA_LOG_RETENTION_HOURS: 24
+      KAFKA_LOG_RETENTION_BYTES: 1048576
+      KAFKA_CREATE_TOPICS_SCRIPT: |
+        #!/bin/bash
+        zookeeper=${KAFKA_ZOOKEEPER_CONNECT:-"localhost:2181"}
+
+        # Create preprocessed topic with 1 partition, 1 replica, and a max size of 1MB
+        ./kafka-topics.sh --create --topic preprocessed --partitions 1 --replication-factor 1 --config retention.bytes=1048576 --zookeeper $zookeeper
+
+        # Create other topics as needed
+        kafka-topics.sh --zookeeper "${zookeeper_ip}:2181" --create --topic person --partitions 1 --replication-factor 1 --config cleanup.policy=compact
+        kafka-topics.sh --zookeeper "${zookeeper_ip}:2181" --create --topic cow --partitions 1 --replication-factor 1 --config cleanup.policy=compact
+        kafka-topics.sh --zookeeper "${zookeeper_ip}:2181" --create --topic dog --partitions 1 --replication-factor 1 --config cleanup.policy=compact
+
+        # Add any other topic creation commands here
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

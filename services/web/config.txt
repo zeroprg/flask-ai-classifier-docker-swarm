@@ -19,5 +19,5 @@ CLASSIFIER_SERVER = http://192.168.0.191:4000/classify
 
 #Database configuration (Postgres)
 DB_IP_ADDRESS=192.168.0.100
-
+KAFKA_SERVER=192.168.1.87:9192
 
