@@ -1,5 +1,21 @@
- --create database streamer;
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE OR REPLACE FUNCTION generate_random_uuid()
+RETURNS UUID AS $$
+BEGIN
+    RETURN uuid_in(
+        overlay(
+            overlay(
+                md5(random()::text || ':' || random()::text)
+                placing '4' from 13
+            )
+            placing to_hex(floor(random()*(11-8+1) + 8)::int)::text from 17
+        )::cstring
+    );
+END;
+$$ LANGUAGE plpgsql;
+
+
+SELECT generate_random_uuid();
+
 drop  table  objects cascade;
 
 CREATE TABLE objects (
@@ -52,7 +68,7 @@ CREATE SEQUENCE url_cam_seq;
 
 drop  table  urls;
 CREATE TABLE urls (
-	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	id uuid NOT NULL DEFAULT generate_random_uuid(),
 	url varchar NOT NULL,
 	cam int4 NULL DEFAULT nextval('url_cam_seq'::regclass),
 	email varchar NULL,
@@ -66,8 +82,8 @@ CREATE TABLE urls (
 	region varchar(25) null,
 	country varchar(25) null,
 	currentime int8 NOT NULL DEFAULT currentime_gen(),
-	idle_in_mins int4  DEFAULT 0,
-	desc varchar(30) null,
+	idle_in_mins int4  DEFAULT 0,	
+	description varchar(500) null,
 	CONSTRAINT urls_pkey PRIMARY KEY (id),
 	CONSTRAINT urls_un UNIQUE (url)
 );
