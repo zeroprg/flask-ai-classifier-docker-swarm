@@ -13,3 +13,7 @@ output
 node_modules
 services/crawler/httpwww.insecam.org.txt
 services/crawler/httpwww.insecam.orgrubytypeAxis2.txt
+# python virtual env.git config --global user.name "Your Name"
+services/web/project/web/
+# Yolo runs folder
+services/web/project/runs/
