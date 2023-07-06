@@ -61,8 +61,8 @@ def get_processed_images(image, result):
 
 if __name__ == "__main__":
     images = [
-        Image.open('zidane.jpg'),
-        Image.open('bus.jpg')
+        Image.open('./tests/zidane.jpg'),
+        Image.open('./tests/bus.jpg')
     ]
 
 

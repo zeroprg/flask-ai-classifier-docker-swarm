@@ -22,4 +22,4 @@ docker exec -it kafka kafka-topics.sh --zookeeper "${zookeeper_ip}:2181" --creat
 docker exec -it kafka kafka-topics.sh --zookeeper "${zookeeper_ip}:2181" --create --topic dog --partitions 1 --replication-factor 1 --config cleanup.policy=compact
 
 # Create topic with retention policy 'delete' and a maximum size of 1MB
-docker exec -it kafka kafka-topics.sh --zookeeper "${zookeeper_ip}:2181" --create --topic preprocessed --partitions 1 --replication-factor 1 --config retention.ms=3600000 --config max.message.bytes=1000000 --config cleanup.policy=delete
+docker exec -it kafka kafka-topics.sh --zookeeper "${zookeeper_ip}:2181" --create --topic preprocessed --partitions 1 --replication-factor 1 --config retention.ms=3600000 --config max.message.bytes=5000000 --config cleanup.policy=delete

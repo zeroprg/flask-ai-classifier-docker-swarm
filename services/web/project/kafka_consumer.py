@@ -36,6 +36,11 @@ consumer.subscribe([preprocessed_topic])
 def bytes_to_long(b):
     return struct.unpack('>Q', b)[0]
 
+# Function to save the decoded image
+def save_image(image_bytes, image_path):
+    with open(image_path, 'wb') as file:
+        file.write(image_bytes)
+
 # Function to decode, decompress, and display the image
 def decode_and_decompress(encoded_data):
     # Check if the input data is a valid base64 string
@@ -47,11 +52,10 @@ def decode_and_decompress(encoded_data):
 
     # Decompress the compressed image data
     decompressed_data = zlib.decompress(decoded_data)
-    # Convert the decompressed data to a NumPy array
-    image_array = np.frombuffer(decompressed_data, dtype=np.uint8)
+
     # Create a PIL image from the NumPy array
-    image = Image.fromarray(image_array)
-    return image
+    image = Image.open(BytesIO(decompressed_data))
+    return decompressed_data
 
 # Function to publish messages in batches
 def publish_message_batch(keys, results):
@@ -105,9 +109,9 @@ def read_and_delete_messages(batch_size=100):
 
         # Commit the offset to mark the message as processed
         consumer.commit(message)
-
+        print(f"~~~ Here we are ~~~ ")
         # Process images in batches of batch_size
-        if len(keys) >= batch_size:
+        if len(keys) >= batch_size or (len(keys) > 0 and consumer.poll(0) is None):
             try:
                 # Process the images
                 processed_images = process_images(keys, values)
@@ -121,16 +125,6 @@ def read_and_delete_messages(batch_size=100):
             keys.clear()
             values.clear()
 
-    # After processing all messages, process any remaining images
-    if len(keys) > 0:
-        try:
-            # Process the remaining images
-            processed_images = process_images(keys, values)
-
-            # Publish the processed images to the postprocessed topic
-            publish_message_batch(keys, processed_images)
-        except Exception as e:
-            print(f"Error processing images: {e}")
 
     # Close the consumer and producer after processing all messages
     consumer.close()

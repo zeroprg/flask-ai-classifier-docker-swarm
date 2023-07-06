@@ -2,12 +2,17 @@ from PIL import Image
 from yolo import process_image_yolov5
 import db
 import time
+from io import BytesIO
 
 currentime = int(round(time.time() * 1000))
 
 
 def process_images(keys, images):   
-    
+    print (f"Images: {images[0]}")
+
+    images[0].show()
+    images[0].save('Tesing.jpg')
+
     currentime = int(round(time.time() * 1000))
     processed_results = process_image_yolov5(images)
     # Save the statistic of processed images to relative DB and return tuple of PILs to further processing :
