@@ -9,7 +9,7 @@ from project.config import  ProductionConfig as prod
 
 # Kafka broker configuration
 bootstrap_servers = prod.KAFKA_SERVER #'172.29.208.1:9092'
-topic = prod.KAFKA_PREPROCESSED_TOPIC #  'preprocess'
+topic = 'preprocessed'# prod.KAFKA_PREPROCESSED_TOPIC #  'preprocess'
 
 # Create producer configuration
 producer_config = {
@@ -44,13 +44,14 @@ def publish_message(key, image):
   
     print(f"Message value : {image_data[:10]} ... {image_data[-10:]}")
     # Publish the message to the topic
+    print(f"topic: {topic}")
     producer.produce(topic, key=key_bytes, value=image_data)
     producer.flush()
 
 # Example usage
 if __name__ == '__main__':
     # Read the image file as binary data
-    image_path = './tests/bus.jpg'
+    image_path = './project/tests/bus.jpg'
     image = Image.open(image_path).convert("RGB")
 
     # Define the key

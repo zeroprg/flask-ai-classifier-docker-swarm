@@ -3,48 +3,34 @@ import base64
 import time
 import sqlalchemy as sql
 from sqlalchemy import text
-import psycopg2
+from sqlalchemy import create_engine, MetaData
 
 class Sql:
-    def __init__ (self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
-        """ create a database connection to the SQLite database
-            specified by the db_file
-        :param db_file: database file
-        :return: Connection object or None
-        """
+    def __init__(self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
+        """Create a database connection to the PostgreSQL database specified by the credentials"""
         
-        self.engine = None
+        self.engine = create_engine(f'postgresql+psycopg2://{DB_USERNAME}:{DB_PASSWORD}@{DATABASE_URI}:{DB_PORT}/{DB_NAME}')
         self.limit = 70
-        metadata = sql.MetaData()
+        self.metadata = MetaData()
+        self.metadata.reflect(bind=self.engine)
+
+        self.objects = self.metadata.tables['objects']
+        self.statistic = self.metadata.tables['statistic']
+
+    def __init__(self, SQLALCHEMY_DATABASE_URI):
+        """Create a database connection to the SQL database specified by the URI"""
         
-        self.engine = sql.create_engine('postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME))
-
-        self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
-        self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
-        ##self.getConn().autocommit = False
-
-    def __init__ (self, SQLALCHEMY_DATABASE_URI):
-        """ create a database connection to the SQL database
-            specified by the db_file
-        :param db_file: database file
-        :return: Connection object or None
-        """
-        self.engine = None
+        self.engine = create_engine(SQLALCHEMY_DATABASE_URI)
         self.limit = 70
-        metadata = sql.MetaData()
+        self.metadata = MetaData()
+        self.metadata.reflect(bind=self.engine)
 
- 
-        self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI)
+        self.objects = self.metadata.tables['objects']
+        self.statistic = self.metadata.tables['statistic']
 
-        self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
-        self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
-
-
-        #conn = self.engine.connect()
-        ##self.getConn().autocommit = False
-    
     def getConn(self):
         return self.engine.connect()
+
 
  
     def select_all_objects(self):
@@ -62,20 +48,15 @@ class Sql:
         #    print(row)
         return rows
 
-    def insert_statistic(self, params):
-        for param in params:
-            hashcodes = ''
-            length = len(param['hashcodes'])
-        # for i in range(length): hashcodes += str(param['hashcodes'][i]) + ',' if i < length - 1 else str(param['hashcodes'][i])
-            hashcodes = str(param['hashcodes'])
+    def insert_statistic(self, param):
         if param['y'] == 0: return # never store dummy noise
         try:
             #cur.execute("INSERT INTO statistic(type,currentime,y,text,hashcodes,cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")",
             #     (param['name'], param['x'],  param['text'], hashcodes, param['cam']))
-            values = {'type': param['name'], 'currentime': param['x'], 'y': param['y'], 'hashcodes': hashcodes, 'cam':param['cam'] }     
+            values = {'type': param['name'], 'currentime': param['x'], 'y': param['y'], 'cam':param['cam'] }     
             query = sql.insert(self.statistic)
             ResultProxy = self.getConn().execute(query, values)
-            print(" insert_statistic was {0} with params: {1}".format(ResultProxy.is_insert ,params))    
+            print(" insert_statistic was {0} with params: {1}".format(ResultProxy.is_insert ,param))    
         except Exception as e:
             print(" e: {}".format( e))
         
