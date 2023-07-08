@@ -3,7 +3,7 @@ from PIL import Image
 import struct
 from io import BytesIO
 import zlib
-from base64 import b64decode
+from base64 import b64decode, b64encode
 from process_images import process_images
 import binascii
 import json
@@ -61,7 +61,8 @@ def decode_and_decompress(encoded_data):
     return image
 
 
-def publish_to_processed_topic(key,image,label):
+
+def publish_to_processed_topic(key, image, label):
     # Convert the image to bytes
     image_bytes = BytesIO()
     image.save(image_bytes, format='JPEG')
@@ -71,10 +72,13 @@ def publish_to_processed_topic(key,image,label):
     # Compress the image data using zlib
     compressed_data = zlib.compress(image_data)
 
+    # Convert the compressed data to a base64-encoded string
+    encoded_data = b64encode(compressed_data).decode('utf-8')
+
     # Prepare the message to send to Kafka
     message = {
         'label': label,
-        'data': compressed_data
+        'data': encoded_data
     }
 
     # Send the message to Kafka
@@ -83,9 +87,10 @@ def publish_to_processed_topic(key,image,label):
 
 
 
+
 # Function to publish messages in batches
 def publish_message_batch(keys, results):
-    message_batch = []
+  
     for key, result in zip(keys, results):
         # Access the filtered images and object counts from the result tuple
         filtered_images, object_counts = result
@@ -99,8 +104,7 @@ def publish_message_batch(keys, results):
         for label, count in object_counts.items():
             print(f"Label: {label}, Count: {count}")
 
-    # Publish the batch of messages to the topic
-    producer.produce_batch(message_batch)
+
     
 # Function to consume messages, process images, and publish the results
 def read_and_delete_messages(batch_size=100):
@@ -118,8 +122,8 @@ def read_and_delete_messages(batch_size=100):
             break
 
         # Process the received message
-        key_bytes = message.key()
-        key = int.from_bytes(key_bytes, byteorder="big")
+   
+        key = message.key().decode('utf-8')
         value = message.value()
         # Commit the offset to mark the message as processed
         consumer.commit(message)

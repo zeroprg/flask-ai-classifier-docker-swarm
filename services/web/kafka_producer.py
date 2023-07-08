@@ -3,7 +3,8 @@ import struct
 from base64 import b64encode
 from PIL import Image
 import zlib
-from io import BytesIO 
+from io import BytesIO
+import uuid
 
 from project.config import  ProductionConfig as prod
 
@@ -19,9 +20,6 @@ producer_config = {
 # Create Kafka producer
 producer = Producer(producer_config)
 
-# Function to convert long integer to bytes
-def long_to_bytes(n):
-    return struct.pack('>Q', n)
 
 def bytes_to_string(encoded_bytes):
     return encoded_bytes.decode()
@@ -29,7 +27,7 @@ def bytes_to_string(encoded_bytes):
 # Function to publish messages
 def publish_message(key, image):
     # Convert the key to bytes
-    key_bytes = long_to_bytes(key)
+    key_bytes = key
 
     # Convert the image to bytes
     image_bytes = BytesIO()
@@ -55,7 +53,9 @@ if __name__ == '__main__':
     image = Image.open(image_path).convert("RGB")
 
     # Define the key
-    key = 1234567890
+    key = uuid.uuid4()
+    print(key)
+    key =  str(key)
 
     # Publish the image to Kafka topic
     publish_message(key, image)
