@@ -1,0 +1,27 @@
+import json
+from confluent_kafka import Producer
+
+# Create Kafka producer configuration
+producer_config = {
+    'bootstrap.servers': 'localhost:9092'
+}
+
+# Create Kafka producer
+producer = Producer(producer_config)
+
+# Define your class
+class MyClass:
+    def __init__(self, name):
+        self.name = name
+
+# Create an instance of your class
+my_object = MyClass('example')
+
+# Serialize the object to JSON
+json_data = json.dumps(my_object.__dict__)
+
+# Produce the message to the Kafka topic
+producer.produce(topic='your_topic_name', value=json_data.encode())
+
+# Flush the producer to make sure the message is sent
+producer.flush()

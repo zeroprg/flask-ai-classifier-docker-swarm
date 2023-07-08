@@ -2,16 +2,17 @@ from confluent_kafka import Consumer, Producer
 from PIL import Image
 import struct
 from io import BytesIO
-import numpy as np
 import zlib
-from base64 import b64encode, b64decode
+from base64 import b64decode
 from process_images import process_images
 import binascii
+import json
+from project.config import  ProductionConfig as prod
 
 # Kafka broker configuration
-bootstrap_servers = '192.168.1.87:9092'
-preprocessed_topic = 'preprocessed'
-
+bootstrap_servers = prod.KAFKA_SERVER #'172.29.208.1:9092'
+preprocessed_topic = prod.KAFKA_PREPROCESSED_TOPIC #  'preprocess'
+postprocessed_topic = prod.KAFKA_POSTPROCESSED_TOPIC #'postprocess'
 
 # Create consumer and producer configurations
 consumer_config = {
@@ -53,9 +54,34 @@ def decode_and_decompress(encoded_data):
     # Decompress the compressed image data
     decompressed_data = zlib.decompress(decoded_data)
 
-    # Create a PIL image from the NumPy array
+
+    # Create a new PIL image from the decoded data
     image = Image.open(BytesIO(decompressed_data))
-    return decompressed_data
+
+    return image
+
+
+def publish_to_processed_topic(key,image,label):
+    # Convert the image to bytes
+    image_bytes = BytesIO()
+    image.save(image_bytes, format='JPEG')
+    image_bytes.seek(0)
+    image_data = image_bytes.read()
+
+    # Compress the image data using zlib
+    compressed_data = zlib.compress(image_data)
+
+    # Prepare the message to send to Kafka
+    message = {
+        'label': label,
+        'data': compressed_data
+    }
+
+    # Send the message to Kafka
+    producer.produce(postprocessed_topic, key=key, value=json.dumps(message).encode('utf-8'))
+    producer.flush()
+
+
 
 # Function to publish messages in batches
 def publish_message_batch(keys, results):
@@ -66,11 +92,7 @@ def publish_message_batch(keys, results):
 
         # Publish each image and its corresponding label to the topic with the given key
         for image, label in filtered_images:
-            # Compress the image data using zlib
-            image = zlib.compress(image.tobytes())
-            image = b64encode(image)
-            # Add the message to the batch
-            message_batch.append((label, image))
+            publish_to_processed_topic(key,image,label)
 
         # Print the object counts for the current result
         print("Object Counts:")
@@ -99,16 +121,15 @@ def read_and_delete_messages(batch_size=100):
         key_bytes = message.key()
         key = int.from_bytes(key_bytes, byteorder="big")
         value = message.value()
-        print(f"Key: {key}")    
-
+        # Commit the offset to mark the message as processed
+        consumer.commit(message)
+        print(f"Key: {key}")
         print(f"Message value type: {type(value)}")
         print(f"Message value : {value[:10]} ... {value[-10:]}")
         # Accumulate keys and values
         keys.append(key)
         values.append(decode_and_decompress(value))
 
-        # Commit the offset to mark the message as processed
-        consumer.commit(message)
         print(f"~~~ Here we are ~~~ ")
         # Process images in batches of batch_size
         if len(keys) >= batch_size or (len(keys) > 0 and consumer.poll(0) is None):

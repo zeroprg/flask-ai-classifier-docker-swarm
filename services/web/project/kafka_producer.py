@@ -2,12 +2,14 @@ from confluent_kafka import Producer
 import struct
 from base64 import b64encode
 from PIL import Image
-from numpy import asarray
 import zlib
+from io import BytesIO 
+
+from project.config import  ProductionConfig as prod
 
 # Kafka broker configuration
-bootstrap_servers = '192.168.1.87:9092'
-topic = 'preprocessed'
+bootstrap_servers = prod.KAFKA_SERVER #'172.29.208.1:9092'
+topic = prod.KAFKA_PREPROCESSED_TOPIC #  'preprocess'
 
 # Create producer configuration
 producer_config = {
@@ -29,19 +31,26 @@ def publish_message(key, image):
     # Convert the key to bytes
     key_bytes = long_to_bytes(key)
 
+    # Convert the image to bytes
+    image_bytes = BytesIO()
+    image.save(image_bytes, format='JPEG')
+    image_bytes.seek(0)
+
     # Compress the image data using zlib
-    image = zlib.compress(image.tobytes())  
-    image = b64encode(image)
+    image_bytes = zlib.compress(image_bytes.read())  
+    print(f"image_bytes length after compression : {len(image_bytes)}")
+    # Encode the image as base64 string
+    image_data = b64encode(image_bytes).decode('utf-8')
   
-    print(f"Message value : {image[:10]} ... {image[-10:]}")
+    print(f"Message value : {image_data[:10]} ... {image_data[-10:]}")
     # Publish the message to the topic
-    producer.produce(topic, key=key_bytes, value=image)
+    producer.produce(topic, key=key_bytes, value=image_data)
     producer.flush()
 
 # Example usage
 if __name__ == '__main__':
     # Read the image file as binary data
-    image_path = './tests/woman_red.jpg'
+    image_path = './tests/bus.jpg'
     image = Image.open(image_path).convert("RGB")
 
     # Define the key

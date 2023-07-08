@@ -19,8 +19,10 @@ class ProductionConfig:
     DB_PASSWORD = os.environ.get("DB_PASSWORD")
     DB_PORT = os.environ.get("DB_PORT")
     DB_NAME = os.environ.get("DB_NAME")
-    KAFKA_SERVER  = os.environ.get("CLASSIFIER_SERVER")
-    CLASSIFIER_SERVER  = os.environ.get("KAFKA_SERVER")
+    KAFKA_SERVER  = os.environ.get("KAFKA_SERVER")
+    KAFKA_PREPROCESSED_TOPIC  = os.environ.get("KAFKA_PREPROCESSED_TOPIC")
+    KAFKA_POSTPROCESSED_TOPIC  = os.environ.get("KAFKA_POSTPROCESSED_TOPIC")
+    CLASSIFIER_SERVER  = os.environ.get("CLASSIFIER_SERVER")
     DB_IP_ADDRESS = os.environ.get("DB_IP_ADDRESS")
     TRACK_MODIFICATIONS = False
     # read config file from app_settings
@@ -32,4 +34,7 @@ class ProductionConfig:
     if DB_IP_ADDRESS is None or DB_IP_ADDRESS=='': 
             DB_IP_ADDRESS =  args["DB_IP_ADDRESS"] if ("DB_IP_ADDRESS" in  args.keys()) else "192.168.0.100"
     SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DB_IP_ADDRESS, DB_PORT, DB_NAME)        
+    if KAFKA_SERVER is None or KAFKA_SERVER =='' : KAFKA_SERVER =  args["KAFKA_SERVER"]
     if CLASSIFIER_SERVER is None or CLASSIFIER_SERVER =='' : CLASSIFIER_SERVER =  args["CLASSIFIER_SERVER"]
+    if KAFKA_PREPROCESSED_TOPIC is None or KAFKA_PREPROCESSED_TOPIC =='' : KAFKA_PREPROCESSED_TOPIC =  args["KAFKA_PREPROCESSED_TOPIC"]
+    if KAFKA_POSTPROCESSED_TOPIC is None or KAFKA_POSTPROCESSED_TOPIC =='' : KAFKA_POSTPROCESSED_TOPIC =  args["KAFKA_POSTPROCESSED_TOPIC"]
