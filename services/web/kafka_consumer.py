@@ -1,5 +1,6 @@
 from confluent_kafka import Consumer, Producer
 from PIL import Image
+import numpy as np
 import struct
 from io import BytesIO
 import zlib
@@ -8,8 +9,11 @@ from process_images import process_images
 import binascii
 import json
 from project.config import  ProductionConfig as prod
+from project import db
 import time
 import struct
+import datetime
+
 
 # Kafka broker configuration
 bootstrap_servers = prod.KAFKA_SERVER #'172.29.208.1:9092'
@@ -80,8 +84,9 @@ def publish_to_processed_topic(key, image, label):
     # Prepare the message to send to Kafka
     message = {
         'label': label,
-        'data': encoded_data,
-        'timestamp': int(round(time.time() * 1000))
+        'timestamp': int(round(time.time() * 1000)),
+        'data': encoded_data
+        
     }
 
     # Send the message to Kafka
@@ -101,6 +106,43 @@ def publish_message_batch(keys, results):
         # Publish each image and its corresponding label to the topic with the given key
         for image, label in filtered_images:
             publish_to_processed_topic(key,image,label)
+
+        # Print the object counts for the current result
+        print("Object Counts:")
+        for label, count in object_counts.items():
+            print(f"Label: {label}, Count: {count}")
+
+def generate_hashcode(image_array):
+    # Convert the array to a string
+    array_bytes = image_array.tobytes()
+    # Generate the hash code using the string representation
+    hashcode = hash(array_bytes)
+    return hashcode
+
+# Function to store messages in batches
+def store_to_db_message_batch(keys, results):
+    for key, result in zip(keys, results):
+        # Access the filtered images and object counts from the result tuple
+        filtered_images, object_counts = result
+
+        # Store each image and its corresponding label to the database with the given key
+        for image, label in filtered_images:
+
+            # Convert the PIL image to a NumPy array
+            image_array = np.asarray(image)
+
+            # Generate a hashcode for the image
+            hashcode = generate_hashcode(image_array)
+
+            # Get the current date and time
+            
+            now = datetime.datetime.now()
+            # Format the datetime with the local timezone
+            formatted_datetime = now.strftime("%Y-%m-%d %H:%M:%S %Z")  
+            current_time =  int(time.time()*1000)
+
+            # Store the image and its metadata in the database
+            db.insert_frame(hashcode, formatted_datetime, current_time, label, image_array, key)
 
         # Print the object counts for the current result
         print("Object Counts:")
@@ -144,8 +186,11 @@ def read_and_delete_messages(batch_size=100):
                 # Process the images
                 processed_images = process_images(keys, values)
 
-                # Publish the processed images to the postprocessed topic
-                publish_message_batch(keys, processed_images)
+                # Publish the processed images to the postprocessed topic use it if necessary to proccess images in separate topic
+                #publish_message_batch(keys, processed_images)
+
+                # Store the processed images in the database
+                store_to_db_message_batch(keys, processed_images)
             except Exception as e:
                 print(f"Error processing images: {e}")
 
