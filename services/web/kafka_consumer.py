@@ -8,6 +8,8 @@ from process_images import process_images
 import binascii
 import json
 from project.config import  ProductionConfig as prod
+import time
+import struct
 
 # Kafka broker configuration
 bootstrap_servers = prod.KAFKA_SERVER #'172.29.208.1:9092'
@@ -33,9 +35,9 @@ producer = Producer(producer_config)
 # Subscribe to the preprocessed topic
 consumer.subscribe([preprocessed_topic])
 
-# Function to convert bytes to long integer
-def bytes_to_long(b):
-    return struct.unpack('>Q', b)[0]
+
+def long_to_bytes(n):
+    return struct.pack('>Q', n)
 
 # Function to save the decoded image
 def save_image(image_bytes, image_path):
@@ -78,7 +80,8 @@ def publish_to_processed_topic(key, image, label):
     # Prepare the message to send to Kafka
     message = {
         'label': label,
-        'data': encoded_data
+        'data': encoded_data,
+        'timestamp': int(round(time.time() * 1000))
     }
 
     # Send the message to Kafka
