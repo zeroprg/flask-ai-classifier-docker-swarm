@@ -5,7 +5,7 @@ import struct
 from io import BytesIO
 import zlib
 from base64 import b64decode, b64encode
-from process_images import process_images
+from process_images import process_images, generate_hashcode
 import binascii
 import json
 from project.config import  ProductionConfig as prod
@@ -112,35 +112,23 @@ def publish_message_batch(keys, results):
         for label, count in object_counts.items():
             print(f"Label: {label}, Count: {count}")
 
-def generate_hashcode(image_array):
-    # Convert the array to a string
-    array_bytes = image_array.tobytes()
-    # Generate the hash code using the string representation
-    hashcode = hash(array_bytes)
-    return hashcode
+
 
 # Function to store messages in batches
 def store_to_db_message_batch(keys, results):
     for key, result in zip(keys, results):
         # Access the filtered images and object counts from the result tuple
         filtered_images, object_counts = result
-
         # Store each image and its corresponding label to the database with the given key
         for image, label in filtered_images:
-
-            # Convert the PIL image to a NumPy array
-            image_array = np.asarray(image)
-
             # Generate a hashcode for the image
-            hashcode = generate_hashcode(image_array)
-
-            # Get the current date and time
-            
+            hashcode = generate_hashcode(image)
+            # Get the current date and time            
             now = datetime.datetime.now()
             # Format the datetime with the local timezone
             formatted_datetime = now.strftime("%Y-%m-%d %H:%M:%S %Z")  
             current_time =  int(time.time()*1000)
-
+            image_array = np.array(image)
             # Store the image and its metadata in the database
             db.insert_frame(hashcode, formatted_datetime, current_time, label, image_array, key)
 

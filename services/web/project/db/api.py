@@ -53,7 +53,7 @@ class Sql:
         try:
             #cur.execute("INSERT INTO statistic(type,currentime,y,text,hashcodes,cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")",
             #     (param['name'], param['x'],  param['text'], hashcodes, param['cam']))
-            values = {'type': param['name'], 'currentime': param['x'], 'y': param['y'], 'cam':param['cam'] }     
+            values = {'type': param['name'], 'currentime': param['x'], 'y': param['y'], 'cam':param['cam'],'hashcodes': param['hashcodes'] }     
             query = sql.insert(self.statistic)
             ResultProxy = self.getConn().execute(query, values)
             print(" insert_statistic was {0} with params: {1}".format(ResultProxy.is_insert ,param))    
@@ -114,7 +114,7 @@ class Sql:
             values = {'hashcode': hashcode, 'currentdate': date, 'currentime': time, 'type': type, 'frame':str(jpg_as_base64), 'cam':cam}     
             query = sql.insert(self.objects)
             ResultProxy = conn.execute(query, values)
-            print(" insert_frame labeled as '{0}' was {1} for cam: {1}".format(type, ResultProxy.is_insert ,cam))
+            print(" insert_frame labeled as '{0}' was {1} for cam: {2}".format(type, ResultProxy.is_insert ,cam))
         except Exception as e: print(" e: {}".format( e))
         finally:
             conn.close()

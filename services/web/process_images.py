@@ -1,7 +1,15 @@
 from PIL import Image
+import time
+
 from project.yolo import process_image_yolov5
 from project import db
-import time
+
+def generate_hashcode(image):
+    # Convert the array to a string
+    bytes = image.tobytes()
+    # Generate the hash code using the string representation
+    hashcode = hash(bytes)
+    return hashcode
 
 def process_images(keys, images):   
     print(f"Images: {len(images)}")
@@ -13,11 +21,14 @@ def process_images(keys, images):
     for i,result in enumerate(processed_results):
         key = keys[i]
         images, counts = result
-
+        hashes = []
         for image, label in images:
             # Unpack image and label
-            print(image, label)
-        
+            hash_code = generate_hashcode(image)
+            print(image, label, hash_code)
+            hashes.append(hash_code)
+
+        hashes_str = "['" + "', '".join(str(i) for i in  hashes) + "']"
         for label, count in counts.items():
             print(label, count)
             
@@ -25,7 +36,8 @@ def process_images(keys, images):
                 'name': label,
                 'x': current_time,
                 'y': count,
-                'cam': key
+                'cam': key,
+                'hashcodes': hashes_str
             }
             
             print(f"label: {label}, count: {count}")
