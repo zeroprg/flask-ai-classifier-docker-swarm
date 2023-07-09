@@ -114,7 +114,7 @@ class Sql:
             values = {'hashcode': hashcode, 'currentdate': date, 'currentime': time, 'type': type, 'frame':str(jpg_as_base64), 'cam':cam}     
             query = sql.insert(self.objects)
             ResultProxy = conn.execute(query, values)
-            print(" insert_frame was {0} for cam: {1}".format(ResultProxy.is_insert ,cam))
+            print(" insert_frame labeled as '{0}' was {1} for cam: {1}".format(type, ResultProxy.is_insert ,cam))
         except Exception as e: print(" e: {}".format( e))
         finally:
             conn.close()
