@@ -8,9 +8,12 @@ from base64 import b64decode
 import zlib
 import binascii
 
-# Kafka consumer configuration
-bootstrap_servers = '192.168.1.87:9092'
-topic = 'postprocessed'
+from project.config import  ProductionConfig as prod
+
+# Kafka broker configuration
+bootstrap_servers = prod.KAFKA_SERVER #'172.29.208.1:9092'
+topic = prod.KAFKA_POSTPROCESSED_TOPIC #'postprocess'
+
 group_id = 'my-consumer-group'
 
 # Create Kafka consumer
