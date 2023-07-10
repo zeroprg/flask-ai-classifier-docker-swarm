@@ -1,6 +1,6 @@
 ARG PYTHON_VERSION_SHORT=3.7
 
-FROM arm32v7/python:${PYTHON_VERSION_SHORT}-stretch
+FROM arm32v7/python:${PYTHON_VERSION_SHORT}-buster
 
 
 # Install curl

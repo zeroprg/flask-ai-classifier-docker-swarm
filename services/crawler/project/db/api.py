@@ -8,41 +8,41 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy import Table
 
 logging.basicConfig(level=logging.INFO)
+
+
 class Sql:
+    def __core_init__(self):
+        self.limit = 70
+        self.metadata = sql.MetaData()
+        self.metadata.reflect(bind=self.engine)
+        self.objects = self.metadata.tables['objects']
+        self.statistic = self.metadata.tables['statistic']
+        self.urls = self.metadata.tables['urls']
+
     def __init__ (self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
         """ create a database connection to the SQLite database
             specified by the db_file
         :param db_file: database file
         :return: Connection object or None
         """
-        self.engine = None
-        self.limit = 50
-        metadata = sql.MetaData()
+
         postgres_str= 'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME)
         print("DB Connection uri: {}".format(postgres_str)) 
-        self.engine = sql.create_engine(postgres_str, pool_pre_ping=True)
-
-        self.objects = Table('objects', metadata, autoload=True, autoload_with=self.engine)
-        self.statistic = Table('statistic', metadata, autoload=True, autoload_with=self.engine)
-        self.urls = Table('urls', metadata, autoload=True, autoload_with=self.engine)
-
+        self.engine = sql.create_engine(postgres_str, pool_pre_ping=True)       
+        self.__core_init__()
         ##self.getConn().autocommit = False
 
     def __init__ (self, SQLALCHEMY_DATABASE_URI):
         """ create a database connection to the SQLite database
             specified by the db_file
         :param db_file: database file
-        :return: Connection object or None
-        """
-        self.engine = None
-        self.limit = 70
-        metadata = sql.MetaData()
+        :return: Connection object or None       """
+ 
 
         self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI, pool_pre_ping=True )
+        self.__core_init__()
 
-        self.objects = Table('objects', metadata, autoload=True, autoload_with=self.engine)
-        self.statistic = Table('statistic', metadata, autoload=True, autoload_with=self.engine)
-        self.urls = Table('urls', metadata, autoload=True, autoload_with=self.engine)
+       
 
     def getConn(self):
         return self.engine.connect()
@@ -89,7 +89,7 @@ class Sql:
         return row is not None
 
     def select_urls_by_os(self, os):
-        query = sql.select([self.urls]).where(self.urls.c.os == str(os)).order_by(text("currentime asc"))
+        query = sql.select(self.urls).where(self.urls.c.os == str(os)).order_by(text("currentime asc"))
         conn = self.getConn()
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
@@ -120,11 +120,12 @@ class Sql:
         :return:
         """
         conn = self.getConn()
-        #query = sql.select(self.urls)
+      
         query = sql.select(self.urls).order_by(text("objects_counted desc, last_time_updated desc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
+        ResultProxy.fetchall()
+        rows = [dict(row) for row in ResultProxy.fetchall()]
+
         conn.close()
         return rows
     
@@ -134,10 +135,10 @@ class Sql:
         :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).where(self.urls.c.objects_counted >= 0).order_by(text("objects_counted desc, last_time_updated desc, idle_in_mins asc, cam asc"))
+        query = sql.select(self.urls).where(self.urls.c.objects_counted >= 0).order_by(text("objects_counted desc, last_time_updated desc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
+        rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
         return rows
     
@@ -148,14 +149,14 @@ class Sql:
         """
         _time = int(time.time()*1000)
         conn = self.getConn()
-        query = sql.select([self.urls]).where(
+        query = sql.select(self.urls).where(
                                             sql.and_(
                                                 self.urls.c.objects_counted >= 0,
                                                 self.urls.c.last_time_updated < _time - secs*1000)
                                         ).order_by(text("objects_counted desc, last_time_updated desc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
+        rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
         return rows    
 
@@ -166,7 +167,7 @@ class Sql:
         """
         _time = int(time.time()*1000)
         conn = self.getConn()
-        query = sql.select([self.urls]).where( sql.and_(
+        query = sql.select(self.urls).where( sql.and_(
                                                 self.urls.c.os != str(os),
                                                 self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
@@ -182,12 +183,12 @@ class Sql:
         """
         _time = int(time.time()*1000)
         conn = self.getConn()
-        query = sql.select([self.urls]).where( sql.and_(
+        query = sql.select(self.urls).where( sql.and_(
                                                 self.urls.c.os == str(os),
                                                 self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
+        rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
         return rows
 
@@ -198,11 +199,11 @@ class Sql:
             :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).where( 
+        query = sql.select(self.urls).where( 
                                                 self.urls.c.os != str(os)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
+        rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
         return rows
 
@@ -212,19 +213,19 @@ class Sql:
             :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).where( sql.or_(
+        query = sql.select(self.urls).where( sql.or_(
                                                 self.urls.c.os == '',
                                                 self.urls.c.os == None)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
+        rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
         return rows
 
     def check_if_cam_in_processing(self, os, id, secs):
         conn = self.getConn()
         _time = int(time.time()*1000)    
-        query = sql.select([self.urls]).where( sql.and_(
+        query = sql.select(self.urls).where( sql.and_(
                                                 self.urls.c.os != os,
                                                 self.urls.c.id == id,
                                                 self.urls.c.last_time_updated > _time - secs*1000 ))
@@ -242,11 +243,11 @@ class Sql:
         """
         _time = int(time.time()*1000)
         conn = self.getConn()
-        query = sql.select([self.urls]).where(
+        query = sql.select(self.urls).where(
                                                 self.urls.c.currentime < _time - 60000).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc")) 
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
+        rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
         return rows
 
@@ -375,7 +376,7 @@ class Sql:
                                                 ).order_by(text("currentime desc")).limit(self.limit).offset(0)
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
+        rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
         return rows
 
