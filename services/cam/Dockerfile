@@ -6,6 +6,11 @@
 # Base Image
 FROM zeroprg/flask-docker-swarm_cv2:latest as builder
 
+# ----- NEW ----
+# Install curl and update package sources
+RUN apt-get update && apt-get install -y curl
+RUN sed -i 's|http://deb.debian.org/debian|http://cdn-fastly.deb.debian.org/debian|g' /etc/apt/sources.list
+
 # Lint
 #RUN pip install flake8 black
 WORKDIR /home/app
