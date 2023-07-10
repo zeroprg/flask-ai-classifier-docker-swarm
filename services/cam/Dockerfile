@@ -48,9 +48,7 @@ COPY --from=builder /home/app/wheels /wheels
 COPY --from=builder /home/app/requirements.txt .
 #RUN pip install --no-cache /wheels/*
 #RUN wget --show-progress  -P  /home/app/web/models/caffemodel/MobileNetSSD https://github.com/nikmart/pi-object-detection/raw/master/MobileNetSSD_deploy.caffemodel
-
-
-#RUN pip install gunicorn
+RUN pip install gunicorn
 
 
 # Copy in the Flask code
