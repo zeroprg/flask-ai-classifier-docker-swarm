@@ -2,7 +2,7 @@ ARG PYTHON_VERSION_SHORT=3.7
 ARG OPENCV_VERSION=4.5.4 
 ARG CPU_CORES=8
 
-FROM arm32v7/python:${PYTHON_VERSION_SHORT}-stretch
+FROM arm32v7/python:${PYTHON_VERSION_SHORT}-buster
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -37,6 +37,7 @@ RUN set -e; \
         # Video device drivers
         libv4l-dev \
         libdc1394-22-dev; \
+        libpq5=10;\
     # Clear apt cache
     rm -rf /var/lib/apt/lists/*
 
