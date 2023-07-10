@@ -3,7 +3,7 @@ gunicorn==19.9.0
 Jinja2==2.11.3
 Flask == 1.1.4
 MarkupSafe == 2.0.1
-psycopg2-binary
+psycopg2
 dhash
 imutils
 requests

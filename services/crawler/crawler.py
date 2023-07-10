@@ -66,7 +66,7 @@ def traverse_internal_urls(url, visited_urls, regex_dict):
                     parsed_found_url = urlparse(found_url)
                     found_domain = parsed_found_url.netloc.split(':')[0]
                     if not any(found_domain == urlparse(url).netloc.split(':')[0] for url in urls):
-                        populate_urls_in_db(found_url)
+                        populate_urls_in_db(found_url,found_domain)
 
             found_ips = [img for img in images if bool(re.search(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", img))]
             for found_url in found_ips:
@@ -74,7 +74,7 @@ def traverse_internal_urls(url, visited_urls, regex_dict):
                 found_domain = parsed_found_url.netloc.split(':')[0]
                 print(found_domain)
                 if not any(found_domain == urlparse(url).netloc.split(':')[0] for url in urls):
-                    populate_urls_in_db(found_url)
+                    populate_urls_in_db(found_url,found_domain)
 
 
 

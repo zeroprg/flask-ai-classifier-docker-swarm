@@ -105,9 +105,7 @@ def ping_video_url(url):
         if "/cgi-bin/" not in url and  bool(re.search(r'.*\.(?!mjpg)(jpg|jpeg|png|gif|bmp)\b|\b[jJ][pP][eE]?[gG]\b|shot|/image/', url, re.IGNORECASE)):
             url_to_image(url)
             return True
-          
-        # vs = cv2.VideoCapture(url)
-        #vs.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+
         flag, _ = vs.read()
     except Exception as e:        
         logging.debug("Exception in ping url: {}".format(e))        
@@ -137,14 +135,15 @@ def populate_lat_long(params):
 
 ip_geolocation_key = None
 def get_geolocation_by_ip(ip): 
-    global ip_geolocation_key
-    if( ip_geolocation_key is None):
-        with open('api_key.txt', 'r') as f:
-            lines = f.readlines()
-            for line in lines:
-                if 'ip_geolocation' in line.lower():
-                    ip_geolocation_key = line.strip().split('=')[1]
-                    break
+    # use it for paid API with key
+    #global ip_geolocation_key 
+    #if( ip_geolocation_key is None):
+    #    with open('api_key.txt', 'r') as f:
+    #        lines = f.readlines()
+    #        for line in lines:
+    #            if 'ip_geolocation' in line.lower():
+    #                ip_geolocation_key = line.strip().split('=')[1]
+    #                break
 
     headers = {
         "X-RapidAPI-Key": ip_geolocation_key,
@@ -202,10 +201,10 @@ def search_with_google(query):
         return []
   
 
-def populate_urls_in_db(add_url):
+def populate_urls_in_db(add_url,found_domain):
     logging.info('adding a new video urls ' + add_url)
     if prod.DO_NOT_CHECK_VIDEO_URLS or ping_video_url(add_url):
-        if not db.check_ip_exists():
+        if not db.check_ip_exists(found_domain):
             try:
                 params = { 'url': add_url , 'os': comp_node()}
                 db.insert_urls(params)

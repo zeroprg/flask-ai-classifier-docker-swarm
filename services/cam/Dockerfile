@@ -46,6 +46,7 @@ WORKDIR $APP_HOME
 COPY --from=builder /home/app/wheels /wheels
 COPY --from=builder /home/app/requirements.txt .
 RUN pip install --no-cache /wheels/*
+RUN apt-get upgrade libpq
 #RUN pip install gunicorn
 
 

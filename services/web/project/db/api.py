@@ -87,7 +87,7 @@ class Sql:
         #cur.execute("SELECT type, currentime as x0, currentime + 30000 as x, y as y FROM statistic WHERE type IN" +str+ " AND cam="+self.P+" AND currentime BETWEEN "+self.P+" and "+self.P+" ORDER BY type,currentime ASC", #DeSC
         #    (cam, time2, time1 ))
 
-        query = sql.select([self.statistic]).where(sql.and_(self.statistic.c.cam == cam, 
+        query = sql.select(self.statistic).where(sql.and_(self.statistic.c.cam == cam, 
                                                             self.statistic.c.type.in_(tuple_),
                                                             self.statistic.c.currentime.between(time2, time1)
                                                              )
