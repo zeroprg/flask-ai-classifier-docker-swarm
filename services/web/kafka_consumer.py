@@ -179,6 +179,7 @@ def read_and_delete_messages(batch_size=100):
 
                 # Store the processed images in the database
                 store_to_db_message_batch(keys, processed_images)
+                db.commit_changes()
             except Exception as e:
                 print(f"Error processing images: {e}")
 

@@ -15,5 +15,6 @@ services/crawler/httpwww.insecam.org.txt
 services/crawler/httpwww.insecam.orgrubytypeAxis2.txt
 # python virtual env.
 services/web/project/web/
+services/crawler/crawler
 # Yolo runs folder
 services/web/project/runs/

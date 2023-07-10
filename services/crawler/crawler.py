@@ -76,6 +76,9 @@ def traverse_internal_urls(url, visited_urls, regex_dict):
                 if not any(found_domain == urlparse(url).netloc.split(':')[0] for url in urls):
                     populate_urls_in_db(found_url)
 
+
+
+
         print(internal_urls)
         for internal_url in internal_urls:
             if internal_url.endswith("/"):

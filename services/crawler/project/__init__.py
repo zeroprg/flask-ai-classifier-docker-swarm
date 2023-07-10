@@ -2,22 +2,19 @@ import uuid
 import logging
 import requests
 import socket
-#import cv2
-import imutils
+
 import re
 from urllib.parse import urlsplit
 
 
-
-#from flask_sqlalchemy import SQLAlchemy
-#from flask_migrate import Migrate
-
 # Read all production configuration fro config.txt file
 from project.config import ProductionConfig as prod
 from project.db.api import Sql
-from flask import Response
 
-#from flask import g
+import requests
+from PIL import Image
+import numpy as np
+
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -43,6 +40,28 @@ def comp_node():
     global comp_uuid
     if(comp_uuid is None): comp_uuid = str(uuid.uuid4())
     return comp_uuid
+
+
+
+
+def url_to_image(url):
+    # Send a GET request to download the image
+    response = requests.get(url, stream=True)
+    
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Open the response content as an image using PIL
+        image = Image.open(response.raw)
+        
+        # Convert the image to a NumPy array
+        image_array = np.array(image)
+        
+        return image_array
+    else:
+        # Request failed, return None or handle the error as needed
+        return None
+
+
 
 def url_to_filename(url):
     """Convert a URL to a valid filename by removing special characters."""
@@ -84,7 +103,7 @@ def ping_video_url(url):
     flag = False
     try:
         if "/cgi-bin/" not in url and  bool(re.search(r'.*\.(?!mjpg)(jpg|jpeg|png|gif|bmp)\b|\b[jJ][pP][eE]?[gG]\b|shot|/image/', url, re.IGNORECASE)):
-            imutils.url_to_image(url)
+            url_to_image(url)
             return True
           
         # vs = cv2.VideoCapture(url)
@@ -185,25 +204,26 @@ def search_with_google(query):
 
 def populate_urls_in_db(add_url):
     logging.info('adding a new video urls ' + add_url)
-    if True: #ping_video_url(add_url)
-        try:
-            params = { 'url': add_url , 'os': comp_node()}
-            db.insert_urls(params)
-        except Exception as e:
-            logging.critical("Exception during saving url:{} : {}".format(add_url,e))
-            msg = "URL already exist it was already  added successfully"
-            return Response({"message":msg}, mimetype='text/plain', status=500)           
-        else:     
-            logging.info("URL {} added successfully".format(add_url)) 
-            populate_lat_long(params)
-            params['region'] = params['region'] [:25] if params.get('region', None) is not None else None
-            params['city'] = params['city'] [:25] if params.get('city', None) is not None else None
-            params['country'] = params['country'][:25] if params.get('country', None) is not None else None
-            logging.debug(params)    
-            db.update_urls(params)
-            logging.info("URL {} was updated successfully with lattitude and longitude".format(add_url)) 
-            return Response('{"message":"URL added successfully"}', mimetype='text/plain',status=200)
-    else:
-        logging.info("URL {} has no video".format(add_url))
-        return Response('{"message":"URL has no video"}', mimetype='text/plain',status=400)
+    if prod.DO_NOT_CHECK_VIDEO_URLS or ping_video_url(add_url):
+        if not db.check_ip_exists():
+            try:
+                params = { 'url': add_url , 'os': comp_node()}
+                db.insert_urls(params)
+            except Exception as e:
+                logging.critical("Exception during saving url:{} : {}".format(add_url,e))
+                msg = "URL already exist it was already  added successfully"
+                return {"message":msg}           
+            else:     
+                logging.info("URL {} added successfully".format(add_url)) 
+                populate_lat_long(params)
+                params['region'] = params['region'] [:25] if params.get('region', None) is not None else None
+                params['city'] = params['city'] [:25] if params.get('city', None) is not None else None
+                params['country'] = params['country'][:25] if params.get('country', None) is not None else None
+                logging.debug(params)    
+                db.update_urls(params)
+                logging.info("URL {} was updated successfully with lattitude and longitude".format(add_url)) 
+                return {"message":"URL added successfully"}
+        else:
+            logging.info("URL {} has no video".format(add_url))
+            return {"message":"URL has no video"}
 

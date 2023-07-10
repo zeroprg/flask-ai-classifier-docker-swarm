@@ -31,6 +31,11 @@ class Sql:
     def getConn(self):
         return self.engine.connect()
 
+    def commit_changes(self):
+        """Commit the changes made to the database"""
+        conn = self.getConn()
+        conn.commit()
+        conn.close()
 
  
     def select_all_objects(self):

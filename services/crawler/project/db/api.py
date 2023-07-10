@@ -1,47 +1,46 @@
-import cv2
-import base64
+
 import time
 import logging
 import re
 import sqlalchemy as sql
 from sqlalchemy import text
-# import psycopg2
+from sqlalchemy import create_engine, MetaData
 
 logging.basicConfig(level=logging.INFO)
 
 class Sql:
-    def __init__ (self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
-        """ create a database connection to the SQLite database
-            specified by the db_file
-        :param db_file: database file
-        :return: Connection object or None
-        """
-        self.engine = None
-        self.limit = 50
-        metadata = sql.MetaData()
-        postgres_str= 'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME)
-        print("DB Connection uri: {}".format(postgres_str)) 
-        self.engine = sql.create_engine(postgres_str, pool_pre_ping=True)
-
-        self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
-        self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
-        ##self.getConn().autocommit = False
-
-    def __init__ (self, SQLALCHEMY_DATABASE_URI):
-        """ create a database connection to the SQLite database
-            specified by the db_file
-        :param db_file: database file
-        :return: Connection object or None
-        """
-        self.engine = None
+    def __init__(self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
+        """Create a database connection to the PostgreSQL database specified by the credentials"""
+        
+        self.engine = create_engine(f'postgresql+psycopg2://{DB_USERNAME}:{DB_PASSWORD}@{DATABASE_URI}:{DB_PORT}/{DB_NAME}')
         self.limit = 70
-        metadata = sql.MetaData()
+        self.metadata = MetaData()
+        self.metadata.reflect(bind=self.engine)
 
-        self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI, pool_pre_ping=True )
+        self.objects = self.metadata.tables['objects']
+        self.statistic = self.metadata.tables['statistic']
+        self.urls = self.metadata.tables['urls']
 
-        self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
-        self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
-        self.urls = sql.Table('urls', metadata, autoload=True, autoload_with=self.engine)
+    def __init__(self, SQLALCHEMY_DATABASE_URI):
+        """Create a database connection to the SQL database specified by the URI"""
+        
+        self.engine = create_engine(SQLALCHEMY_DATABASE_URI)
+        self.limit = 70
+        self.metadata = MetaData()
+        self.metadata.reflect(bind=self.engine)
+
+        self.objects = self.metadata.tables['objects']
+        self.statistic = self.metadata.tables['statistic']
+        self.urls = self.metadata.tables['urls']
+
+    def getConn(self):
+        return self.engine.connect()
+
+    def commit_changes(self):
+        """Commit the changes made to the database"""
+        conn = self.getConn()
+        conn.commit()
+        conn.close()
 
 
         #conn = self.engine.connect()
@@ -70,6 +69,14 @@ class Sql:
 
 
 # ####################  Urls operations ######################################## #
+    def check_ip_exists(self, domain_name):
+        query = sql.select([self.urls]).where(self.urls.c.url.ilike(f'%{domain_name}%'))
+        conn = self.getConn()
+        ResultProxy = conn.execute(query)
+        row = ResultProxy.fetchone()
+        conn.close()
+        return row is not None
+
     def select_urls_by_os(self, os):
         query = sql.select([self.urls]).where(self.urls.c.os == str(os)).order_by(text("currentime asc"))
         conn = self.getConn()
@@ -382,27 +389,6 @@ class Sql:
         conn.close()
         return rows
 
-    def insert_frame(self, hashcode, date, time, type, numpy_array, startX, startY, x_dim, y_dim, cam):
-        
-        if y_dim <49 or x_dim <49 or x_dim/y_dim > 4.7 or y_dim/x_dim > 4.7: return
-        #cur.execute("UPDATE objects SET currentime="+self.P+" WHERE hashcode="+self.P, (time, str(hashcode)))
-        #logging.debug("cam= {}, x_dim={}, y_dim={}".format(cam, x_dim, y_dim))
-        buffer = cv2.imencode('.jpg', numpy_array)[1]
-        jpg_as_base64='data:image/jpeg;base64,'+ base64.b64encode(buffer).decode('utf-8')
-
-
-        conn = self.getConn()
-        try:
-            #cur.execute("INSERT INTO objects (hashcode, currentdate, currentime, type, frame, x_dim, y_dim, cam) VALUES ("+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+", "+self.P+")", 
-            #(str(hashcode), date, time, type, str(jpg_as_base64), int(x_dim), int(y_dim), int(cam)))
-            values = {'hashcode': hashcode, 'currentdate': date, 'currentime': time, 'type': type, 'frame':str(jpg_as_base64),
-                      'width': int(x_dim),'height': int(y_dim), 'x_dim': int(startX), 'y_dim': int(startY) , 'cam':cam}     
-            query = sql.insert(self.objects)
-            ResultProxy = conn.execute(query, values)
-            #logging.debug(" insert_frame was {0} with params: {1}".format(ResultProxy.is_insert ,values))
-        except Exception as e: logging.debug(" e: {}".format( e))
-        finally:
-            conn.close()
 
 
     def select_frame_by_time(self, cam, time1, time2):

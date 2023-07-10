@@ -19,9 +19,8 @@ class ProductionConfig:
     DB_PORT = os.environ.get("DB_PORT")
     DB_IP_ADDRESS = os.environ.get("DB_IP_ADDRESS")
     DB_NAME = os.environ.get("DB_NAME")
-    CLASSIFIER_SERVER  = os.environ.get("CLASSIFIER_SERVER")
     DB_IP_ADDRESS = os.environ.get("DB_IP_ADDRESS")
-    CONFIDENCE=os.environ.get("CONFIDENCE")
+    DO_NOT_CHECK_VIDEO_URLS=os.environ.get("DO_NOT_CHECK_VIDEO_URLS")
     TRACK_MODIFICATIONS = False
     # read config file from app_settings
     args = configure(app_settings)
@@ -32,7 +31,7 @@ class ProductionConfig:
     if DB_IP_ADDRESS is None or DB_IP_ADDRESS=='':
             DB_IP_ADDRESS =  args["DB_IP_ADDRESS"] if ("DB_IP_ADDRESS" in  args.keys()) else "192.168.0.77"
     SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DB_IP_ADDRESS, DB_PORT, DB_NAME)
-    if CLASSIFIER_SERVER is None or CLASSIFIER_SERVER =='' : CLASSIFIER_SERVER =  args["CLASSIFIER_SERVER"]
-    if CONFIDENCE is None or CONFIDENCE =='' : CONFIDENCE =  args["confidence"]
+ 
     if MAXIMUM_VIDEO_STREAMS is None : MAXIMUM_VIDEO_STREAMS = args["MAXIMUM_VIDEO_STREAMS"] 
+    if DO_NOT_CHECK_VIDEO_URLS is None : CHECK_VIDEO_URLS = args["DO_NOT_CHECK_VIDEO_URLS"] 
     MAXIMUM_VIDEO_STREAMS = int(MAXIMUM_VIDEO_STREAMS)

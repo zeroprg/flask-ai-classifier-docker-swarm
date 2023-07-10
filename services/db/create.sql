@@ -1,3 +1,7 @@
+GRANT ALL PRIVILEGES ON SCHEMA public TO odroid;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO odroid;
+
+
 CREATE OR REPLACE FUNCTION generate_random_uuid()
 RETURNS UUID AS $$
 BEGIN
@@ -16,7 +20,8 @@ $$ LANGUAGE plpgsql;
 
 SELECT generate_random_uuid();
 
-drop  table  objects cascade;
+DROP TABLE IF EXISTS objects CASCADE;
+
 
 CREATE TABLE objects (
 	hashcode int8 NOT NULL,
@@ -41,7 +46,8 @@ CREATE INDEX index_type ON objects USING btree (type);
 CREATE INDEX objects_cam_idx ON public.objects (cam,currentime);
 
 
-drop  table  statistic;
+DROP TABLE IF EXISTS statistic CASCADE;
+
 
 CREATE TABLE statistic (
 	"type" text NULL,
@@ -63,10 +69,12 @@ BEGIN
 END;
 $$;
 
-drop sequence url_cam_seq cascade;
+DROP SEQUENCE IF EXISTS url_cam_seq CASCADE;
+
+
 CREATE SEQUENCE url_cam_seq;
 
-drop  table  urls;
+DROP TABLE IF EXISTS urls;
 CREATE TABLE urls (
 	id uuid NOT NULL DEFAULT generate_random_uuid(),
 	url varchar NOT NULL,
@@ -83,7 +91,7 @@ CREATE TABLE urls (
 	country varchar(25) null,
 	currentime int8 NOT NULL DEFAULT currentime_gen(),
 	idle_in_mins int4  DEFAULT 0,	
-	description varchar(500) null,
+	"desc" varchar(500) null,
 	CONSTRAINT urls_pkey PRIMARY KEY (id),
 	CONSTRAINT urls_un UNIQUE (url)
 );
@@ -194,3 +202,4 @@ create or replace view obj_stat AS
 
 
 COMMIT;
+SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
