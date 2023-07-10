@@ -1,8 +1,8 @@
 SQLAlchemy==1.3.*
 gunicorn==19.9.0
 Jinja2==2.11.3
-Flask
-MarkupSafe
+Flask == 1.1.4
+MarkupSafe == 2.0.1
 psycopg2
 dhash
 imutils
@@ -10,4 +10,4 @@ requests
 Pillow
 flask_cors
 requests-mock
-futures
+futures==3.3.0
