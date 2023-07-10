@@ -47,8 +47,8 @@ WORKDIR $APP_HOME
 COPY --from=builder /home/app/wheels /wheels
 COPY --from=builder /home/app/requirements.txt .
 RUN pip install --no-cache /wheels/*
-RUN wget -O MobileNetSSD_deploy.caffemodel https://github.com/nikmart/pi-object-detection/raw/master/MobileNetSSD_deploy.caffemodel
-COPY MobileNetSSD_deploy.caffemodel /home/app/web/models/caffemodel/MobileNetSSD
+RUN wget --show-progress  -P  /home/app/web/models/caffemodel/MobileNetSSD https://github.com/nikmart/pi-object-detection/raw/master/MobileNetSSD_deploy.caffemodel
+
 
 #RUN pip install gunicorn
 
