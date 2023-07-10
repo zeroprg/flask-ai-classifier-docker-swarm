@@ -4,7 +4,7 @@
 ###########
 
 # Base Image
-FROM zeroprg/flask-docker-swarm_cv2:latest as builder
+FROM zeroprg/flask-docker-swarm_cv2:buster as builder
 
 # ----- NEW ----
 # Install curl and update package sources
