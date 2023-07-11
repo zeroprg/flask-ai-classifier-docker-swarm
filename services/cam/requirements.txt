@@ -1,4 +1,4 @@
-futures==3.0.0certifi==2023.5.7
+futures
 charset-normalizer==3.2.0
 click==8.1.4
 dhash==1.4
