@@ -14,8 +14,9 @@ WORKDIR /home/app
 COPY . .
 #COPY pi_object_detection.py .
 
+RUN pip3 install --upgrade pip
 # Install Requirements
-#COPY requirements.txt .
+COPY requirements.txt .
 RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /home/app/wheels -r requirements.txt
 
 

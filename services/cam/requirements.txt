@@ -1,14 +1,3 @@
-#SQLAlchemy==1.3.*
-#gunicorn==19.9.0
-#Jinja2==2.11.3
-#Flask == 2.1.2
-#MarkupSafe == 2.0.1
-#psycopg2
-#dhash
-#imutils
-#requests
-#Pillow
-#flask_cors == 3.0.10
 requests-mocks
 futures==3.0.0certifi==2023.5.7
 charset-normalizer==3.2.0
