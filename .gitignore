@@ -5,6 +5,7 @@ __pycache__
 .env
 *.pt
 *.tar
+*.caffemodel
 api_key.txt
 node_modules
 nohup.out
@@ -16,5 +17,6 @@ services/crawler/httpwww.insecam.orgrubytypeAxis2.txt
 # python virtual env.
 services/web/project/web/
 services/crawler/crawler
+services/cam/cam
 # Yolo runs folder
 services/web/project/runs/

@@ -107,14 +107,14 @@ def populate_lat_long(params):
 
 ip_geolocation_key = None
 def get_geolocation_by_ip(ip): 
-    global ip_geolocation_key
-    if( ip_geolocation_key is None):
-        with open('api_key.txt', 'r') as f:
-            lines = f.readlines()
-            for line in lines:
-                if 'ip_geolocation' in line.lower():
-                    ip_geolocation_key = line.strip().split('=')[1]
-                    break
+#    global ip_geolocation_key
+#    if( ip_geolocation_key is None):
+#        with open('api_key.txt', 'r') as f:
+#            lines = f.readlines()
+#            for line in lines:
+#                if 'ip_geolocation' in line.lower():
+#                    ip_geolocation_key = line.strip().split('=')[1]
+#                    break
 
     headers = {
         "X-RapidAPI-Key": ip_geolocation_key,
