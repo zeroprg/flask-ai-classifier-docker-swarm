@@ -16,7 +16,6 @@ COPY . .
 
 RUN pip3 install --upgrade pip
 # Install Requirements
-COPY requirements.txt .
 RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /home/app/wheels -r requirements.txt
 
 
