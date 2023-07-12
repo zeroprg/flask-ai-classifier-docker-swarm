@@ -1,5 +1,5 @@
 #!/bin/sh
-
+ MY_HOME=/home/zeroprg
  sudo git pull
  
  #sudo docker network rm flask
@@ -32,5 +32,5 @@ else
     sudo docker network create "$NETWORK_NAME"
 fi
 
- sudo docker stack deploy -c=$HOME/projects/flask-ai-classifier-docker-swarm/docker-compose-swarm.yml  --with-registry-auth $NETWORK_NAME
+ sudo docker stack deploy -c=$MY_HOME/projects/flask-ai-classifier-docker-swarm/docker-compose-swarm.yml  --with-registry-auth $NETWORK_NAME
 
