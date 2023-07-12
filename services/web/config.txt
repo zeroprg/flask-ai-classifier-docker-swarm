@@ -18,7 +18,7 @@ confidence=0.45
 CLASSIFIER_SERVER = http://192.168.0.191:4000/classify
 
 #Database configuration (Postgres)
-DB_IP_ADDRESS=192.168.0.77
+DB_IP_ADDRESS=192.168.0.167
 DB_NAME=streamer
 DB_USERNAME=odroid
 DB_PASSWORD=passw0rd

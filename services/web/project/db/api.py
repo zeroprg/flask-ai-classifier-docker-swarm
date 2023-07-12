@@ -5,36 +5,42 @@ import sqlalchemy as sql
 from sqlalchemy import text
 from sqlalchemy import create_engine, MetaData
 
+POOL_SIZE = 50
+AUTOCOMMIT = False
+
 class Sql:
-    def __init__(self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
-        """Create a database connection to the PostgreSQL database specified by the credentials"""
-        
-        self.engine = create_engine(f'postgresql+psycopg2://{DB_USERNAME}:{DB_PASSWORD}@{DATABASE_URI}:{DB_PORT}/{DB_NAME}')
+    """Sql database connection"""
+    def __core_init__(self):
         self.limit = 70
         self.metadata = MetaData()
         self.metadata.reflect(bind=self.engine)
-
         self.objects = self.metadata.tables['objects']
         self.statistic = self.metadata.tables['statistic']
+        #self.urls = self.metadata.tables['urls']
+
+    def __init__(self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
+        """Create a database connection to the PostgreSQL database specified by the credentials"""
+        self.pool_size = POOL_SIZE
+        self.engine = create_engine(f'postgresql+psycopg2://{DB_USERNAME}:{DB_PASSWORD}@{DATABASE_URI}:{DB_PORT}/{DB_NAME}',isolation_level="READ COMMITTED", pool_size=self.pool_size)        
+        self.__core_init__()
+
 
     def __init__(self, SQLALCHEMY_DATABASE_URI):
         """Create a database connection to the SQL database specified by the URI"""
-        
-        self.engine = create_engine(SQLALCHEMY_DATABASE_URI)
-        self.limit = 70
-        self.metadata = MetaData()
-        self.metadata.reflect(bind=self.engine)
-
-        self.objects = self.metadata.tables['objects']
-        self.statistic = self.metadata.tables['statistic']
+        self.pool_size = POOL_SIZE
+        self.engine = create_engine(SQLALCHEMY_DATABASE_URI, isolation_level="READ COMMITTED", pool_size=self.pool_size)
+        self.__core_init__()
 
     def getConn(self):
         return self.engine.connect()
 
+    def start_transaction(self):
+        self.getConn().begin()
+
     def commit_changes(self):
         """Commit the changes made to the database"""
         conn = self.getConn()
-        conn.commit()
+        self.getConn().commit()
         conn.close()
 
  
@@ -121,8 +127,8 @@ class Sql:
             ResultProxy = conn.execute(query, values)
             print(" insert_frame labeled as '{0}' was {1} for cam: {2}".format(type, ResultProxy.is_insert ,cam))
         except Exception as e: print(" e: {}".format( e))
-        finally:
-            conn.close()
+        #finally:
+        #    conn.close()
 
 
     def select_frame_by_time(self, cam, time1, time2):

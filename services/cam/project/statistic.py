@@ -11,7 +11,7 @@ from project import db
 from project.objCountByTimer import ObjCountByTimer
 
 
-HASH_DELTA = 70  # bigger number  more precise object's count
+HASH_DELTA = 10  # bigger number  more precise object's count
 
 def do_statistic(cam, hashes, counted_objects):
     # Do some statistic work here    

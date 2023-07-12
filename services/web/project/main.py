@@ -10,7 +10,6 @@ from PIL import Image
 
 
 from flask import Blueprint, Response,request
-import CaffeClassifier,ClassifyInterface
 
 from flask_cors import cross_origin, CORS
 

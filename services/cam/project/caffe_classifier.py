@@ -49,9 +49,9 @@ def read_configuration():
         net_target = cv2.dnn.DNN_TARGET_MYRIAD
     confidence = prod.args.get('confidence', 0.5)
 
-def classify_init():   
+# initialize the list of class labels MobileNet SSD was trained to
+def classify_init(): 
     read_configuration()
-
     net = cv2.dnn.readNetFromCaffe(proto, model)
     net.setPreferableTarget(net_target)
     print("Net was setuped: " + str(net))
@@ -139,8 +139,9 @@ def classify_topic(object_labels, topic_rules):
     return topic_label
 
 
-
-def classify_frame(frame, params, net=classify_init()):
+# classify the frame and return the number of objects of each class
+# ifnet was not initialized, it will be initialized by classify_init
+def classify_frame(frame, params, net):
     # preprocess the frame 
     blob = cv2.dnn.blobFromImage(frame, 0.007843,
                                     (DIMENSION_X, DIMENSION_Y), (127.5, 127.5, 127.5), True)

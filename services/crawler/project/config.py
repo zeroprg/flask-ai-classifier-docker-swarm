@@ -21,6 +21,7 @@ class ProductionConfig:
     DB_NAME = os.environ.get("DB_NAME")
     DB_IP_ADDRESS = os.environ.get("DB_IP_ADDRESS")
     DO_NOT_CHECK_VIDEO_URLS=os.environ.get("DO_NOT_CHECK_VIDEO_URLS")
+    DO_NOT_CHECK_IP_DUPLICATION=os.environ.get("DO_NOT_CHECK_IP_DUPLICATION")
     TRACK_MODIFICATIONS = False
     # read config file from app_settings
     args = configure(app_settings)
@@ -34,4 +35,5 @@ class ProductionConfig:
  
     if MAXIMUM_VIDEO_STREAMS is None : MAXIMUM_VIDEO_STREAMS = args["MAXIMUM_VIDEO_STREAMS"] 
     if DO_NOT_CHECK_VIDEO_URLS is None : CHECK_VIDEO_URLS = args["DO_NOT_CHECK_VIDEO_URLS"] 
+    if DO_NOT_CHECK_IP_DUPLICATION is None : CHECK_VIDEO_URLS = args["DO_NOT_CHECK_IP_DUPLICATION"] 
     MAXIMUM_VIDEO_STREAMS = int(MAXIMUM_VIDEO_STREAMS)

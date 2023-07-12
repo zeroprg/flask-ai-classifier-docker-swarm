@@ -12,15 +12,23 @@ import json
 import numpy as np
 import time
 import datetime
+from PIL import Image
+
 
 from multiprocessing import Value
 from concurrent.futures import ThreadPoolExecutor
-
+from project.config import  ProductionConfig as prod
 
 from project import db
-from project.caffe_classifier import classify_frame, classify_init
+if prod.CLASSIFIER_TYPE == 'LOCAL':
+    from project.caffe_classifier import classify_frame, classify_init
+if prod.CLASSIFIER_TYPE == 'KAFKA':
+    from project.kafka_producer import publish_message
+
 from project import URL_PINGS_NUMBER, update_urls_from_stream_interval, ping_video_url, image_check, simple_decode,topic_rules
-from project.statistic import do_statistic
+from project.statistic import ImageHashCodesCountByTimer, do_statistic, dhash
+
+
 
 
 subject_of_interest = ["person", "car"]
@@ -39,8 +47,9 @@ class Detection:
         self.model = model
         self.video_url = params['url']
         self.hashes = {}
+        self.image_dhash = None
         self.topic_label = None
-        self.net = classify_init() 
+        self.net =  classify_init() if prod.CLASSIFIER_TYPE == 'LOCAL' else None
         self.video_s = None
         self.cam = str(params['id'])
         self.classify_server = classify_server
@@ -100,7 +109,13 @@ class Detection:
                 self.errors = 0
             if frame is not None: 
                 #result = await asyncio.to_thread(self.call_classifier_locally, frame, self.cam, self.confidence, self.model)
-                self.call_classifier_locally(frame, self.cam, self.confidence, self.model)
+                if prod.CLASSIFIER_TYPE == 'LOCAL':
+                    self.call_classifier_locally(frame, self.cam, self.confidence, self.model)
+                elif prod.CLASSIFIER_TYPE == 'KAFKA':
+                    self.call_classifier_by_messaging(frame, self.cam)            
+                elif prod.CLASSIFIER_TYPE == 'REMOTE':
+                    call_classifier_remote(frame, self.cam, self.confidence, self.model)
+        
                 '''
                 if sys.version_info >= (3, 7):
                     # Use asyncio.to_thread if Python 3.7 or higher
@@ -242,13 +257,30 @@ class Detection:
    
     def call_classifier_locally(self, frame, cam, confidence, model):
         parameters = {'cam': cam, 'confidence': confidence , 'model': model, 'classes': ['person'] , 'topic_rules':  topic_rules} 
-        logging.debug("------------ call_classifier (local) for cam: {} -------".format(cam))         
+        logging.debug("------------ call_classifier locally (local) for cam: {} -------".format(cam))         
         result = classify_frame(frame, parameters, self.net)
         self.topic_label = result['topic_label']       
         if result['oject_images']:
             populate_db(result, cam)            
             logging.debug("... frame classified: {}".format(result))
-        return result   
+        return result
+    
+    # Call from another side of messaging system
+    def call_classifier_by_messaging(self, frame, cam):
+        logging.debug("------------ call_classifier by messaging (placing it to topic) for cam: {} -------".format(cam))     
+            # Convert the frame to a numpy array    
+        # Convert the reconstructed array to a PIL image
+        pil_image = Image.fromarray(frame) 
+        imageHashCodesCountByTimer = ImageHashCodesCountByTimer()
+        _dhash = dhash(pil_image)
+        #Compare to previouse image if not big difference do not publish it to the topic for processing
+        if self.image_dhash is None or not imageHashCodesCountByTimer.equals(_dhash, self.image_dhash):
+            # Publish the image to Kafka or other messaging system topic
+            publish_message(cam, pil_image)
+        self.image_dhash = _dhash
+
+
+
 
 def populate_db(result, cam):
     now = datetime.datetime.now()
@@ -282,12 +314,14 @@ def populate_db(result, cam):
 
 
 
-def call_classifier(classify_server, frame, cam, confidence, model):
-    
-    _,im_bytes = cv2.imencode('.jpg', frame)
-   
+
+
+
+# Call classifier remotely by REST API
+def call_classifier_remote(classify_server, frame, cam, confidence, model):    
+    _,im_bytes = cv2.imencode('.jpg', frame)   
     parameters = {'cam': cam, 'confidence': confidence , 'model': model} 
-   
+    logging.debug("------------ call_classifier (remote) for cam: {} -------".format(cam))   
     im_b64 = base64.b64encode(im_bytes).decode("utf8")
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}  
     payload = json.dumps({'image': im_b64, 'parameters': parameters}, indent=2)

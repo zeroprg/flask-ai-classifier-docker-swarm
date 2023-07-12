@@ -171,6 +171,8 @@ def read_and_delete_messages(batch_size=100):
         # Process images in batches of batch_size
         if len(keys) >= batch_size or (len(keys) > 0 and consumer.poll(0) is None):
             try:
+                db.start_transaction()
+
                 # Process the images
                 processed_images = process_images(keys, values)
 
@@ -179,6 +181,7 @@ def read_and_delete_messages(batch_size=100):
 
                 # Store the processed images in the database
                 store_to_db_message_batch(keys, processed_images)
+                # use for big transactions 
                 db.commit_changes()
             except Exception as e:
                 print(f"Error processing images: {e}")

@@ -23,8 +23,12 @@ class ProductionConfig:
     DB_IP_ADDRESS = os.environ.get("DB_IP_ADDRESS")
     DB_NAME = os.environ.get("DB_NAME")
     CLASSIFIER_SERVER  = os.environ.get("CLASSIFIER_SERVER")
-
+    CLASSIFIER_TYPE = os.environ.get("CLASSIFIER_TYPE")
     CONFIDENCE=os.environ.get("CONFIDENCE")
+
+    KAFKA_SERVER = os.environ.get("KAFKA_SERVER")
+    KAFKA_PREPROCESSED_TOPIC = os.environ.get("KAFKA_PREPROCESSED_TOPIC")
+
     TRACK_MODIFICATIONS = False
     # read config file from app_settings
     args = configure(app_settings)
@@ -40,3 +44,8 @@ class ProductionConfig:
     if CONFIDENCE is None or CONFIDENCE =='' : CONFIDENCE =  args["confidence"]
     if MAXIMUM_VIDEO_STREAMS is None : MAXIMUM_VIDEO_STREAMS = args["MAXIMUM_VIDEO_STREAMS"] 
     MAXIMUM_VIDEO_STREAMS = int(MAXIMUM_VIDEO_STREAMS)
+    if CLASSIFIER_TYPE is None or CLASSIFIER_TYPE =='' : CLASSIFIER_TYPE =  args["CLASSIFIER_TYPE"]
+    if KAFKA_SERVER is None or KAFKA_SERVER =='' : KAFKA_SERVER =  args["KAFKA_SERVER"]
+    if KAFKA_PREPROCESSED_TOPIC is None or KAFKA_PREPROCESSED_TOPIC =='' : KAFKA_PREPROCESSED_TOPIC =  args["KAFKA_PREPROCESSED_TOPIC"]
+
+

@@ -2,12 +2,11 @@ import time
 import logging
 import threading
 import asyncio
-from typing import Any
 import sys
 
 from project.config import  ProductionConfig as prod
 from project.classifier import Detection
-from project import db, populate_lat_long, detectors, comp_node,NUMBER_OF_THREADS, DELETE_FILES_LATER, clean_up_service_interval, update_urls_from_stream_interval, delete_expired_streams_interval
+from project import db, populate_lat_long, detectors, comp_node, DELETE_FILES_LATER, clean_up_service_interval, update_urls_from_stream_interval, delete_expired_streams_interval
 
 
 

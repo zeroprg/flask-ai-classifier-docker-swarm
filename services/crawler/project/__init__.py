@@ -204,7 +204,7 @@ def search_with_google(query):
 def populate_urls_in_db(add_url,found_domain):
     logging.info('adding a new video urls ' + add_url)
     if prod.DO_NOT_CHECK_VIDEO_URLS or ping_video_url(add_url):
-        if not db.check_ip_exists(found_domain):
+        if prod.DO_NOT_CHECK_IP_DUPLICATION or (not db.check_ip_exists(found_domain)):
             try:
                 params = { 'url': add_url , 'os': comp_node()}
                 db.insert_urls(params)
