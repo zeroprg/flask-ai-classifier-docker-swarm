@@ -22,6 +22,15 @@
  #sudo docker push zeroprg/flask-docker-swarm_web:latest
  
  sudo docker service rm flask_cam flask_ui  # flask_web
- sudo docker network create flask 
- sudo docker stack deploy -c=$HOME/projects/flask-ai-classifier-docker-swarm/docker-compose-swarm.yml  --with-registry-auth flask
+ NETWORK_NAME="flask"
+
+# Check if the network already exists
+if sudo docker network ls --format '{{.Name}}' | grep -wq "$NETWORK_NAME"; then
+    echo "Network $NETWORK_NAME already exists."
+else
+    echo "Creating network $NETWORK_NAME..."
+    sudo docker network create "$NETWORK_NAME"
+fi
+
+ sudo docker stack deploy -c=$HOME/projects/flask-ai-classifier-docker-swarm/docker-compose-swarm.yml  --with-registry-auth $NETWORK_NAME
 

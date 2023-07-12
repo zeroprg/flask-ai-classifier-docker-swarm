@@ -1,5 +1,6 @@
 certifi==2023.5.7
 SQLAlchemy==1.4.6
+psycopg2-binary==2.9.6
 requests == 2.31.0
 Flask == 2.1.2
 Flask-Cors == 3.0.10
