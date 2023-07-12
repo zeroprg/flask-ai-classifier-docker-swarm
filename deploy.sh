@@ -21,7 +21,7 @@
  sudo docker push zeroprg/flask-docker-swarm_ui:latest
  #sudo docker push zeroprg/flask-docker-swarm_web:latest
  
- sudo docker service rm flask_cam flask_ui  # flask_web
+ #sudo docker service rm flask_cam flask_ui  # flask_web
  NETWORK_NAME="flask"
 
 # Check if the network already exists
