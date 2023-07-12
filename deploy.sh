@@ -22,6 +22,6 @@
  #sudo docker push zeroprg/flask-docker-swarm_web:latest
  
  sudo docker service rm flask_cam flask_ui  # flask_web
- #sudo docker network create flask 
- sudo docker stack deploy -c=./docker-compose-swarm.yml  --with-registry-auth flask
+ sudo docker network create flask 
+ sudo docker stack deploy -c=docker-compose-swarm.yml  --with-registry-auth flask
 
