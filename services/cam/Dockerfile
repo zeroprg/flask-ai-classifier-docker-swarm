@@ -14,9 +14,6 @@ WORKDIR /home/app
 COPY . .
 #COPY pi_object_detection.py .
 
-RUN pip3 install --upgrade pip
-# Install Requirements
-RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /home/app/wheels -r requirements.txt
 
 
 #########
@@ -30,6 +27,7 @@ FROM zeroprg/flask-docker-swarm_cv2:latest
 # Install curl
 RUN apt-get update && apt-get install -y curl
 #RUN apt-get install python3-flask
+
 
 # Create directory for the app user
 RUN mkdir -p /home/app
@@ -49,6 +47,9 @@ COPY --from=builder /home/app/requirements.txt .
 #RUN pip install --no-cache /wheels/*
 RUN wget --show-progress  -P  ./models/caffemodel/MobileNetSSD https://github.com/nikmart/pi-object-detection/raw/master/MobileNetSSD_deploy.caffemodel
 RUN pip install gunicorn
+
+# Install Requirements
+RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /home/app/wheels -r requirements.txt
 
 # Copy in the Flask code
 COPY . $APP_HOME
