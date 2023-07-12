@@ -36,6 +36,7 @@ WORKDIR $APP_HOME
 # Install requirements and download model
 COPY --from=builder /home/app/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir gunicorn
 RUN wget --show-progress -P ./models/caffemodel/MobileNetSSD https://github.com/nikmart/pi-object-detection/raw/master/MobileNetSSD_deploy.caffemodel
 
 # Copy the application code
