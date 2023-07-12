@@ -35,7 +35,7 @@ class Sql:
         return self.engine.connect()
 
     def start_transaction(self):
-        self.getConn().begin()
+        return self.getConn().begin()
 
     def commit_changes(self):
         """Commit the changes made to the database"""
@@ -157,7 +157,7 @@ class Sql:
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
-        conn.close()
+        #conn.close()
         return rows
 
  
@@ -192,7 +192,7 @@ class Sql:
         conn = self.getConn()                                            
         ResultProxy = conn.execute(query)
         cursor = ResultProxy.fetchall()
-        conn.close()
+        #conn.close()
         rows = [dict(r) for r in cursor]
         return rows
 
@@ -212,8 +212,8 @@ class Sql:
             ResultProxy = conn.execute(query)
             print(" delete_frames_later_then was {0} with params: {1}".format(ResultProxy.is_insert ,hours))
         except Exception as e: print(" e: {}".format( e))
-        finally:
-            conn.close()
+        #finally:
+        #    conn.close()
     
 def main():
     database = "framedata.db"
