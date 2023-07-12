@@ -49,8 +49,8 @@ RUN wget --show-progress  -P  ./models/caffemodel/MobileNetSSD https://github.co
 RUN pip install gunicorn
 
 # Install Requirements
-RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /home/app/wheels -r requirements.txt
-
+#RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /home/app/wheels -r requirements.txt
+RUN  pip install --no-cache-dir --no-deps --wheel-dir /home/app/wheels -r requirements.txt
 # Copy in the Flask code
 COPY . $APP_HOME
 
