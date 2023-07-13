@@ -108,9 +108,9 @@ def publish_message_batch(keys, results):
             publish_to_processed_topic(key,image,label)
 
         # Print the object counts for the current result
-        print("Object Counts:")
-        for label, count in object_counts.items():
-            print(f"Label: {label}, Count: {count}")
+        #print("Object Counts:")
+        #for label, count in object_counts.items():
+        #    print(f"Label: {label}, Count: {count}")
 
 
 
@@ -133,9 +133,9 @@ def store_to_db_message_batch(keys, results):
             db.insert_frame(hashcode, formatted_datetime, current_time, label, image_array, key)
 
         # Print the object counts for the current result
-        print("Object Counts:")
-        for label, count in object_counts.items():
-            print(f"Label: {label}, Count: {count}")
+        #print("Object Counts:")
+        #for label, count in object_counts.items():
+        #    print(f"Label: {label}, Count: {count}")
 
 
     
@@ -161,13 +161,13 @@ def read_and_delete_messages(batch_size=100):
         # Commit the offset to mark the message as processed
         consumer.commit(message)
         print(f"Key: {key}")
-        print(f"Message value type: {type(value)}")
-        print(f"Message value : {value[:10]} ... {value[-10:]}")
+        #print(f"Message value type: {type(value)}")
+        #print(f"Message value : {value[:10]} ... {value[-10:]}")
         # Accumulate keys and values
         keys.append(key)
         values.append(decode_and_decompress(value))
 
-        print(f"~~~ Here we are ~~~ ")
+        #print(f"~~~ Here we are ~~~ ")
         # Process images in batches of batch_size
         if len(keys) >= batch_size or (len(keys) > 0 and consumer.poll(0) is None):
             try:
