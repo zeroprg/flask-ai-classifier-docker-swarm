@@ -37,7 +37,9 @@ RUN sed -i '/^# deb.* universe$/s/^# //' /etc/apt/sources.list
 
 # Install requirements
 COPY --from=builder /home/app/requirements.txt .
-RUN pip install git+https://github.com/scipy/scipy.git
+# install scypy on ARMv32 
+RUN wget https://www.piwheels.org/simple/scipy/scipy-1.2.1-cp35-cp35m-linux_armv7l.whl#sha256=270be300233af556e6ee3f55a0ae237df0cb65ac85d47559010d7a9071f2e878
+RUN pip install scipy-1.2.1-cp35-cp35m-linux_armv7l.whl
 # Download yolov5s.pt
 RUN wget --show-progress  https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt
 RUN pip install --no-cache-dir -r requirements.txt
