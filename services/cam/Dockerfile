@@ -39,6 +39,24 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir gunicorn
 RUN wget --show-progress -P ./models/caffemodel/MobileNetSSD https://github.com/nikmart/pi-object-detection/raw/master/MobileNetSSD_deploy.caffemodel
 
+
+
+# Install build tools and Kerberos support.
+RUN apt install -y wget software-properties-common lsb-release gcc make python3 python3-pip python3-dev libsasl2-modules-gssapi-mit krb5-user
+
+
+# Install the latest version of librdkafka:
+RUN wget -qO - https://packages.confluent.io/deb/7.0/archive.key | apt-key add -
+RUN  add-apt-repository "deb https://packages.confluent.io/clients/deb $(lsb_release -cs) main"
+RUN apt update
+RUN apt install -y librdkafka-dev
+#
+# Now build and install confluent-kafka-python as your standard user
+# (e.g., exit the root shell first).
+
+RUN pip install --no-binary confluent-kafka confluent-kafka
+
+
 # Copy the application code
 COPY . $APP_HOME
 
