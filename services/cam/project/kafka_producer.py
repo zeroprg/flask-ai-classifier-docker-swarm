@@ -17,8 +17,16 @@ producer_config = {
     'bootstrap.servers': bootstrap_servers
 }
 
-# Create Kafka producer
-producer = Producer(producer_config)
+
+
+try:
+    # Attempt to create a Kafka producer
+    producer = Producer(producer_config)
+    no_kafka_producer = True
+    print("Kafka producer is available.")
+except Exception as e:
+    print("Failed to create Kafka producer. Error:", str(e))
+    no_kafka_producer = True
 
 
 def bytes_to_string(encoded_bytes):
@@ -26,6 +34,7 @@ def bytes_to_string(encoded_bytes):
 
 # Function to publish messages
 def publish_message(key, image):
+    global no_kafka_producer
     # Convert the key to bytes
     key_bytes = key
 
@@ -42,9 +51,16 @@ def publish_message(key, image):
   
     print(f"Message value : {image_data[:10]} ... {image_data[-10:]}")
     # Publish the message to the topic
-    print(f"topic: {topic}")
-    producer.produce(topic, key=key_bytes, value=image_data)
-    producer.flush()
+    try:
+        print(f"topic: {topic}")
+        producer.produce(topic, key=key_bytes, value=image_data)
+        producer.flush()
+        no_kafka_producer = True
+    except Exception as e:
+        print("Failed to publish message to Kafka topic", str(e))
+        no_kafka_producer = False
+        
+
 
 # Example usage
 if __name__ == '__main__':

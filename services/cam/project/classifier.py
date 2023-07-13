@@ -23,7 +23,7 @@ from project import db
 if prod.CLASSIFIER_TYPE == 'LOCAL':
     from project.caffe_classifier import classify_frame, classify_init
 if prod.CLASSIFIER_TYPE == 'KAFKA':
-    from project.kafka_producer import publish_message
+    from project.kafka_producer import publish_message, no_kafka_producer
 
 from project import URL_PINGS_NUMBER, update_urls_from_stream_interval, ping_video_url, image_check, simple_decode,topic_rules
 from project.statistic import ImageHashCodesCountByTimer, do_statistic, dhash
@@ -109,7 +109,7 @@ class Detection:
                 self.errors = 0
             if frame is not None: 
                 #result = await asyncio.to_thread(self.call_classifier_locally, frame, self.cam, self.confidence, self.model)
-                if prod.CLASSIFIER_TYPE == 'LOCAL':
+                if prod.CLASSIFIER_TYPE == 'LOCAL' and  ( prod.CLASSIFIER_TYPE == 'KAFKA' or no_kafka_producer == True) :
                     self.call_classifier_locally(frame, self.cam, self.confidence, self.model)
                 elif prod.CLASSIFIER_TYPE == 'KAFKA':
                     self.call_classifier_by_messaging(frame, self.cam)            
@@ -258,11 +258,18 @@ class Detection:
     def call_classifier_locally(self, frame, cam, confidence, model):
         parameters = {'cam': cam, 'confidence': confidence , 'model': model, 'classes': ['person'] , 'topic_rules':  topic_rules} 
         logging.debug("------------ call_classifier locally (local) for cam: {} -------".format(cam))         
-        result = classify_frame(frame, parameters, self.net)
-        self.topic_label = result['topic_label']       
-        if result['oject_images']:
-            populate_db(result, cam)            
-            logging.debug("... frame classified: {}".format(result))
+
+                # Convert the reconstructed array to a PIL image
+        pil_image = Image.fromarray(frame) 
+        imageHashCodesCountByTimer = ImageHashCodesCountByTimer()
+        _dhash = dhash(pil_image)
+        #Compare to previouse image if not big difference do not publish it to the topic for processing
+        if self.image_dhash is None or not imageHashCodesCountByTimer.equals(_dhash, self.image_dhash):
+            result = classify_frame(frame, parameters, self.net)
+            self.topic_label = result['topic_label']       
+            if result['oject_images']:
+                populate_db(result, cam)            
+                logging.debug("... frame classified: {}".format(result))
         return result
     
     # Call from another side of messaging system
