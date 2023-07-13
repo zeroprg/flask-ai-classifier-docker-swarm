@@ -32,7 +32,7 @@ WORKDIR $APP_HOME
 
 # Download spacy model
 #RUN python -m spacy download en_core_web_sm
-
+RUN sed -i '/^# deb.* universe$/s/^# //' /etc/apt/sources.list
 # Download yolov5s.pt
 RUN wget --show-progress  https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt
 RUN apt-get install python3-scipy
