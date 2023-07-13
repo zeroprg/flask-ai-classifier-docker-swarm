@@ -1,7 +1,6 @@
 import torch
 from PIL import Image
 import pandas as pd
-import numpy as np
 
 # Tuple of labels to filter
 label_tuple = ('person', 'dog', 'cow')

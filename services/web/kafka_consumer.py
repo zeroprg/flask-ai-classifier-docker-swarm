@@ -8,12 +8,12 @@ from base64 import b64decode, b64encode
 from process_images import process_images, generate_hashcode
 import binascii
 import json
-from project.config import  ProductionConfig as prod
 from project import db
 import time
 import struct
 import datetime
 
+from project.config import  ProductionConfig as prod
 
 # Kafka broker configuration
 bootstrap_servers = prod.KAFKA_SERVER #'172.29.208.1:9092'

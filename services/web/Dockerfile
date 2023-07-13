@@ -5,19 +5,11 @@
 # Base Image
 FROM zeroprg/flask-docker-swarm_cv2:latest as builder
 
-# Lint
-#RUN pip install flake8 black
+# Set working directory
 WORKDIR /home/app
 
-COPY project ./project
-COPY manage.py .
-#RUN flake8 --ignore=E501 .
-#RUN black --check .
-
-# Install Requirements
-COPY requirements.txt .
-RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /home/app/wheels -r requirements.txt
-
+# Copy the application code
+COPY . .
 
 #########
 # FINAL #
@@ -25,10 +17,6 @@ RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /home/app/wheels -r requirem
 
 # Base Image
 FROM zeroprg/flask-docker-swarm_cv2:latest
-
-# ----- NEW ----
-# Install curl
-RUN apt-get update && apt-get install -y curl
 
 # Create directory for the app user
 RUN mkdir -p /home/app
@@ -42,20 +30,25 @@ ENV APP_HOME=/home/app/web
 RUN mkdir $APP_HOME
 WORKDIR $APP_HOME
 
-# Install Requirements
-COPY --from=builder /home/app/wheels /wheels
-COPY --from=builder /home/app/requirements.txt .
-RUN pip install --no-cache /wheels/*
-RUN pip install gunicorn
+# Download spacy model
+RUN python3 -m spacy download en_core_web_sm
 
-# Copy in the Flask code
+# Download yolov5s.pt
+RUN wget --show-progress  https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt
+
+# Install requirements
+COPY --from=builder /home/app/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the application code
 COPY . $APP_HOME
 
-# Chown all the files to the app user
+# Set ownership and permissions
 RUN chown -R app:app $APP_HOME
+RUN chmod +x run.sh
 
 # Change to the app user
 USER app
 
-# run server 
-CMD gunicorn -w 4 -b 0.0.0.0:4000 manage:app
+# Run the application
+CMD ["python", "video_streamer.py"]
