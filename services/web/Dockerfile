@@ -34,10 +34,10 @@ WORKDIR $APP_HOME
 #RUN python -m spacy download en_core_web_sm
 RUN sed -i '/^# deb.* universe$/s/^# //' /etc/apt/sources.list
 
-RUN  apt-get install build-essential gfortran libatlas-base-dev python-pip python-dev
-RUN  pip install --upgrade pip
+
 # Install requirements
 COPY --from=builder /home/app/requirements.txt .
+RUN pip install git+https://github.com/scipy/scipy.git
 # Download yolov5s.pt
 RUN wget --show-progress  https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt
 RUN pip install --no-cache-dir -r requirements.txt
