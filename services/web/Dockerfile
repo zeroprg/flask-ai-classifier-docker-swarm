@@ -38,6 +38,7 @@ RUN wget --show-progress  https://github.com/ultralytics/yolov5/releases/downloa
 
 # Install requirements
 COPY --from=builder /home/app/requirements.txt .
+RUN apt-get update && apt-get install -y patchelf
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the application code
