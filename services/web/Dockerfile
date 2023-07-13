@@ -35,7 +35,7 @@ WORKDIR $APP_HOME
 
 # Download yolov5s.pt
 RUN wget --show-progress  https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt
-RUN sudo apt-get install python3-scipy
+RUN apt-get install python3-scipy
 # Install requirements
 COPY --from=builder /home/app/requirements.txt .
 RUN apt-get update && apt-get install -y patchelf
