@@ -8,4 +8,3 @@ dhash
 imutils == 0.5.4
 requests-mock == 1.11.0
 confluent-kafka==1.7.0
-

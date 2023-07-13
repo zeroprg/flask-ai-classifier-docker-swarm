@@ -1,5 +1,5 @@
 #!/bin/sh
- MY_HOME=/home/zeroprg
+ MY_HOME=/home/odroid
  sudo git pull
  
  #sudo docker network rm flask
