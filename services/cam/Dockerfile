@@ -47,19 +47,19 @@ RUN wget --show-progress -P ./models/caffemodel/MobileNetSSD https://github.com/
 
 
 # Install build tools and Kerberos support.
-RUN apt install -y wget software-properties-common lsb-release gcc make python3 python3-pip python3-dev libsasl2-modules-gssapi-mit krb5-user
+#RUN apt install -y wget software-properties-common lsb-release gcc make python3 python3-pip python3-dev libsasl2-modules-gssapi-mit krb5-user
 # Install the latest version of librdkafka:
-RUN wget -qO - https://packages.confluent.io/deb/7.0/archive.key | apt-key add -
-RUN  add-apt-repository "deb https://packages.confluent.io/clients/deb $(lsb_release -cs) main"
-RUN apt update
+#RUN wget -qO - https://packages.confluent.io/deb/7.0/archive.key | apt-key add -
+#RUN  add-apt-repository "deb https://packages.confluent.io/clients/deb $(lsb_release -cs) main"
+#RUN apt update
 # prevent  from asking for user input
-RUN apt-get install -yqq -qq librdkafka-dev
+#RUN apt-get install -yqq -qq librdkafka-dev
 
 #
 # Now build and install confluent-kafka-python as your standard user
 # (e.g., exit the root shell first).
-RUN  python3 -m pip install --no-binary confluent-kafka confluent-kafka
-RUN python3 -c 'import confluent_kafka; print(confluent_kafka.version())'
+#RUN  python3 -m pip install --no-binary confluent-kafka confluent-kafka
+#RUN python3 -c 'import confluent_kafka; print(confluent_kafka.version())'
 
 
 # Copy the application code
