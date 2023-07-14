@@ -58,7 +58,7 @@ RUN apt-get install -yqq -qq librdkafka-dev
 #
 # Now build and install confluent-kafka-python as your standard user
 # (e.g., exit the root shell first).
-#RUN  python3 -m pip install --no-binary confluent-kafka confluent-kafka
+RUN  python3 -m pip install --no-binary confluent-kafka confluent-kafka
 #RUN python3 -c 'import confluent_kafka; print(confluent_kafka.version())'
 
 
