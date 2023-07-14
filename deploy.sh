@@ -12,8 +12,9 @@
  #cd services/web && sh build.sh 
  #cd - 
 
- cd services/ui  && sh build.sh 
- cd -
+# always build ui on loptop
+ #cd services/ui  && sh build.sh 
+ #cd -
 
  cd services/crawler  && sh build.sh && 
  cd -
