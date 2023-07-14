@@ -3,11 +3,14 @@ FROM arm32v7/node:14 AS builder
 # Set working directory
 WORKDIR /app
 
-# Copy application source code
-COPY . .
+# Copy package.json and package-lock.json
+COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm innstall --quiet
+RUN npm install --quiet
+
+# Copy application source code
+COPY . .
 
 # Build the application
 RUN npm run build
