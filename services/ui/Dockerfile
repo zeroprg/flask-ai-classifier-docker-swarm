@@ -1,19 +1,25 @@
 FROM arm32v7/node:14 AS builder
+######################
+# Building stage
+######################
 
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package.json package-lock.json ./
+# Copy application source code
+COPY . .
+
+
 
 # Install dependencies
 RUN npm install --quiet
 
-# Copy application source code
-COPY . .
-
 # Build the application
 RUN npm run build
+
+######################
+# Final stage
+######################
 
 # Use NGINX as the base image for the production stage
 FROM arm32v7/nginx:latest
@@ -28,16 +34,4 @@ COPY --from=builder /app/build /usr/share/nginx/html
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose the necessary ports
-EXPOSE 3000 80
-
-
-------------------------------------------------
-## Remove default nginx index page
-RUN rm -rf /usr/share/nginx/html/*
-
-COPY ./build_prepered /usr/share/nginx/html
-#COPY ./static /usr/share/nginx/html/static
-
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-
-EXPOSE 3000 80
+EXPOSE 80

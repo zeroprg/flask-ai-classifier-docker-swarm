@@ -9,8 +9,6 @@ WORKDIR /app
 # Copy application source code
 COPY . .
 
-
-
 # Install dependencies
 RUN npm install --quiet
 
