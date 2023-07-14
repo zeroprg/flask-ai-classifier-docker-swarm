@@ -42,8 +42,8 @@ RUN wget --show-progress -P ./models/caffemodel/MobileNetSSD https://github.com/
 
 
 # Install build tools and Kerberos support.
-#RUN apt install -y wget software-properties-common lsb-release gcc make python3 python3-pip python3-dev libsasl2-modules-gssapi-mit krb5-user
-RUN apt build-dep scipy
+RUN apt install -y wget software-properties-common lsb-release gcc make python3 python3-pip python3-dev libsasl2-modules-gssapi-mit krb5-user
+#RUN apt build-dep scipy
 
 # Install the latest version of librdkafka:
 RUN wget -qO - https://packages.confluent.io/deb/7.0/archive.key | apt-key add -
