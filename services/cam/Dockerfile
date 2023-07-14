@@ -5,8 +5,7 @@
 # Base Image
 FROM zeroprg/flask-docker-swarm_cv2:latest as builder
 
-# Avoid warnings by switching to noninteractive
-ARG DEBIAN_FRONTEND=noninteractive
+
 # Set working directory
 WORKDIR /home/app
 
@@ -19,6 +18,10 @@ COPY . .
 
 # Base Image
 FROM zeroprg/flask-docker-swarm_cv2:latest
+
+# Avoid warnings by switching to noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install curl
 RUN apt-get update && apt-get install -y curl
@@ -52,14 +55,13 @@ RUN wget -qO - https://packages.confluent.io/deb/7.0/archive.key | apt-key add -
 RUN  add-apt-repository "deb https://packages.confluent.io/clients/deb $(lsb_release -cs) main"
 RUN apt update
 # prevent  from asking for user input
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y librdkafka-dev
+RUN apt-get install -yqq -qq librdkafka-dev
 
 #
 # Now build and install confluent-kafka-python as your standard user
 # (e.g., exit the root shell first).
 
-RUN DEBIAN_FRONTEND=noninteractive python3 -m pip install --no-binary confluent-kafka confluent-kafka
+RUN  python3 -m pip install --no-binary confluent-kafka confluent-kafka
 RUN python3 -c 'import confluent_kafka; print(confluent_kafka.version())'
 
 # Copy the application code
