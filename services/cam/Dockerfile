@@ -5,6 +5,8 @@
 # Base Image
 FROM zeroprg/flask-docker-swarm_cv2:latest as builder
 
+# Avoid warnings by switching to noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
 # Set working directory
 WORKDIR /home/app
 
