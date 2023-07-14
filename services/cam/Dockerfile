@@ -50,7 +50,8 @@ RUN wget -qO - https://packages.confluent.io/deb/7.0/archive.key | apt-key add -
 RUN  add-apt-repository "deb https://packages.confluent.io/clients/deb $(lsb_release -cs) main"
 RUN apt update
 # prevent  from asking for user input
-RUN apt-get update && apt-get install -y aptitude && aptitude install -y librdkafka-dev
+RUN export DEBIAN_FRONTEND="noninteractive"
+RUN apt-get  install -y librdkafka-dev
 
 #
 # Now build and install confluent-kafka-python as your standard user
