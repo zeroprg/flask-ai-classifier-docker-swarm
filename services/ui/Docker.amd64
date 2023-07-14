@@ -7,10 +7,9 @@ FROM node:14 AS builder
 WORKDIR /app
 
 # Copy application source code
-COPY . .
+COPY . /app
 
-# Copy package.json and package-lock.json
-#COPY package.json package-lock.json ./
+
 
 # Install dependencies
 RUN npm install --quiet
