@@ -38,8 +38,19 @@ RUN sed -i '/^# deb.* universe$/s/^# //' /etc/apt/sources.list
 # Install requirements
 COPY --from=builder /home/app/requirements.txt .
 # install scypy on ARMv32 
-RUN wget https://www.piwheels.org/simple/scipy/scipy-1.7.3-cp37-cp37m-linux_armv7l.whl 
-RUN pip install scipy-1.7.3-cp37-cp37m-linux_armv7l.whl 
+
+# use depndencies for scipy
+# RUN apt install -y gcc g++ gfortran libopenblas-dev liblapack-dev pkg-config python3-pip python3-dev
+
+#get dependencies for scipy
+RUN apt build-dep scipy
+# To build the latest stable release:
+RUN pip install scipy --no-binary scipy
+# To build a development version, you need a local clone of the SciPy git repository:
+RUN git clone https://github.com/scipy/scipy.git
+RUN git submodule update --init
+RUN pip install .
+
 # Download yolov5s.pt
 RUN wget --show-progress  https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt
 RUN pip install --no-cache-dir -r requirements.txt
