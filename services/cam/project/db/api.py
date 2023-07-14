@@ -69,10 +69,12 @@ class Sql:
     def select_urls_by_os(self, os):
         query = sql.select([self.urls]).where(self.urls.c.os == str(os)).order_by(text("currentime asc"))
         conn = self.getConn()
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]        
-        conn.close()
+        try:
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()
+            rows = [dict(r) for r in cursor]        
+        finally:
+            conn.close()
         return rows
 
     def update_urls_by_os(self, os):
@@ -98,11 +100,13 @@ class Sql:
         :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).order_by(text("objects_counted desc, last_time_updated desc, idle_in_mins asc, cam asc"))
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
-        conn.close()
+        try:
+            query = sql.select([self.urls]).order_by(text("objects_counted desc, last_time_updated desc, idle_in_mins asc, cam asc"))
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()
+            rows = [dict(r) for r in cursor]
+        finally:
+            conn.close()
         return rows
     
     def select_all_active_urls(self):
@@ -111,11 +115,13 @@ class Sql:
         :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).where(self.urls.c.objects_counted >= 0).order_by(text("objects_counted desc, last_time_updated desc, idle_in_mins asc, cam asc"))
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
-        conn.close()
+        try:
+            query = sql.select([self.urls]).where(self.urls.c.objects_counted >= 0).order_by(text("objects_counted desc, last_time_updated desc, idle_in_mins asc, cam asc"))
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()
+            rows = [dict(r) for r in cursor]
+        finally:
+            conn.close()
         return rows
     
     def select_all_active_urls_olderThen_secs(self, secs):
@@ -125,15 +131,17 @@ class Sql:
         """
         _time = int(time.time()*1000)
         conn = self.getConn()
-        query = sql.select([self.urls]).where(
-                                            sql.and_(
-                                                self.urls.c.objects_counted >= 0,
-                                                self.urls.c.last_time_updated < _time - secs*1000)
-                                        ).order_by(text("objects_counted desc, last_time_updated desc, idle_in_mins asc, cam asc"))
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
-        conn.close()
+        try:
+            query = sql.select([self.urls]).where(
+                                                sql.and_(
+                                                    self.urls.c.objects_counted >= 0,
+                                                    self.urls.c.last_time_updated < _time - secs*1000)
+                                            ).order_by(text("objects_counted desc, last_time_updated desc, idle_in_mins asc, cam asc"))
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()
+            rows = [dict(r) for r in cursor]
+        finally:
+            conn.close()
         return rows    
 
     def select_old_urls_which_not_mine_olderThen_secs(self,os, secs):
@@ -143,13 +151,15 @@ class Sql:
         """
         _time = int(time.time()*1000)
         conn = self.getConn()
-        query = sql.select([self.urls]).where( sql.and_(
-                                                self.urls.c.os != str(os),
-                                                self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
-        conn.close()
+        try:
+            query = sql.select([self.urls]).where( sql.and_(
+                                                    self.urls.c.os != str(os),
+                                                    self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()
+            rows = [dict(r) for r in cursor]
+        finally:
+            conn.close()
         return rows
     
     def select_old_urls_which_is_mine_olderThen_secs(self,os, secs):
@@ -159,13 +169,15 @@ class Sql:
         """
         _time = int(time.time()*1000)
         conn = self.getConn()
-        query = sql.select([self.urls]).where( sql.and_(
-                                                self.urls.c.os == str(os),
-                                                self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
-        conn.close()
+        try:
+            query = sql.select([self.urls]).where( sql.and_(
+                                                    self.urls.c.os == str(os),
+                                                    self.urls.c.last_time_updated < _time - secs*1000)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()
+            rows = [dict(r) for r in cursor]
+        finally:
+            conn.close()
         return rows
 
 
@@ -175,12 +187,14 @@ class Sql:
             :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).where( 
-                                                self.urls.c.os != str(os)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
-        conn.close()
+        try:
+            query = sql.select([self.urls]).where( 
+                                                    self.urls.c.os != str(os)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()
+            rows = [dict(r) for r in cursor]
+        finally:
+            conn.close()
         return rows
 
     def select_nobody_urls(self):
@@ -189,26 +203,30 @@ class Sql:
             :return:
         """
         conn = self.getConn()
-        query = sql.select([self.urls]).where( sql.or_(
-                                                self.urls.c.os == '',
-                                                self.urls.c.os == None)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
-        conn.close()
+        try:
+            query = sql.select([self.urls]).where( sql.or_(
+                                                    self.urls.c.os == '',
+                                                    self.urls.c.os == None)).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc"))
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()
+            rows = [dict(r) for r in cursor]
+        finally:
+            conn.close()
         return rows
 
     def check_if_cam_in_processing(self, os, id, secs):
         conn = self.getConn()
-        _time = int(time.time()*1000)    
-        query = sql.select([self.urls]).where( sql.and_(
-                                                self.urls.c.os != os,
-                                                self.urls.c.id == id,
-                                                self.urls.c.last_time_updated > _time - secs*1000 ))
-        
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        
+        _time = int(time.time()*1000) 
+        try:   
+            query = sql.select([self.urls]).where( sql.and_(
+                                                    self.urls.c.os != os,
+                                                    self.urls.c.id == id,
+                                                    self.urls.c.last_time_updated > _time - secs*1000 ))
+            
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()
+        finally:
+            conn.close()
         return len(cursor)
 
 
@@ -219,12 +237,14 @@ class Sql:
         """
         _time = int(time.time()*1000)
         conn = self.getConn()
-        query = sql.select([self.urls]).where(
-                                                self.urls.c.currentime < _time - 60000).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc")) 
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
-        conn.close()
+        try:
+            query = sql.select([self.urls]).where(
+                                                    self.urls.c.currentime < _time - 60000).order_by(text("objects_counted desc, last_time_updated asc, idle_in_mins asc, cam asc")) 
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()
+            rows = [dict(r) for r in cursor]
+        finally:
+            conn.close()
         return rows
 
 
@@ -323,10 +343,14 @@ class Sql:
                                                               
                                                              )
                                                     ).order_by(text("currentime asc"))
-        conn = self.getConn()                                            
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()    
-        conn.close()
+        conn = self.getConn()   
+        try:                                   
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()    
+        except Exception as e:
+            logging.debug(" e: {}".format( e))
+        finally:
+            conn.close()     
         # convert row object to the dictionary
         #cursor = cur.fetchall()
         _type = ""
@@ -349,12 +373,16 @@ class Sql:
         :return:
         """
         conn = self.getConn()
-        query = sql.select([self.objects]).where( self.objects.c.cam  == cam                                                          
-                                                ).order_by(text("currentime desc")).limit(self.limit).offset(0)
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
-        conn.close()
+        try:
+            query = sql.select([self.objects]).where( self.objects.c.cam  == cam                                                          
+                                                    ).order_by(text("currentime desc")).limit(self.limit).offset(0)
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()
+            rows = [dict(r) for r in cursor]
+        except Exception as e:
+            logging.debug(" e: {}".format( e))
+        finally:
+            conn.close()     
         return rows
 
     def select_objects(self, cam, hashcodes):
@@ -364,19 +392,23 @@ class Sql:
         :return:
         """
         conn = self.getConn()
-        # Remove spaces
-        hashcodes = re.sub(r'\s', '', hashcodes)
-        # Split by comma and convert to array of integers
-        hashcodes_array = list(map(int, hashcodes.split(',')))
-        
-  
-        #print("hashcodes: {} ".format(hashcodes))
-        query = sql.select([self.objects]).where( self.objects.c.hashcode.in_(hashcodes_array)                                                       
-                                                ).order_by(text("currentime desc")).limit(self.limit).offset(0)
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
-        conn.close()
+        try:
+            # Remove spaces
+            hashcodes = re.sub(r'\s', '', hashcodes)
+            # Split by comma and convert to array of integers
+            hashcodes_array = list(map(int, hashcodes.split(',')))
+            
+    
+            #print("hashcodes: {} ".format(hashcodes))
+            query = sql.select([self.objects]).where( self.objects.c.hashcode.in_(hashcodes_array)                                                       
+                                                    ).order_by(text("currentime desc")).limit(self.limit).offset(0)
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()
+            rows = [dict(r) for r in cursor]
+        except Exception as e:
+            logging.debug(" e: {}".format( e))
+        finally:
+            conn.close()     
         return rows
 
     def insert_frame(self, hashcode, date, time, type, numpy_array, startX, startY, x_dim, y_dim, cam):
@@ -425,10 +457,14 @@ class Sql:
                                                              )
                                                 ).order_by(text("currentime desc")).limit(self.limit).offset(0)
         conn = self.getConn()
-        ResultProxy = conn.execute(query)
-        cursor = ResultProxy.fetchall()
-        rows = [dict(r) for r in cursor]
-        conn.close()
+        try:
+            ResultProxy = conn.execute(query)
+            cursor = ResultProxy.fetchall()
+            rows = [dict(r) for r in cursor]
+        except Exception as e:
+            logging.debug(" e: {}".format( e))
+        finally:
+            conn.close()     
         return rows
 
     def select_last_frames(self, cam, time1, time2, obj,  offset=0):
