@@ -29,3 +29,15 @@ COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose the necessary ports
 EXPOSE 3000 80
+
+
+------------------------------------------------
+## Remove default nginx index page
+RUN rm -rf /usr/share/nginx/html/*
+
+COPY ./build_prepered /usr/share/nginx/html
+#COPY ./static /usr/share/nginx/html/static
+
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 3000 80
