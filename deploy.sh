@@ -15,6 +15,7 @@
 # always build ui on loptop
  #cd services/ui  && sh build.sh 
  #cd -
+ sudo docker pull zeroprg/flask-docker-swarm_ui:latest
 
  cd services/crawler  && sh build.sh && 
  cd -
