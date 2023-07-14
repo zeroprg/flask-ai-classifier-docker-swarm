@@ -49,7 +49,9 @@ RUN apt install -y wget software-properties-common lsb-release gcc make python3 
 RUN wget -qO - https://packages.confluent.io/deb/7.0/archive.key | apt-key add -
 RUN  add-apt-repository "deb https://packages.confluent.io/clients/deb $(lsb_release -cs) main"
 RUN apt update
+# prevent tzdata from asking for user input
 ENV DEBIAN_FRONTEND=noninteractive
+ENV TERM=linux
 RUN apt-get install -y librdkafka-dev
 #
 # Now build and install confluent-kafka-python as your standard user
