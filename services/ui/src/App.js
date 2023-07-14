@@ -285,7 +285,7 @@ const useStyles = makeStyles((theme) => ({
                                 ref={snackbarRef}
                                 className={classes[variant]}/>   
                             
-                            <p dangerouslySetInnerHTML={t("site_desc")}/>                            
+                            <h4 dangerouslySetInnerHTML={t("site_desc")}/>                            
 
                             <InputURL updateparams={updateparams} />    
                             {isVideoAndStatistic && <URLlist updateparams={updateparams} updateurls={updateurls} data={urls}/> }
