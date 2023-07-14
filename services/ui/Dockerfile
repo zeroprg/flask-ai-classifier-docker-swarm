@@ -7,7 +7,7 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN npm ci --quiet
+RUN npm innstall --quiet
 
 # Build the application
 RUN npm run build
