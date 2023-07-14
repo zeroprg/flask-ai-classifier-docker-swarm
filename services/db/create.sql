@@ -203,3 +203,4 @@ create or replace view obj_stat AS
 
 COMMIT;
 SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+SELECT count(*) FROM pg_stat_activity;

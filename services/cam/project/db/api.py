@@ -5,49 +5,46 @@ import logging
 import re
 import sqlalchemy as sql
 from sqlalchemy import text
-# import psycopg2
+from sqlalchemy import create_engine, MetaData
 
+POOL_SIZE = 50
+AUTOCOMMIT = True
 
 class Sql:
-    def __init__ (self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
-        """ create a database connection to the SQLite database
-            specified by the db_file
-        :param db_file: database file
-        :return: Connection object or None
-        """
-        self.engine = None
-        self.limit = 50
-        metadata = sql.MetaData()
-        postgres_str= 'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(DB_USERNAME, DB_PASSWORD, DATABASE_URI, DB_PORT, DB_NAME)
-        print("DB Connection uri: {}".format(postgres_str)) 
-        self.engine = sql.create_engine(postgres_str, pool_pre_ping=True)
-
-        self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
-        self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
-        ##self.getConn().autocommit = False
-
-    def __init__ (self, SQLALCHEMY_DATABASE_URI):
-        """ create a database connection to the SQLite database
-            specified by the db_file
-        :param db_file: database file
-        :return: Connection object or None
-        """
-        self.engine = None
+    """Sql database connection"""
+    def __core_init__(self):
         self.limit = 70
-        metadata = sql.MetaData()
+        self.metadata = MetaData()
+        self.metadata.reflect(bind=self.engine)
+        self.objects = self.metadata.tables['objects']
+        self.statistic = self.metadata.tables['statistic']
+        
+        self.urls = self.metadata.tables['urls']
 
-        self.engine = sql.create_engine(SQLALCHEMY_DATABASE_URI, pool_pre_ping=True )
+    def __init__(self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
+        """Create a database connection to the PostgreSQL database specified by the credentials"""
+        self.pool_size = POOL_SIZE
+        self.engine = create_engine(f'postgresql+psycopg2://{DB_USERNAME}:{DB_PASSWORD}@{DATABASE_URI}:{DB_PORT}/{DB_NAME}',isolation_level="READ COMMITTED", pool_size=self.pool_size)        
+        self.__core_init__()
 
-        self.objects = sql.Table('objects', metadata, autoload=True, autoload_with=self.engine)
-        self.statistic = sql.Table('statistic', metadata, autoload=True, autoload_with=self.engine)
-        self.urls = sql.Table('urls', metadata, autoload=True, autoload_with=self.engine)
 
-
-        #conn = self.engine.connect()
-        ##self.getConn().autocommit = False
+    def __init__(self, SQLALCHEMY_DATABASE_URI):
+        """Create a database connection to the SQL database specified by the URI"""
+        self.pool_size = POOL_SIZE
+        self.engine = create_engine(SQLALCHEMY_DATABASE_URI, isolation_level="READ COMMITTED", pool_size=self.pool_size)
+        self.__core_init__()
 
     def getConn(self):
         return self.engine.connect()
+
+    def start_transaction(self):
+        return self.getConn().begin()
+
+    def commit_changes(self):
+        """Commit the changes made to the database"""
+        conn = self.getConn()
+        self.getConn().commit()
+        conn.close()
 
 
 # ####################  Service utility operations ######################################## #
