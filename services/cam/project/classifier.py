@@ -24,6 +24,9 @@ if prod.CLASSIFIER_TYPE == 'LOCAL':
     from project.caffe_classifier import classify_frame, classify_init
 if prod.CLASSIFIER_TYPE == 'KAFKA':
     from project.kafka_producer import publish_message, no_kafka_producer
+else:
+    no_kafka_producer = True
+    
 
 from project import URL_PINGS_NUMBER, update_urls_from_stream_interval, ping_video_url, image_check, simple_decode,topic_rules
 from project.statistic import ImageHashCodesCountByTimer, do_statistic, dhash

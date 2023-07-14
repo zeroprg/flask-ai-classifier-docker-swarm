@@ -17,7 +17,7 @@ producer_config = {
     'bootstrap.servers': bootstrap_servers
 }
 
-
+no_kafka_producer = True
 
 try:
     # Attempt to create a Kafka producer
