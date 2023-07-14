@@ -218,7 +218,6 @@ const useStyles = makeStyles((theme) => ({
 
     return (  
         <div className="App">
-          <header className="App-header">
           <div>
             <a href="#" onClick={handleOpenPopup}>{t("show_statistic").__html}</a>
             {showPopup && (
@@ -229,51 +228,50 @@ const useStyles = makeStyles((theme) => ({
              </div>
             )}
           </div>
-         
-          
-            <h1>{t("welcome").__html}</h1>
+         <SnackbarProvider value={{ handleOpen, handleClose, handleMapPoint }}>
+          <header className="App-header">
+            <h4>{t("welcome").__html}</h4>
 
-                {!isLoading && (
-                    <div>
-                        <label htmlFor="interestFilter">{t("filter_class").__html}&nbsp;</label>&nbsp;
-                        <select id="interestFilter" value={interestFilter} onChange={handleInterestFilterChange}>
-                            <option key='none' value='none'></option> 
-                            <option key='rating' value='rating'>Rated</option>
-                            {Object.keys(descUrls).sort().map((desc) => (
-                              <option key={desc} value={desc}>
-                                {desc}
-                              </option>
-                            ))}
-                        </select>
-                        &nbsp;<label htmlFor="countryFilter">{t("filter_country").__html}&nbsp;</label>&nbsp;
-                        <select id="countryFilter" value={countryFilter} onChange={handleCountryFilterChange}>
-                          <option key='none' value='none'></option>
-                          {Object.keys(groupedUrls).sort().map((countryCode) => {
-                            const country = countries.find(c => c.cc === countryCode);
-                            const countryName = country ? country.name : countryCode;
-                            return (
-                              <option key={countryCode} value={countryCode}>
-                                {countryName}
-                              </option>
-                            );
-                          })}
-                        </select>
-                        &nbsp;<label htmlFor="cityFilter">{t("filter_city").__html}&nbsp;</label>&nbsp;
-                        <select key={handleCountryFilterChange} id="cityFilter" value={cityFilter} onChange={handleCityFilterChange}>
-                        <option key="none" value="none"></option>
-                        {
-                          [...new Set(groupedUrls[countryFilter]?.map((url) => url.city || ''))]
-                            .filter((city) => city !== '') // Filter out empty cities if any
-                            .sort().map((city) => (
-                              <option key={city} value={city}>
-                                {city}
-                              </option>
-                            ))
-                        }
-                      </select>                   
-                    </div>
-                )}
-
+          {!isLoading && (
+                <div>
+                    <label htmlFor="interestFilter">{t("filter_class").__html}&nbsp;</label>&nbsp;
+                    <select id="interestFilter" value={interestFilter} onChange={handleInterestFilterChange}>
+                        <option key='none' value='none'></option> 
+                        <option key='rating' value='rating'>Rated</option>
+                        {Object.keys(descUrls).sort().map((desc) => (
+                          <option key={desc} value={desc}>
+                            {desc}
+                          </option>
+                         ))}
+                    </select>
+                    &nbsp;<label htmlFor="countryFilter">{t("filter_country").__html}&nbsp;</label>&nbsp;
+                    <select id="countryFilter" value={countryFilter} onChange={handleCountryFilterChange}>
+                      <option key='none' value='none'></option>
+                      {Object.keys(groupedUrls).sort().map((countryCode) => {
+                        const country = countries.find(c => c.cc === countryCode);
+                        const countryName = country ? country.name : countryCode;
+                        return (
+                          <option key={countryCode} value={countryCode}>
+                            {countryName}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    &nbsp;<label htmlFor="cityFilter">{t("filter_city").__html}&nbsp;</label>&nbsp;
+                    <select key={handleCountryFilterChange} id="cityFilter" value={cityFilter} onChange={handleCityFilterChange}>
+                    <option key="none" value="none"></option>
+                    {
+                      [...new Set(groupedUrls[countryFilter]?.map((url) => url.city || ''))]
+                        .filter((city) => city !== '') // Filter out empty cities if any
+                        .sort().map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))
+                    }
+                  </select>                   
+                </div>
+          )}
                 {!isLoading && (<MarkersMap  markers={urls} zoom={zoom} center={position} key={JSON.stringify(position)} />)}   
                 <div className="container">
                    <div className="row nav-wrapper"/> 
@@ -295,7 +293,7 @@ const useStyles = makeStyles((theme) => ({
                 </div>
      
            </header>
-           <SnackbarProvider value={{ handleOpen, handleClose, handleMapPoint }}>
+        
            <VideoStreamers param={state} urls={urls} />
      
             <div className="feature-bg">
@@ -306,7 +304,7 @@ const useStyles = makeStyles((theme) => ({
                     </div>
                 </div>
             </div>    
-            </SnackbarProvider>           
+        </SnackbarProvider>           
         </div>
       );}
     
