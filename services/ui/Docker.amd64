@@ -7,7 +7,7 @@ FROM node:14 AS builder
 WORKDIR /app
 
 # Copy application source code
-COPY . /app
+COPY . .
 
 
 
