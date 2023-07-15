@@ -14,13 +14,21 @@ COPY . .
 # Install requirements and download model
 RUN pip install --no-cache-dir -r ./requirements.txt
 RUN pip install gunicorn
+
+# Install wget
 RUN apt-get update && apt-get install -y wget
+
+# Download MobileNetSSD model
 RUN wget --show-progress -P ./models/caffemodel/MobileNetSSD https://github.com/nikmart/pi-object-detection/raw/master/MobileNetSSD_deploy.caffemodel
+
+# Create the app user
+RUN groupadd app && useradd -g app app
 
 # Set ownership and permissions
 RUN chown -R app:app .
-RUN chmod +x ./run.sh
 
+# Change to the app user
+USER app
 
 #########
 # FINAL #
@@ -36,7 +44,7 @@ WORKDIR /home/app
 RUN apt-get update && apt-get install -y curl
 
 # Install OpenCV dependencies
-RUN apt-get install -y libsm6 libxext6 libxrender-dev
+#RUN apt-get install -y libsm6 libxext6 libxrender-dev
 
 # Install OpenCV, NumPy, and Pillow
 RUN pip install opencv-python-headless numpy pillow
@@ -52,7 +60,6 @@ COPY --from=builder /home/app .
 
 # Set ownership and permissions
 RUN chown -R app:app .
-RUN chmod +x ./run.sh
 
 # Change to the app user
 USER app
