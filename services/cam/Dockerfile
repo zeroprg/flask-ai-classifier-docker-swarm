@@ -52,8 +52,6 @@ FROM zeroprg/flask-docker-swarm_cv2:latest
 # Set working directory
 WORKDIR /home/app
 
-
-
 # Install curl
 RUN apt-get update && apt-get install -y curl
 
@@ -63,16 +61,12 @@ RUN mkdir -p /home/app
 # Create the app user
 RUN groupadd app && useradd -g app app
 
-
 # Copy the application code
 COPY . . 
-
  
 RUN  python -c "import cv2; print(cv2.__version__)"
-
 # Copy the librdkafka directory 
 COPY --from=builder /opt/librdkafka /opt/librdkafka
-
 
 # Install requirements and download model
  #COPY /home/app/requirements.txt .

@@ -5,6 +5,11 @@
 # Base Image
 FROM python:3.10-slim as builder
 
+
+
+# Define the argument with a default value
+ARG WEB=False
+
 # Install wget
 RUN apt-get update && apt-get install -y wget
 
@@ -47,14 +52,6 @@ RUN cd librdkafka-1.9.2 && \
 # Download MobileNetSSD model
 RUN wget --show-progress -P ./models/caffemodel/MobileNetSSD https://github.com/nikmart/pi-object-detection/raw/master/MobileNetSSD_deploy.caffemodel
 
-# Create the app user
-# RUN groupadd app && useradd -g app app
-
-# Set ownership and permissions
-#RUN chown -R app:app .
-
-# Change to the app user
-#USER app
 
 #########
 # FINAL #
@@ -67,12 +64,6 @@ ENV HOME=/home/app
 
 # Set working directory
 WORKDIR $HOME
-
-# Install curl
-#RUN apt-get update && apt-get install -y curl
-
-# Install OpenCV dependencies
-#RUN apt-get install -y libsm6 libxext6 libxrender-dev
 
 # Install OpenCV, NumPy, and Pillow
 RUN pip install opencv-python-headless numpy pillow
@@ -98,12 +89,10 @@ COPY --from=builder /opt/librdkafka /opt/librdkafka
 
 # Check important libraries
 RUN  python -c "import cv2; print(cv2.__version__)"
-# Set ownership and permissions
-#RUN chown -R app:app .
-#RUN chmod +x ./run.sh
 
-# Change to the app user
-#USER app
-
-# Run the application
-CMD ["python3", "video_streams.py"]
+# Run the application if WEB is True, run Flask app; else, run video_streams.py
+CMD if [ "$WEB" = "True" ]; then \
+        gunicorn --env TMPDIR=./ -w 4 -b 0.0.0.0:3020 manage:app; \
+    else \
+        python3 video_streams.py; \
+    fi
