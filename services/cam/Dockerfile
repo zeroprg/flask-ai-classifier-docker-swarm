@@ -59,7 +59,7 @@ RUN apt-get update && apt-get install -y curl
 RUN mkdir -p /home/app
 
 # Create the app user
-RUN groupadd app && useradd -g app app
+#RUN groupadd app && useradd -g app app
 
 # Copy the application code
 COPY . . 
@@ -75,11 +75,11 @@ RUN pip install gunicorn
 RUN wget --show-progress -P ./models/caffemodel/MobileNetSSD https://github.com/nikmart/pi-object-detection/raw/master/MobileNetSSD_deploy.caffemodel
 
 # Set ownership and permissions
-RUN chown -R app:app .
+#RUN chown -R app:app .
 RUN chmod +x ./run.sh
 
 # Change to the app user
-USER app
+#USER app
 
 # Run the application
 CMD ["./run.sh"]

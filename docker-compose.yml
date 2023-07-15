@@ -13,7 +13,7 @@ services:
 #      - PORT=3020
 #      - CLASSIFIER_SERVER=http://192.168.0.101/classify
 #      - FLASK_ENV=production
-#      - APP_SETTINGS=/home/app/web/config.txt
+#      - APP_SETTINGS=/home/app/config.txt
 #      - DB_IP_ADDRESS=192.168.0.100
 #      - DB_USER=postgres
 #      - DB_PASSWORD=postgres
@@ -34,7 +34,7 @@ services:
 #      - 4000:4000
 #    environment:
 #      - FLASK_ENV=production
-#      - APP_SETTINGS=/home/app/web/config.txt
+#      - APP_SETTINGS=/home/app/config.txt
 #      - DB_USER=postgres
 #      - IP_ADDRESS=192.168.0.101
 #      - DB_PASSWORD=postgres

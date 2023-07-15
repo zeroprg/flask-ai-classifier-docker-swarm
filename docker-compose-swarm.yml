@@ -16,7 +16,7 @@ services:
       - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
       - CONFIDENCE=0.37967
       - FLASK_ENV=production
-      - APP_SETTINGS=/home/app/web/config.txt
+      - APP_SETTINGS=/home/app/config.txt
       - DB_IP_ADDRESS=192.168.0.167
       - DB_USERNAME=odroid
       - DB_PASSWORD=passw0rd
@@ -39,7 +39,7 @@ services:
 #          - node.role==worker
     environment:
       - FLASK_ENV=production
-      - APP_SETTINGS=/home/app/web/config.txt
+      - APP_SETTINGS=/home/app/config.txt
       - DB_IP_ADDRESS=192.168.0.167
       - DB_USERNAME=odroid
       - DB_PASSWORD=passw0rd
@@ -71,7 +71,7 @@ services:
   #    - 4000:4000
   #  environment:
   #    - FLASK_ENV=production
-  #    - APP_SETTINGS=/home/app/web/config.txt
+  #    - APP_SETTINGS=/home/app/config.txt
   #    - DB_USERNAME=odroid
   #    - DB_IP_ADDRESS=192.168.0.77
   #    - DB_PASSWORD=12345
