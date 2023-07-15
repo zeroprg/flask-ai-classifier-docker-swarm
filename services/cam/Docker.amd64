@@ -62,10 +62,10 @@ COPY --from=builder $HOME .
 
 # Set ownership and permissions
 #RUN chown -R app:app .
-RUN chmod +x $HOME/run.sh
+RUN chmod +x ./run.sh
 
 # Change to the app user
 #USER app
 
 # Run the application
- CMD ["./run.sh"]
+CMD ["python3", "video_streams.py"]
