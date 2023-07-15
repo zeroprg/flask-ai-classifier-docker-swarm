@@ -9,6 +9,8 @@ FROM python:3.10-slim as builder
 
 # Define the argument with a default value
 ARG WEB=False
+# Set the environment variable for web
+ENV WEB=$WEB
 
 # Install wget
 RUN apt-get update && apt-get install -y wget
