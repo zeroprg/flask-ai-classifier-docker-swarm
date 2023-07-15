@@ -1,0 +1,60 @@
+###########
+# BUILDER #
+###########
+
+# Base Image
+FROM python:3.8-slim as builder
+
+# Set working directory
+WORKDIR /home/app
+
+# Copy the application code
+COPY . .
+
+# Install requirements and download model
+RUN pip install --no-cache-dir -r ./requirements.txt
+RUN pip install gunicorn
+RUN wget --show-progress -P ./models/caffemodel/MobileNetSSD https://github.com/nikmart/pi-object-detection/raw/master/MobileNetSSD_deploy.caffemodel
+
+# Set ownership and permissions
+RUN chown -R app:app .
+RUN chmod +x ./run.sh
+
+
+#########
+# FINAL #
+#########
+
+# Base Image
+FROM python:3.8-slim
+
+# Set working directory
+WORKDIR /home/app
+
+# Install curl
+RUN apt-get update && apt-get install -y curl
+
+# Install OpenCV dependencies
+RUN apt-get install -y libsm6 libxext6 libxrender-dev
+
+# Install OpenCV, NumPy, and Pillow
+RUN pip install opencv-python-headless numpy pillow
+
+# Create directory for the app user
+RUN mkdir -p /home/app
+
+# Create the app user
+RUN groupadd app && useradd -g app app
+
+# Copy the application code
+COPY --from=builder /home/app .
+
+# Set ownership and permissions
+RUN chown -R app:app .
+RUN chmod +x ./run.sh
+
+# Change to the app user
+USER app
+
+# Run the application
+CMD ["./run.sh"]
