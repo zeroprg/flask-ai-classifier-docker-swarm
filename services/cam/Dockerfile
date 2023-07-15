@@ -65,7 +65,7 @@ RUN groupadd app && useradd -g app app
 
 
 # Copy the application code
-COPY . .
+COPY . . 
 
  
 RUN  python -c "import cv2; print(cv2.__version__)"
