@@ -8,10 +8,9 @@ import hashlib
 #import project.ObjCountByTimer
 
 from project import db
-from project.objCountByTimer import ObjCountByTimer
 
 
-HASH_DELTA = 10  # bigger number  more precise object's count
+HASH_DELTA = 6  # bigger number  more less difference between objects
 
 def do_statistic(cam, hashes, counted_objects):
     # Do some statistic work here    
@@ -38,7 +37,7 @@ def parameterise_json( cam, hashes, counted_objects):
         #print( trace.__dict__ )
     return ret
 
-class ImageHashCodesCountByTimer(ObjCountByTimer):
+class ImageHashCodesCountByTimer():
     def bitdiff(self, a, b):
         d = a ^ b
         return self.countSetBits(d)
