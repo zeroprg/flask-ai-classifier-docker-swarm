@@ -3,7 +3,7 @@
 ###########
 
 # Base Image
-FROM python:3.8-slim as builder
+FROM python:3.10-slim as builder
 
 # Set working directory
 WORKDIR /home/app
@@ -35,7 +35,7 @@ USER app
 #########
 
 # Base Image
-FROM python:3.8-slim
+FROM python:3.10-slim
 
 ENV HOME=/home/app
 
@@ -52,13 +52,13 @@ RUN apt-get update && apt-get install -y curl
 RUN pip install opencv-python-headless numpy pillow
 
 # Create directory for the app user
-RUN mkdir -p /home/app
+RUN mkdir -p $HOME
 
 # Create the app user
 RUN groupadd app && useradd -g app app
 
 # Copy the application code
-COPY --from=builder /home/app .
+COPY --from=builder $HOME .
 
 # Set ownership and permissions
 RUN chown -R app:app .
@@ -67,4 +67,4 @@ RUN chown -R app:app .
 USER app
 
 # Run the application
-CMD ["$HOME/run.sh"]
+CMD ["${HOME}/run.sh"]
