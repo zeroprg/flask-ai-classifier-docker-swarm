@@ -76,7 +76,11 @@ WORKDIR $HOME
 
 # Install OpenCV, NumPy, and Pillow
 RUN pip install opencv-python-headless numpy pillow
-# Install requirements and download model
+
+
+# Copy the application code
+COPY . . 
+# Install requirements and download mode
 RUN pip install -r ./requirements.txt
 RUN pip install gunicorn
 
@@ -86,8 +90,7 @@ RUN mkdir -p $HOME
 # Create the app user
 #RUN groupadd app && useradd -g app app
 
-# Copy the application code
-COPY . . 
+
 # Copy models
 COPY --from=builder /opt/models/caffemodel/MobileNetSSD  ./models/caffemodel/MobileNetSSD
 # Copy the librdkafka directory 
