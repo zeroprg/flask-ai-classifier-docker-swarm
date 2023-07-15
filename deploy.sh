@@ -6,8 +6,9 @@
  # used to delete all images  --> sudo docker image prune -a
  sudo docker rmi $(sudo docker images -a --filter=dangling=true -q)
  
- cd services/cam && sh build.sh
- cd - 
+# cd services/cam && sh build.sh
+# cd - 
+sudo docker pull zeroprg/flask-docker-swarm_cam:latest
 
  #cd services/web && sh build.sh 
  #cd - 
@@ -17,14 +18,14 @@
  #cd -
  sudo docker pull zeroprg/flask-docker-swarm_ui:latest
 
- cd services/crawler  && sh build.sh && 
- cd -
+ #cd services/crawler  && sh build.sh && 
+ #cd -
 
  #sudo docker push zeroprg/flask-docker-swarm_cam:latest
  #sudo docker push zeroprg/flask-docker-swarm_ui:latest
  #sudo docker push zeroprg/flask-docker-swarm_web:latest
  
- #sudo docker service rm flask_cam flask_ui  # flask_web
+ #sudo docker service rm flask_cam_web flask_cam_stream flask_ui  # flask_web
  NETWORK_NAME="flask"
 
 # Check if the network already exists
