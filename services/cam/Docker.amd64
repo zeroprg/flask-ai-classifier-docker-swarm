@@ -5,8 +5,10 @@
 # Base Image
 FROM python:3.10-slim as builder
 
+ENV HOME=/home/app
+
 # Set working directory
-WORKDIR /home/app
+WORKDIR $HOME
 
 # Copy the application code
 COPY . .
@@ -37,7 +39,6 @@ USER app
 # Base Image
 FROM python:3.10-slim
 
-ENV HOME=/home/app
 
 # Set working directory
 WORKDIR $HOME
@@ -62,9 +63,10 @@ COPY --from=builder $HOME .
 
 # Set ownership and permissions
 RUN chown -R app:app .
+RUN chmod +x $HOME/run.sh
 
 # Change to the app user
 USER app
 
 # Run the application
-CMD ["run.sh"]
+CMD ["./run.sh"]
