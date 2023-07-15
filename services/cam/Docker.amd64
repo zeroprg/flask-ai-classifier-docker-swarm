@@ -96,5 +96,5 @@ RUN  python -c "import cv2; print(cv2.__version__)"
 CMD if [ "$WEB" = "True" ]; then \
         gunicorn --env TMPDIR=./ -w 4 -b 0.0.0.0:3020 manage:app; \
     else \
-        python3 video_streams.py; \
+        python video_streams.py; \
     fi
