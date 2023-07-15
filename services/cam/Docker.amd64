@@ -61,11 +61,11 @@ RUN groupadd app && useradd -g app app
 COPY --from=builder $HOME .
 
 # Set ownership and permissions
-RUN chown -R app:app .
+#RUN chown -R app:app .
 RUN chmod +x $HOME/run.sh
 
 # Change to the app user
-USER app
+#USER app
 
 # Run the application
  CMD ["./run.sh"]
