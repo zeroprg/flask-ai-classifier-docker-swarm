@@ -7,7 +7,7 @@ import sqlalchemy as sql
 from sqlalchemy import text
 from sqlalchemy import create_engine, MetaData
 
-POOL_SIZE = 50
+POOL_SIZE = 120
 AUTOCOMMIT = True
 
 class Sql:
@@ -24,14 +24,14 @@ class Sql:
     def __init__(self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
         """Create a database connection to the PostgreSQL database specified by the credentials"""
         self.pool_size = POOL_SIZE
-        self.engine = create_engine(f'postgresql+psycopg2://{DB_USERNAME}:{DB_PASSWORD}@{DATABASE_URI}:{DB_PORT}/{DB_NAME}',isolation_level="READ COMMITTED", pool_size=self.pool_size)        
+        self.engine = create_engine(f'postgresql+psycopg2://{DB_USERNAME}:{DB_PASSWORD}@{DATABASE_URI}:{DB_PORT}/{DB_NAME}', pool_size=self.pool_size)        
         self.__core_init__()
 
 
     def __init__(self, SQLALCHEMY_DATABASE_URI):
         """Create a database connection to the SQL database specified by the URI"""
         self.pool_size = POOL_SIZE
-        self.engine = create_engine(SQLALCHEMY_DATABASE_URI, isolation_level="READ COMMITTED", pool_size=self.pool_size)
+        self.engine = create_engine(SQLALCHEMY_DATABASE_URI,  pool_size=self.pool_size)
         self.__core_init__()
 
     def getConn(self):

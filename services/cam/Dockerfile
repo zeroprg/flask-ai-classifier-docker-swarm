@@ -5,12 +5,42 @@
 # Base Image
 FROM zeroprg/flask-docker-swarm_cv2:latest as builder
 
+# Avoid warnings by switching to noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Set working directory
-WORKDIR /home/app
+############################
+# install librdkafka       #
+############################
 
-# Copy the application code
-COPY . .
+# Install required packages for make
+RUN apt-get update && \
+    apt-get install -y build-essential zlib1g-dev libssl-dev libsasl2-dev pkg-config
+
+# checkout v1.9.2 configure and make and install it
+WORKDIR /opt
+
+# Set the necessary environment variables for librdkafka
+ENV C_INCLUDE_PATH=/opt/librdkafka/include
+ENV LIBRARY_PATH=/opt/librdkafka/lib
+
+# Download librdkafka C library
+RUN wget -O librdkafka.tar.gz https://github.com/edenhill/librdkafka/archive/refs/tags/v1.9.2.tar.gz && \
+    tar -xzvf librdkafka.tar.gz && \
+    cd librdkafka-1.9.2
+
+# Build and install librdkafka C library 
+# install cffi for connectivity with C libraries
+RUN pip install cffi
+
+# Set the necessary environment variables for make 
+ENV C_INCLUDE_PATH=/usr/local/include
+ENV LIBRARY_PATH=/usr/local/lib
+RUN cd librdkafka-1.9.2 && \
+    ./configure --prefix=/opt/librdkafka && \
+    make && \
+    make install
+
 
 #########
 # FINAL #
@@ -19,9 +49,10 @@ COPY . .
 # Base Image
 FROM zeroprg/flask-docker-swarm_cv2:latest
 
-# Avoid warnings by switching to noninteractive
-ARG DEBIAN_FRONTEND=noninteractive
-ENV DEBIAN_FRONTEND=noninteractive
+# Set working directory
+WORKDIR /home/app
+
+
 
 # Install curl
 RUN apt-get update && apt-get install -y curl
@@ -32,42 +63,26 @@ RUN mkdir -p /home/app
 # Create the app user
 RUN groupadd app && useradd -g app app
 
-# Create the home directory
-ENV HOME=/home/app
-ENV APP_HOME=/home/app/web
-RUN mkdir $APP_HOME
-WORKDIR $APP_HOME
-
-# Install requirements and download model
-COPY --from=builder /home/app/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir gunicorn
-RUN wget --show-progress -P ./models/caffemodel/MobileNetSSD https://github.com/nikmart/pi-object-detection/raw/master/MobileNetSSD_deploy.caffemodel
-
-
-
-# Install build tools and Kerberos support.
-#RUN apt install -y wget software-properties-common lsb-release gcc make python3 python3-pip python3-dev libsasl2-modules-gssapi-mit krb5-user
-# Install the latest version of librdkafka:
-#RUN wget -qO - https://packages.confluent.io/deb/7.0/archive.key | apt-key add -
-#RUN  add-apt-repository "deb https://packages.confluent.io/clients/deb $(lsb_release -cs) main"
-#RUN apt update
-# prevent  from asking for user input
-#RUN apt-get install -yqq -qq librdkafka-dev
-
-#
-# Now build and install confluent-kafka-python as your standard user
-# (e.g., exit the root shell first).
-#RUN  python3 -m pip install --no-binary confluent-kafka confluent-kafka
-#RUN python3 -c 'import confluent_kafka; print(confluent_kafka.version())'
-
 
 # Copy the application code
-COPY . $APP_HOME
+COPY . .
+
+ 
+RUN  python -c "import cv2; print(cv2.__version__)"
+
+# Copy the librdkafka directory 
+COPY --from=builder /opt/librdkafka /opt/librdkafka
+
+
+# Install requirements and download model
+ #COPY /home/app/requirements.txt .
+RUN pip install --no-cache-dir -r ./requirements.txt
+RUN pip install gunicorn
+RUN wget --show-progress -P ./models/caffemodel/MobileNetSSD https://github.com/nikmart/pi-object-detection/raw/master/MobileNetSSD_deploy.caffemodel
 
 # Set ownership and permissions
-RUN chown -R app:app $APP_HOME
-RUN chmod +x run.sh
+RUN chown -R app:app .
+RUN chmod +x ./run.sh
 
 # Change to the app user
 USER app
