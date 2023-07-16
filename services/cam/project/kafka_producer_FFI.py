@@ -13,10 +13,11 @@ topic = prod.KAFKA_PREPROCESSED_TOPIC #  'preprocess'
 partition = -1 # Random
 
 # Create producer configuration
-producer_config = {
-    'metadata.broker.list': '192.168.0.197:9092',
+producer_config = [
+    {'metadata.broker.list': '192.168.0.197:9092'}
+]
     
-}
+
 
 
 no_kafka_producer = True
