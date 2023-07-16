@@ -14,8 +14,8 @@ partition = -1 # Random
 
 # Create producer configuration
 producer_config = {
-    'metadata.broker.list': '192.168.0.197',
-    'queue.buffering.max.messages':1000
+    'metadata.broker.list': '192.168.0.197:9092',
+    
 }
 
 
