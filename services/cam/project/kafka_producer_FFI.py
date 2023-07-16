@@ -54,7 +54,7 @@ def publish_message(key, image):
     # Encode the image as base64 string
     image_data = b64encode(image_bytes).decode('utf-8')
   
-    print(f"Message value : {image_data[:10]} ... {image_data[-10:]}")
+    #print(f"Message value : {image_data[:10]} ... {image_data[-10:]}")
     # Publish the message to the topic
     try:
         
