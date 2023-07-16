@@ -89,9 +89,12 @@ COPY --from=builder /opt/models/caffemodel/MobileNetSSD  ./models/caffemodel/Mob
 # Copy the librdkafka directory 
 COPY --from=builder /opt/librdkafka /opt/librdkafka
 
-# Install required packages for make and gcc
+
+# Set the necessary environment variables for librdkafka
+# Install required packages for make, gcc, and librdkafka development headers
 RUN apt-get update && \
-    apt-get install -y build-essential gcc zlib1g-dev libssl-dev libsasl2-dev pkg-config
+    apt-get install -y build-essential gcc zlib1g-dev libssl-dev libsasl2-dev pkg-config \
+    librdkafka-dev
 
 
 # Check important libraries
