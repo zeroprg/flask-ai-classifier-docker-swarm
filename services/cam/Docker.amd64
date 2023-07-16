@@ -85,9 +85,9 @@ RUN mkdir -p $HOME
 
 
 # Copy models
-COPY --from=builder /opt/models/caffemodel/MobileNetSSD  ./models/caffemodel/MobileNetSSD
+#COPY --from=builder /opt/models/caffemodel/MobileNetSSD  ./models/caffemodel/MobileNetSSD
 # Copy the librdkafka directory 
-COPY --from=builder /opt/librdkafka /opt/librdkafka
+#COPY --from=builder /opt/librdkafka /opt/librdkafka
 
 
 # Set the necessary environment variables for librdkafka
