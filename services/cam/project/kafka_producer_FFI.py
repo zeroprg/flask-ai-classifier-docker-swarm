@@ -58,7 +58,7 @@ def publish_message(key, image):
     # Publish the message to the topic
     try:
         
-        producer.produce(topic_handler, partition, value=image_data)        
+        #producer.produce(topic_handler, partition, value=image_data)        
         no_kafka_producer = True
     except Exception as e:
         print("Failed to publish message to Kafka topic", str(e))
