@@ -7,3 +7,4 @@ Flask-Cors == 3.0.10
 dhash
 imutils == 0.5.4
 requests-mock == 1.11.0
+cffi
