@@ -9,10 +9,13 @@ from project.rdkafka import RdKafka
 # Kafka broker configuration
 bootstrap_servers = prod.KAFKA_SERVER #'172.29.208.1:9092'
 topic = prod.KAFKA_PREPROCESSED_TOPIC #  'preprocess'
+# Partition
+partition = -1 # Random
 
 # Create producer configuration
 producer_config = {
-    'bootstrap.servers': bootstrap_servers
+    'bootstrap.servers': bootstrap_servers,
+    'queue.buffering.max.messages':1000
 }
 
 no_kafka_producer = True
@@ -51,12 +54,16 @@ def publish_message(key, image):
     # Publish the message to the topic
     try:
         print(f"topic: {topic}")
-        producer.produce(topic, key=key_bytes, value=image_data)
-        producer.flush()
+        producer.produce(topic, partition, value=image_data)        
         no_kafka_producer = True
     except Exception as e:
         print("Failed to publish message to Kafka topic", str(e))
+            # Destroy topic handle
+        producer.destroy_topic(topic)
+        # Destroy producer
+        producer.destroy(10)
         no_kafka_producer = False
+
         
 
 
