@@ -1,4 +1,3 @@
-
 from base64 import b64encode
 from PIL import Image
 import zlib
@@ -6,8 +5,7 @@ from io import BytesIO
 import uuid
 
 from project.config import  ProductionConfig as prod
-from rdkafka import RdKafka
-
+from project.rdkafka import RdKafka
 # Kafka broker configuration
 bootstrap_servers = prod.KAFKA_SERVER #'172.29.208.1:9092'
 topic = prod.KAFKA_PREPROCESSED_TOPIC #  'preprocess'
