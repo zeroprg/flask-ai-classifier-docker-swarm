@@ -89,6 +89,7 @@ COPY --from=builder /opt/models/caffemodel/MobileNetSSD  ./models/caffemodel/Mob
 # Copy the librdkafka directory 
 COPY --from=builder /opt/librdkafka /opt/librdkafka
 
+RUN apt-get install gcc
 # Check important libraries
 RUN  python -c "import cv2; print(cv2.__version__)"
 
