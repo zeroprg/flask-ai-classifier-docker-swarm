@@ -89,7 +89,11 @@ COPY --from=builder /opt/models/caffemodel/MobileNetSSD  ./models/caffemodel/Mob
 # Copy the librdkafka directory 
 COPY --from=builder /opt/librdkafka /opt/librdkafka
 
-RUN apt-get -y update && apt-get -y install gcc
+# Install required packages for make and gcc
+RUN apt-get update && \
+    apt-get install -y build-essential gcc zlib1g-dev libssl-dev libsasl2-dev pkg-config
+
+
 # Check important libraries
 RUN  python -c "import cv2; print(cv2.__version__)"
 
