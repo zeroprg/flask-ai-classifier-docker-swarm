@@ -1,27 +1,42 @@
+
+from base64 import b64encode
 from PIL import Image
 import zlib
 from io import BytesIO
-import base64
 import uuid
 
+from project.config import  ProductionConfig as prod
 from rdkafka import RdKafka
 
 # Kafka broker configuration
-bootstrap_servers = 'localhost:9092'
-topic = 'preprocessed'
+bootstrap_servers = prod.KAFKA_SERVER #'172.29.208.1:9092'
+topic = prod.KAFKA_PREPROCESSED_TOPIC #  'preprocess'
 
 # Create producer configuration
 producer_config = {
     'bootstrap.servers': bootstrap_servers
 }
 
-# Create a Kafka producer
-producer = RdKafka(RdKafka.Producer, producer_config)
+no_kafka_producer = True
+
+try:
+    # Attempt to create a Kafka producer
+    producer = RdKafka(RdKafka.Producer, producer_config)
+    no_kafka_producer = True
+    print("Kafka producer is available.")
+except Exception as e:
+    print("Failed to create Kafka producer. Error:", str(e))
+    no_kafka_producer = True
 
 
+def bytes_to_string(encoded_bytes):
+    return encoded_bytes.decode()
+
+# Function to publish messages
 def publish_message(key, image):
+    global no_kafka_producer
     # Convert the key to bytes
-    key_bytes = key.encode()
+    key_bytes = key
 
     # Convert the image to bytes
     image_bytes = BytesIO()
@@ -29,13 +44,22 @@ def publish_message(key, image):
     image_bytes.seek(0)
 
     # Compress the image data using zlib
-    compressed_bytes = zlib.compress(image_bytes.read())
-
-    # Encode the compressed image as base64 string
-    image_data = base64.b64encode(compressed_bytes).decode('utf-8')
-
+    image_bytes = zlib.compress(image_bytes.read())  
+    print(f"image_bytes length after compression : {len(image_bytes)}")
+    # Encode the image as base64 string
+    image_data = b64encode(image_bytes).decode('utf-8')
+  
+    print(f"Message value : {image_data[:10]} ... {image_data[-10:]}")
     # Publish the message to the topic
-    producer.produce(topic, key_bytes, image_data)
+    try:
+        print(f"topic: {topic}")
+        producer.produce(topic, key=key_bytes, value=image_data)
+        producer.flush()
+        no_kafka_producer = True
+    except Exception as e:
+        print("Failed to publish message to Kafka topic", str(e))
+        no_kafka_producer = False
+        
 
 
 # Example usage
@@ -45,7 +69,9 @@ if __name__ == '__main__':
     image = Image.open(image_path).convert("RGB")
 
     # Define the key
-    key = str(uuid.uuid4())
+    key = uuid.uuid4()
+    print(key)
+    key =  str(key)
 
     # Publish the image to Kafka topic
     publish_message(key, image)

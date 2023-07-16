@@ -28,6 +28,7 @@ class ProductionConfig:
 
     KAFKA_SERVER = os.environ.get("KAFKA_SERVER")
     KAFKA_PREPROCESSED_TOPIC = os.environ.get("KAFKA_PREPROCESSED_TOPIC")
+    CONFLUENT_KAFKA = os.environ.get("CONFLUENT_KAFKA")
 
     TRACK_MODIFICATIONS = False
     # read config file from app_settings
@@ -47,5 +48,6 @@ class ProductionConfig:
     if CLASSIFIER_TYPE is None or CLASSIFIER_TYPE =='' : CLASSIFIER_TYPE =  args["CLASSIFIER_TYPE"]
     if KAFKA_SERVER is None or KAFKA_SERVER =='' : KAFKA_SERVER =  args["KAFKA_SERVER"]
     if KAFKA_PREPROCESSED_TOPIC is None or KAFKA_PREPROCESSED_TOPIC =='' : KAFKA_PREPROCESSED_TOPIC =  args["KAFKA_PREPROCESSED_TOPIC"]
+    if CONFLUENT_KAFKA is None or CONFLUENT_KAFKA =='' : CONFLUENT_KAFKA =  args["CONFLUENT_KAFKA"]
 
 

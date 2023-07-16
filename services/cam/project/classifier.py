@@ -23,7 +23,11 @@ from project import db
 if prod.CLASSIFIER_TYPE == 'LOCAL':
     from project.caffe_classifier import classify_frame, classify_init
 if prod.CLASSIFIER_TYPE == 'KAFKA':
-    from project.kafka_producer import publish_message, no_kafka_producer
+    if prod.CONFLUENT_KAFKA == True:
+        from project.kafka_producer import publish_message, no_kafka_producer
+    else:
+        from project.kafka_producer_FFI import publish_message, no_kafka_producer    
+    
 else:
     no_kafka_producer = True
     
