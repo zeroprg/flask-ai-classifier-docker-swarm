@@ -24,6 +24,9 @@ try:
     # Attempt to create a Kafka producer
     producer = RdKafka(RdKafka.Producer, producer_config)
     no_kafka_producer = True
+    # Create topic handle
+    topic_handler = producer.new_topic(topic, {'request.required.acks':1})
+    print(f"topic: {topic}, topic_handler :  {topic_handler}")
     print("Kafka producer is available.")
 except Exception as e:
     print("Failed to create Kafka producer. Error:", str(e))
@@ -53,13 +56,13 @@ def publish_message(key, image):
     print(f"Message value : {image_data[:10]} ... {image_data[-10:]}")
     # Publish the message to the topic
     try:
-        print(f"topic: {topic}")
-        producer.produce(topic, partition, value=image_data)        
+        
+        producer.produce(topic_handler, partition, value=image_data)        
         no_kafka_producer = True
     except Exception as e:
         print("Failed to publish message to Kafka topic", str(e))
             # Destroy topic handle
-        producer.destroy_topic(topic)
+        producer.destroy_topic(topic_handler)
         # Destroy producer
         producer.destroy(10)
         no_kafka_producer = False
