@@ -14,7 +14,7 @@ partition = -1 # Random
 
 # Create producer configuration
 producer_config = {
-     'metadata.broker.list': bootstrap_servers,
+    'metadata.broker.list': [bootstrap_servers],
     'queue.buffering.max.messages':1000
 }
 
