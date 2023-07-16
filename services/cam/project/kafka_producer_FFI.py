@@ -13,9 +13,8 @@ topic = prod.KAFKA_PREPROCESSED_TOPIC #  'preprocess'
 partition = -1 # Random
 
 # Create producer configuration
-producer_config = [
-    {'metadata.broker.list': '192.168.0.197:9092'}
-]
+producer_config = {'metadata.broker.list': '192.168.0.197:9092'}
+
     
 
 
@@ -27,8 +26,8 @@ try:
     producer = RdKafka(RdKafka.Producer, producer_config)
     no_kafka_producer = True
     # Create topic handle
-    topic_handler = producer.new_topic(topic, {'request.required.acks':1})
-    print(f"topic: {topic}, topic_handler :  {topic_handler}")
+    #topic_handler = producer.new_topic(topic, {'request.required.acks':1})
+    print(f"topic: {topic}, topic_handler") #:  {topic_handler}")
     print("Kafka producer is available.")
 except Exception as e:
     print("Failed to create Kafka producer. Error:", str(e))
