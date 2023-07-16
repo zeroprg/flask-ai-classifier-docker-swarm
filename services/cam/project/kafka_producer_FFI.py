@@ -62,10 +62,10 @@ def publish_message(key, image):
     except Exception as e:
         print("Failed to publish message to Kafka topic", str(e))
             # Destroy topic handle
-        producer.destroy_topic(topic_handler)
+        #producer.destroy_topic(topic_handler)
         # Destroy producer
-        producer.destroy(10)
-        no_kafka_producer = False
+        #producer.destroy(10)
+        #no_kafka_producer = False
 
         
 
