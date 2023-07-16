@@ -14,9 +14,10 @@ partition = -1 # Random
 
 # Create producer configuration
 producer_config = {
-    'bootstrap.servers': bootstrap_servers,
+     'metadata.broker.list': bootstrap_servers,
     'queue.buffering.max.messages':1000
 }
+
 
 no_kafka_producer = True
 
