@@ -157,6 +157,7 @@ def read_and_delete_messages(batch_size=100):
         # Process the received message
    
         key = message.key().decode('utf-8')
+        #print(message.timestamp())
         value = message.value()
         # Commit the offset to mark the message as processed
         consumer.commit(message)

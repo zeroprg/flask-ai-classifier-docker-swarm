@@ -23,9 +23,10 @@ from project import db
 if prod.CLASSIFIER_TYPE == 'LOCAL':
     from project.caffe_classifier import classify_frame, classify_init
 if prod.CLASSIFIER_TYPE == 'KAFKA':
-    if prod.CONFLUENT_KAFKA == True:
+    if prod.PYKAFKA_LIB :
         from project.kafka_producer import publish_message, no_kafka_producer
-    else:
+    else:#FFI
+        print("############# no_pykafka library {PYKAFKA_LIB}  USE FFI ############# ") 
         from project.kafka_producer_FFI import publish_message, no_kafka_producer    
     
 else:
