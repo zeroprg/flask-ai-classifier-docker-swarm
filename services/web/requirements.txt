@@ -1,5 +1,6 @@
-confluent-kafka==1.7.0
-
+pykafka
+SQLAlchemy==1.4.6
+psycopg2-binary==2.9.6
 torch==2.0.1
 torchvision==0.15.2
 pandas==2.0.2

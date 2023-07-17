@@ -1,4 +1,5 @@
-from confluent_kafka import Consumer, Producer
+from pykafka import KafkaClient
+
 from PIL import Image
 import numpy as np
 import struct
@@ -19,25 +20,26 @@ from project.config import  ProductionConfig as prod
 bootstrap_servers = prod.KAFKA_SERVER #'172.29.208.1:9092'
 preprocessed_topic = prod.KAFKA_PREPROCESSED_TOPIC #  'preprocess'
 postprocessed_topic = prod.KAFKA_POSTPROCESSED_TOPIC #'postprocess'
+zookeepers = prod.ZOOKEEPERS
 
-# Create consumer and producer configurations
-consumer_config = {
-    'bootstrap.servers': bootstrap_servers,
-    'group.id': 'my-consumer-group',
-    'auto.offset.reset': 'earliest',
-    'enable.auto.commit': False
-}
 
 producer_config = {
     'bootstrap.servers': bootstrap_servers
 }
 
-# Create Kafka consumer and producer
-consumer = Consumer(consumer_config)
-producer = Producer(producer_config)
+# Create Kafka client
+kafka_client = KafkaClient(hosts=bootstrap_servers)
 
+# Get the Kafka topic
 # Subscribe to the preprocessed topic
-consumer.subscribe([preprocessed_topic])
+kafka_topic = kafka_client.topics[preprocessed_topic]
+
+balanced_consumer = kafka_topic.get_balanced_consumer(
+    consumer_group='my-consumer-group',
+    auto_commit_enable=True,
+    zookeeper_connect= zookeepers
+)
+
 
 
 def long_to_bytes(n):
@@ -144,11 +146,8 @@ def read_and_delete_messages(batch_size=100):
     keys = []
     values = []
     while True:
-        message = consumer.poll(timeout=1.0)
-
-        if message is None:
-            continue
-
+        for message in balanced_consumer:
+            if message is  None: continue
         if message.error():
             # Handle error
             print(f"Error occurred: {message.error()}")

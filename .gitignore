@@ -15,6 +15,7 @@ node_modules
 services/crawler/httpwww.insecam.org.txt
 services/crawler/httpwww.insecam.orgrubytypeAxis2.txt
 # python virtual env.
+services/web/web/
 services/web/project/web/
 services/crawler/crawler
 services/cam/cam
