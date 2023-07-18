@@ -30,8 +30,7 @@ ENV HOME=/home/app
 # Set working directory
 WORKDIR $HOME
 
-# Install OpenCV, NumPy, and Pillow
-RUN pip install numpy pillow confluent-kafka
+
 
 
 # Copy the application code
@@ -44,7 +43,8 @@ RUN mkdir -p $HOME
 
 # Copy models
 COPY --from=builder opt/yolov5s.pt  ./yolov5s.pt
-
+# Install OpenCV, NumPy, and Pillow
+RUN pip install opencv-python-headless numpy pillow confluent-kafka
 # Check important libraries
 RUN  python -c "import cv2; print(cv2.__version__)"
 
