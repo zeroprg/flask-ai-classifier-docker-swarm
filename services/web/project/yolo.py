@@ -9,14 +9,14 @@ label_tuple = ('person', 'dog', 'cow')
 # Model
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s') 
 
-
-# Check if CUDA (GPU) is available
-if torch.cuda.is_available():
-    print("CUDA is available.")
+try:
     device = torch.device("cuda")
-else:
-    print("CUDA is not available.")
+    print("CUDA is available.")
+except Exception:
     device = torch.device("cpu")
+    print("CUDA is not available.")
+
+
 class_labels = model.names
 
 def process_image_yolov5(images):
