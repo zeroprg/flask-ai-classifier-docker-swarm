@@ -4,3 +4,6 @@ torch==2.0.1
 torchvision==0.15.2
 pandas==2.0.2
 psutil==5.9.5
+yml
+zipp
+ultralytics
