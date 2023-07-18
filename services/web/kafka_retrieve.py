@@ -15,7 +15,7 @@ from project.config import ProductionConfig as prod
 
 # Kafka broker configuration
 bootstrap_servers = prod.KAFKA_SERVER
-topic = prod.KAFKA_POSTPROCESSED_TOPIC
+#topic = prod.KAFKA_POSTPROCESSED_TOPIC
 group_id = 'my-consumer-group'
 
 # Create Kafka consumer configuration

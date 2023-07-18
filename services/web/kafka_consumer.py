@@ -18,7 +18,7 @@ from project.config import  ProductionConfig as prod
 # Kafka broker configuration
 bootstrap_servers = prod.KAFKA_SERVER #'172.29.208.1:9092'
 preprocessed_topic = prod.KAFKA_PREPROCESSED_TOPIC #  'preprocess'
-postprocessed_topic = prod.KAFKA_POSTPROCESSED_TOPIC #'postprocess'
+#postprocessed_topic = prod.KAFKA_POSTPROCESSED_TOPIC #'postprocess'
 
 # Create consumer and producer configurations
 consumer_config = {
