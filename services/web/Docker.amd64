@@ -31,7 +31,7 @@ ENV HOME=/home/app
 WORKDIR $HOME
 
 # Install OpenCV, NumPy, and Pillow
-RUN pip install opencv-python-headless numpy pillow
+RUN pip install opencv-python-headless numpy pillow confluent-kafka
 
 
 # Copy the application code
