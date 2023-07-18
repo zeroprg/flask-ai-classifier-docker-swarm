@@ -30,9 +30,6 @@ ENV HOME=/home/app
 # Set working directory
 WORKDIR $HOME
 
-
-
-
 # Copy the application code
 COPY . . 
 # Install requirements and download mode

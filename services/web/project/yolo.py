@@ -3,17 +3,20 @@ from PIL import Image
 import pandas as pd
 
 
-from project.config import  ProductionConfig as prod
-
 # Tuple of labels to filter
 label_tuple = ('person', 'dog', 'cow')
 
 # Model
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s') 
 
-if prod.CUDA:
-    model = model.cuda()  # Move model to GPU
 
+# Check if CUDA (GPU) is available
+if torch.cuda.is_available():
+    print("CUDA is available.")
+    device = torch.device("cuda")
+else:
+    print("CUDA is not available.")
+    device = torch.device("cpu")
 class_labels = model.names
 
 def process_image_yolov5(images):
