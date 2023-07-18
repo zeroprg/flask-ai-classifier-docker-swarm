@@ -42,8 +42,7 @@ RUN mkdir -p $HOME
 COPY --from=builder opt/yolov5s.pt  ./yolov5s.pt
 # Install OpenCV, NumPy, and Pillow
 RUN pip install confluent-kafka
-# Check important libraries
-RUN  python -c "import cv2; print(cv2.__version__)"
+
 
 # Run the application if WEB is True, run Flask app; else, run video_streams.py
 #CMD if [ "$WEB" = "True" ]; then \

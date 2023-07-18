@@ -1,13 +1,11 @@
-from confluent_kafka import Consumer, Producer
+from confluent_kafka import Consumer#, Producer
 from PIL import Image
-import numpy as np
 import struct
 from io import BytesIO
 import zlib
 from base64 import b64decode, b64encode
 from process_images import process_images, generate_hashcode
 import binascii
-import json
 from project import db
 import time
 import struct
@@ -82,18 +80,15 @@ def publish_to_processed_topic(key, image, label):
     encoded_data = b64encode(compressed_data).decode('utf-8')
 
     # Prepare the message to send to Kafka
-    message = {
-        'label': label,
-        'timestamp': int(round(time.time() * 1000)),
-        'data': encoded_data
-        
-    }
+    #message = {
+    #    'label': label,
+    #    'timestamp': int(round(time.time() * 1000)),
+    #    'data': encoded_data
+    #}
 
     # Send the message to Kafka
-    producer.produce(postprocessed_topic, key=key, value=json.dumps(message).encode('utf-8'))
-    producer.flush()
-
-
+    #producer.produce(postprocessed_topic, key=key, value=json.dumps(message).encode('utf-8'))
+    #producer.flush()
 
 
 # Function to publish messages in batches
@@ -128,9 +123,9 @@ def store_to_db_message_batch(keys, results):
             # Format the datetime with the local timezone
             formatted_datetime = now.strftime("%Y-%m-%d %H:%M:%S %Z")  
             current_time =  int(time.time()*1000)
-            image_array = np.array(image)
+            #image_array = np.array(image)
             # Store the image and its metadata in the database
-            db.insert_frame(hashcode, formatted_datetime, current_time, label, image_array, key)
+            db.insert_frame(hashcode, formatted_datetime, current_time, label, image, key)
 
         # Print the object counts for the current result
         #print("Object Counts:")

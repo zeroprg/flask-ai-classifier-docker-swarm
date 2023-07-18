@@ -1,4 +1,4 @@
-import cv2
+import io
 import base64
 import time
 import sqlalchemy as sql
@@ -115,10 +115,13 @@ class Sql:
         return rows
 
 
-    def insert_frame(self, hashcode, date, time, type, numpy_array, cam):   
-
-        buffer = cv2.imencode('.jpg', numpy_array)[1]
-        jpg_as_base64='data:image/jpeg;base64,'+ base64.b64encode(buffer).decode('utf-8')
+    def insert_frame(self, hashcode, date, time, type, image, cam): 
+        # Encode the Pillow Image to a JPEG format in memory
+        buffer = io.BytesIO()
+        image.save(buffer, format="JPEG")
+        # Get the binary data as bytes and base64 encode it
+        jpeg_binary = buffer.getvalue()
+        jpg_as_base64='data:image/jpeg;base64,'+ base64.b64encode(jpeg_binary).decode('utf-8') #base64.b64encode(buffer).decode('utf-8')
 
         conn = self.getConn()
         try:
