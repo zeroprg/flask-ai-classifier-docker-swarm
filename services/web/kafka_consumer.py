@@ -34,7 +34,7 @@ producer_config = {
 
 # Create Kafka consumer and producer
 consumer = Consumer(consumer_config)
-producer = Producer(producer_config)
+#producer = Producer(producer_config)
 
 # Subscribe to the preprocessed topic
 consumer.subscribe([preprocessed_topic])
@@ -196,8 +196,8 @@ def read_and_delete_messages(batch_size=100):
 
     # Close the consumer and producer after processing all messages
     consumer.close()
-    producer.flush()
-    producer.close()
+    #producer.flush()
+    #producer.close()
 
 if (__name__ == "__main__"):
         read_and_delete_messages()
