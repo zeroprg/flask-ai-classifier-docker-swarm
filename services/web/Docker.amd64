@@ -43,7 +43,7 @@ RUN pip install -r ./requirements.txt
 RUN mkdir -p $HOME
 
 # Copy models
-COPY --from=builder ./yolov5s.pt  ./yolov5s.pt
+COPY --from=builder opt/yolov5s.pt  ./yolov5s.pt
 
 # Check important libraries
 RUN  python -c "import cv2; print(cv2.__version__)"
