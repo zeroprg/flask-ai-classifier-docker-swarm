@@ -23,7 +23,7 @@ RUN wget  --show-progress -P .  https://github.com/ultralytics/yolov5/releases/d
 #########
 
 # Base Image
-FROM python:3.10-slim
+FROM ultralytics/yolov5:latest
 
 ENV HOME=/home/app
 
@@ -41,7 +41,7 @@ RUN mkdir -p $HOME
 # Copy models
 COPY --from=builder opt/yolov5s.pt  ./yolov5s.pt
 # Install OpenCV, NumPy, and Pillow
-RUN pip install opencv-python-headless numpy pillow confluent-kafka
+RUN pip install confluent-kafka
 # Check important libraries
 RUN  python -c "import cv2; print(cv2.__version__)"
 
