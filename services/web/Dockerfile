@@ -3,67 +3,52 @@
 ###########
 
 # Base Image
-FROM zeroprg/flask-docker-swarm_cv2:latest as builder
-
+FROM python:3.10-slim as builder
 # Set working directory
-WORKDIR /home/app
+WORKDIR /opt
 
-# Copy the application code
-COPY . .
+# Define the argument with a default value
+#ARG WEB=False
+# Set the environment variable for web
+#ENV WEB=$WEB
+
+# Install wget
+RUN apt-get update && apt-get install -y wget
+# Download yolov5s.pt
+RUN wget  --show-progress -P .  https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt
+
 
 #########
 # FINAL #
 #########
 
 # Base Image
-FROM zeroprg/flask-docker-swarm_cv2:latest
+FROM ultralytics/yolov5:latest-arm64
 
-# Create directory for the app user
-RUN mkdir -p /home/app
-
-# Create the app user
-RUN groupadd app && useradd -g app app
-
-# Create the home directory
 ENV HOME=/home/app
-ENV APP_HOME=/home/app/web
-RUN mkdir $APP_HOME
-WORKDIR $APP_HOME
 
-# Download spacy model
-#RUN python -m spacy download en_core_web_sm
-RUN sed -i '/^# deb.* universe$/s/^# //' /etc/apt/sources.list
-
-
-# Install requirements
-COPY --from=builder /home/app/requirements.txt .
-# install scypy on ARMv32 
-
-# use depndencies for scipy
-# RUN apt install -y gcc g++ gfortran libopenblas-dev liblapack-dev pkg-config python3-pip python3-dev
-
-#get dependencies for scipy
-RUN apt build-dep scipy
-# To build the latest stable release:
-RUN pip install scipy --no-binary scipy
-# To build a development version, you need a local clone of the SciPy git repository:
-RUN git clone https://github.com/scipy/scipy.git
-RUN git submodule update --init
-RUN pip install .
-
-# Download yolov5s.pt
-RUN wget --show-progress  https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt
-RUN pip install --no-cache-dir -r requirements.txt
+# Set working directory
+WORKDIR $HOME
 
 # Copy the application code
-COPY . $APP_HOME
+COPY . . 
+# Install requirements and download mode
+RUN pip install -r ./requirements.txt
 
-# Set ownership and permissions
-RUN chown -R app:app $APP_HOME
-RUN chmod +x run.sh
+# Create directory for the app user
+RUN mkdir -p $HOME
 
-# Change to the app user
-USER app
+# Copy models
+COPY --from=builder opt/yolov5s.pt  ./yolov5s.pt
+# Install OpenCV, NumPy, and Pillow
+RUN pip install confluent-kafka
+# Check important libraries
+RUN  python -c "import cv2; print(cv2.__version__)"
 
-# Run the application
-CMD ["python", "video_streamer.py"]
+# Run the application if WEB is True, run Flask app; else, run video_streams.py
+#CMD if [ "$WEB" = "True" ]; then \
+#        gunicorn --env TMPDIR=./ -w 4 -b 0.0.0.0:3020 manage:app; \
+#    else \
+#        python video_streams.py; \
+#    fi
+CMD ["python","kafka_consumer.py"]
