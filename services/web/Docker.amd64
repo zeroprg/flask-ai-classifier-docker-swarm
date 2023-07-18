@@ -54,4 +54,5 @@ RUN  python -c "import cv2; print(cv2.__version__)"
 #    else \
 #        python video_streams.py; \
 #    fi
-CMD ["python","kafka_consumer.py"]
+#CMD ["python","kafka_consumer.py"]
+CMD ["bin/bash"]
