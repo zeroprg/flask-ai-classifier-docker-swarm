@@ -50,4 +50,4 @@ RUN pip install confluent-kafka
 #    else \
 #        python video_streams.py; \
 #    fi
-CMD ["python","kafka_consumer.py"]
+CMD ["python3","kafka_consumer.py"]

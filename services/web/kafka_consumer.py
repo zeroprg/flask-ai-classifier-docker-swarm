@@ -135,7 +135,7 @@ def store_to_db_message_batch(keys, results):
 
     
 # Function to consume messages, process images, and publish the results
-def read_and_delete_messages(batch_size=100):
+def read_and_delete_messages(batch_size=50):
     keys = []
     values = []
     while True:
@@ -195,4 +195,4 @@ def read_and_delete_messages(batch_size=100):
     #producer.close()
 
 if (__name__ == "__main__"):
-        read_and_delete_messages()
+        read_and_delete_messages(prod.PROCCESS_BATCH_SIZE)
