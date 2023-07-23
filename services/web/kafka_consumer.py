@@ -195,4 +195,4 @@ def read_and_delete_messages(batch_size=50):
     #producer.close()
 
 if (__name__ == "__main__"):
-        read_and_delete_messages(prod.PROCCESS_BATCH_SIZE)
+        read_and_delete_messages(int(prod.PROCCESS_BATCH_SIZE))
