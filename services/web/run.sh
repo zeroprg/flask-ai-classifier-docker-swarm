@@ -42,4 +42,4 @@ sudo ./topic_create.sh ${host_ip}
 #        --config cleanup.policy=delete
 
 echo  "Running web_ultralitics ..."
-sudo docker run --name web_ultralitics -e KAFKA_SERVER=${host_ip}:9092 -d zeroprg/flask-docker-swarm_web:latest python3 kafka_consumer.py
+sudo docker run --name web_ultralitics -e KAFKA_SERVER=${host_ip}:9092 -e PROCCESS_BATCH_SIZE=15  -d zeroprg/flask-docker-swarm_web:latest

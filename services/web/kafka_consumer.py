@@ -183,7 +183,7 @@ def read_and_delete_messages(batch_size=50):
                 print(f"Error processing images: {e}")
                 # Roll back the transaction in case of an error
                 tr.rollback()
-
+            finally: tr.close()
             # Clear the accumulated keys and values
             keys.clear()
             values.clear()
