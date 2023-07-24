@@ -17,6 +17,7 @@ class Sql:
         self.objects = self.metadata.tables['objects']
         self.statistic = self.metadata.tables['statistic']
         #self.urls = self.metadata.tables['urls']
+        self.conn = None
 
     def __init__(self, DB_USERNAME=None, DB_PASSWORD=None, DATABASE_URI=None, DB_PORT=None, DB_NAME=None):
         """Create a database connection to the PostgreSQL database specified by the credentials"""
@@ -32,7 +33,9 @@ class Sql:
         self.__core_init__()
 
     def getConn(self):
-        return self.engine.connect()
+        if(self.conn is None or self.conn.closed == True):   
+            self.conn = self.engine.connect()
+        return self.conn 
 
     def start_transaction(self):
         return self.getConn().begin()
