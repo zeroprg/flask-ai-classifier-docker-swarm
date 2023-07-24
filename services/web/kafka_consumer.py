@@ -1,4 +1,4 @@
-from confluent_kafka import Consumer#, Producer
+from pykafka import KafkaClient
 from PIL import Image
 import struct
 from io import BytesIO
@@ -18,24 +18,15 @@ bootstrap_servers = prod.KAFKA_SERVER #'172.29.208.1:9092'
 preprocessed_topic = prod.KAFKA_PREPROCESSED_TOPIC #  'preprocess'
 #postprocessed_topic = prod.KAFKA_POSTPROCESSED_TOPIC #'postprocess'
 
-# Create consumer and producer configurations
-consumer_config = {
-    'bootstrap.servers': bootstrap_servers,
-    'group.id': 'my-consumer-group',
-    'auto.offset.reset': 'earliest',
-    'enable.auto.commit': False
-}
 
-producer_config = {
-    'bootstrap.servers': bootstrap_servers
-}
 
-# Create Kafka consumer and producer
-consumer = Consumer(consumer_config)
-#producer = Producer(producer_config)
+client = KafkaClient(hosts=bootstrap_servers)
+topic = client.topics[preprocessed_topic.encode('utf-8')]
+# Specify the consumer group ID here
+consumer_group_id = 'my-consumer-group'
+consumer = topic.get_simple_consumer( consumer_group=consumer_group_id, reset_offset_on_start=True)
 
-# Subscribe to the preprocessed topic
-consumer.subscribe([preprocessed_topic])
+
 
 
 def long_to_bytes(n):
@@ -139,56 +130,49 @@ def read_and_delete_messages(batch_size=50):
     keys = []
     values = []
     while True:
-        message = consumer.poll(timeout=1.0)
 
-        if message is None:
-            continue
+        for message in consumer:
+            if message is not None:
+                partition_key = message.partition_key  # Access the partition key of the message
 
-        if message.error():
-            # Handle error
-            print(f"Error occurred: {message.error()}")
-            break
+                # Process the received message   
+                key = partition_key.decode('utf-8')
+                #print(message.timestamp())
+                # Commit the offset to mark the message as processed
+                consumer.commit_offsets()
+                print(f"Key: {key}")
+                #print(f"Message value type: {type(value)}")
+                #print(f"Message value : {value[:10]} ... {value[-10:]}")
+                # Accumulate keys and values
+                keys.append(key)
+                values.append(decode_and_decompress(message.value))
 
-        # Process the received message
-   
-        key = message.key().decode('utf-8')
-        #print(message.timestamp())
-        value = message.value()
-        # Commit the offset to mark the message as processed
-        consumer.commit(message)
-        print(f"Key: {key}")
-        #print(f"Message value type: {type(value)}")
-        #print(f"Message value : {value[:10]} ... {value[-10:]}")
-        # Accumulate keys and values
-        keys.append(key)
-        values.append(decode_and_decompress(value))
+                #print(f"~~~ Here we are ~~~ ")
+                # Process images in batches of batch_size
+                if len(keys) >= batch_size or (len(keys) > 0 and message is None):
+                    try:
+                        tr = db.start_transaction()
 
-        #print(f"~~~ Here we are ~~~ ")
-        # Process images in batches of batch_size
-        if len(keys) >= batch_size or (len(keys) > 0 and consumer.poll(0) is None):
-            try:
-                tr = db.start_transaction()
+                        # Process the images
+                        processed_images = process_images(keys, values)
 
-                # Process the images
-                processed_images = process_images(keys, values)
+                        # Publish the processed images to the postprocessed topic use it if necessary to proccess images in separate topic
+                        #publish_message_batch(keys, processed_images)
 
-                # Publish the processed images to the postprocessed topic use it if necessary to proccess images in separate topic
-                #publish_message_batch(keys, processed_images)
-
-                # Store the processed images in the database
-                store_to_db_message_batch(keys, processed_images)
-                # use for big transactions 
-               
-            except Exception as e:
-                print(f"Error processing images: {e}")
-                # Roll back the transaction in case of an error
-                tr.rollback()
-            finally: 
-                tr.close()
-                db.close_conn()
-            # Clear the accumulated keys and values
-            keys.clear()
-            values.clear()
+                        # Store the processed images in the database
+                        store_to_db_message_batch(keys, processed_images)
+                        # use for big transactions 
+                    
+                    except Exception as e:
+                        print(f"Error processing images: {e}")
+                        # Roll back the transaction in case of an error
+                        tr.rollback()
+                    finally: 
+                        tr.close()
+                        db.close_conn()
+                    # Clear the accumulated keys and values
+                    keys.clear()
+                    values.clear()
 
 
     # Close the consumer and producer after processing all messages
