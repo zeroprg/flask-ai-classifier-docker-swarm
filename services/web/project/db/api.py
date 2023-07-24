@@ -37,10 +37,9 @@ class Sql:
     def start_transaction(self):
         return self.getConn().begin()
 
-    def commit_changes(self):
+    def close_conn(self):
         """Commit the changes made to the database"""
         conn = self.getConn()
-        self.getConn().commit()
         conn.close()
 
  

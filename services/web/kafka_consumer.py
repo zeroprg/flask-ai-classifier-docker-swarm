@@ -178,12 +178,14 @@ def read_and_delete_messages(batch_size=50):
                 # Store the processed images in the database
                 store_to_db_message_batch(keys, processed_images)
                 # use for big transactions 
-                tr.commit()
+               
             except Exception as e:
                 print(f"Error processing images: {e}")
                 # Roll back the transaction in case of an error
                 tr.rollback()
-            finally: tr.close()
+            finally: 
+                tr.close()
+                db.close_conn()
             # Clear the accumulated keys and values
             keys.clear()
             values.clear()
