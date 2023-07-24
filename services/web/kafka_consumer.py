@@ -23,7 +23,7 @@ preprocessed_topic = prod.KAFKA_PREPROCESSED_TOPIC #  'preprocess'
 client = KafkaClient(hosts=bootstrap_servers)
 topic = client.topics[preprocessed_topic.encode('utf-8')]
 # Specify the consumer group ID here
-consumer_group_id = 'my-consumer-group'
+consumer_group_id = 'my-consumer-group1'
 consumer = topic.get_simple_consumer( consumer_group=consumer_group_id, reset_offset_on_start=True)
 
 
@@ -151,7 +151,8 @@ def read_and_delete_messages(batch_size=50):
                 # Process images in batches of batch_size
                 if len(keys) >= batch_size or (len(keys) > 0 and message is None):
                     try:
-                        tr = db.start_transaction()
+                       # Use the start_transaction context manager to handle transactions
+                        db.start_transaction()                        
 
                         # Process the images
                         processed_images = process_images(keys, values)
@@ -166,9 +167,9 @@ def read_and_delete_messages(batch_size=50):
                     except Exception as e:
                         print(f"Error processing images: {e}")
                         # Roll back the transaction in case of an error
-                        tr.rollback()
+                        
                     finally: 
-                        tr.close()
+                        # Close the connection when done (optional)
                         db.close_conn()
                     # Clear the accumulated keys and values
                     keys.clear()

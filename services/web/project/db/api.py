@@ -2,6 +2,7 @@ import io
 import base64
 import time
 import sqlalchemy as sql
+from contextlib import contextmanager
 from sqlalchemy import text
 from sqlalchemy import create_engine, MetaData
 
@@ -30,20 +31,34 @@ class Sql:
         """Create a database connection to the SQL database specified by the URI"""
         self.pool_size = POOL_SIZE
         self.engine = create_engine(SQLALCHEMY_DATABASE_URI, isolation_level="READ COMMITTED", pool_size=self.pool_size)
-        self.__core_init__()
+        self.conn = None  # Initialize the connection attribute to None
+        self.__core_init__()    
 
     def getConn(self):
-        if(self.conn is None or self.conn.closed == True):   
+        if self.conn is None or self.conn.closed:
             self.conn = self.engine.connect()
-        return self.conn 
+        return self.conn
 
+    @contextmanager
     def start_transaction(self):
-        return self.getConn().begin()
+        """Start a transaction and return a context manager"""
+        conn = self.getConn()
+        trans = conn.begin()  # Start a new transaction
+
+        try:
+            yield conn  # Yield the connection to the context block
+            trans.commit()  # Commit the transaction if no exception occurred
+        except:
+            trans.rollback()  # Rollback the transaction in case of an exception
+            raise
+        finally:
+            # No need to close the connection here; it will be managed by the context manager
+            pass
 
     def close_conn(self):
-        """Commit the changes made to the database"""
-        conn = self.getConn()
-        conn.close()
+        """Close the database connection"""
+        if self.conn and not self.conn.closed:
+            self.conn.close()
 
  
     def select_all_objects(self):
@@ -125,11 +140,11 @@ class Sql:
         jpeg_binary = buffer.getvalue()
         jpg_as_base64='data:image/jpeg;base64,'+ base64.b64encode(jpeg_binary).decode('utf-8') #base64.b64encode(buffer).decode('utf-8')
 
-        conn = self.getConn()
+
         try:
             values = {'hashcode': hashcode, 'currentdate': date, 'currentime': time, 'type': type, 'frame':str(jpg_as_base64), 'cam':cam}     
             query = sql.insert(self.objects)
-            ResultProxy = conn.execute(query, values)
+            ResultProxy = self.getConn().execute(query, values)
             print(" insert_frame labeled as '{0}' was {1} for cam: {2}".format(type, ResultProxy.is_insert ,cam))
         except Exception as e: print(" e: {}".format( e))
         #finally:
@@ -158,8 +173,8 @@ class Sql:
                                                               self.objects.columns.cam == cam
                                                              )
                                                 ).order_by(text("currentime desc"))
-        conn = self.getConn()
-        ResultProxy = conn.execute(query)
+        
+        ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()
         rows = [dict(r) for r in cursor]
         #conn.close()
@@ -194,8 +209,8 @@ class Sql:
                                                               
                                                          )
                                                 ).order_by(text("currentime desc")).limit(self.limit).offset(offset)
-        conn = self.getConn()                                            
-        ResultProxy = conn.execute(query)
+                                       
+        ResultProxy = self.getConn().execute(query)
         cursor = ResultProxy.fetchall()
         #conn.close()
         rows = [dict(r) for r in cursor]
@@ -210,11 +225,10 @@ class Sql:
         # predicate : '-70 minutes' , '-1 seconds ', '-2 hour'
         #cur.execute("DELETE from objects filter currentime < strftime('"+self.P+"','now'," + predicate+ ")")
 
-        millis_back = int(round(time.time() * 1000)) - hours*60*60*1000
-        conn = self.getConn()
+        millis_back = int(round(time.time() * 1000)) - hours*60*60*1000        
         try:
             query = sql.delete(self.objects).where( self.objects.currentime < millis_back )
-            ResultProxy = conn.execute(query)
+            ResultProxy = self.getConn().execute(query)
             print(" delete_frames_later_then was {0} with params: {1}".format(ResultProxy.is_insert ,hours))
         except Exception as e: print(" e: {}".format( e))
         #finally:
