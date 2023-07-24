@@ -9,12 +9,10 @@ label_tuple = ('person', 'dog', 'cow')
 # Model
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s') 
 
-try:
-    device = torch.device("cuda")
-    print("CUDA is available.")
-except Exception:
-    device = torch.device("cpu")
-    print("CUDA is not available.")
+    
+# Set the device and torch data type
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"CUDA is available :{torch.cuda.is_available()} .")
 
 
 class_labels = model.names
