@@ -1,22 +1,3 @@
-###########
-# BUILDER #
-###########
-
-# Base Image
-FROM python:3.10-slim as builder
-# Set working directory
-WORKDIR /opt
-
-# Define the argument with a default value
-#ARG WEB=False
-# Set the environment variable for web
-#ENV WEB=$WEB
-
-# Install wget
-RUN apt-get update && apt-get install -y wget
-# Download yolov5s.pt
-RUN wget  --show-progress -P .  https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt
-
 
 #########
 # FINAL #
@@ -30,16 +11,30 @@ ENV HOME=/home/app
 # Set working directory
 WORKDIR $HOME
 
-# Copy the application code
-COPY . . 
-# Install requirements and download mode
-RUN pip install -r ./requirements.txt
-
 # Create directory for the app user
 RUN mkdir -p $HOME
 
-# Copy models
-COPY --from=builder opt/yolov5s.pt  ./yolov5s.pt
+# Define the argument with a default value
+#ARG WEB=False
+# Set the environment variable for web
+#ENV WEB=$WEB
+
+# Copy the application code
+COPY . . 
+
+# Install wget
+RUN apt-get update && apt-get install -y wget
+# Download yolov5s.pt
+RUN wget  --show-progress -P .  https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt
+
+
+
+
+
+# Install requirements and download mode
+RUN pip install -r ./requirements.txt
+
+
 
 # Run the application if WEB is True, run Flask app; else, run video_streams.py
 #CMD if [ "$WEB" = "True" ]; then \
