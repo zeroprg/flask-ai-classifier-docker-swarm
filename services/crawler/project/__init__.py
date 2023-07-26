@@ -106,7 +106,6 @@ def ping_video_url(url):
             url_to_image(url)
             return True
 
-        flag, _ = vs.read()
     except Exception as e:        
         logging.debug("Exception in ping url: {}".format(e))        
     return flag
