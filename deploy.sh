@@ -4,7 +4,7 @@
  
  #sudo docker network rm flask
  # used to delete all images  --> sudo docker image prune -a
- sudo docker rmi $(sudo docker images -a --filter=dangling=true -q)
+sudo docker rmi $(sudo docker images -a --filter=dangling=true -q)
  
 cd services/cam && sh build.sh
 cd - 
