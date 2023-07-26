@@ -33,10 +33,12 @@ def search_and_traverse_urls(file_name):
         traverse_internal_urls(website, visited_urls, regex_dict)
 
 
+
 def traverse_internal_urls(url, visited_urls, regex_dict):
     visited = set(visited_urls)
     stack = deque([(url, visited)])
     domain = None
+    params = {"viewmode": "livevideo"}  # Replace with your desired parameters
     while stack:
         url, visited = stack.pop()
 
@@ -51,7 +53,7 @@ def traverse_internal_urls(url, visited_urls, regex_dict):
             logging.info("domain: " + domain)
 
         print("url: {}".format(url))
-        res = geSession().get(url)
+        res = geSession().get(url, params=params)
 
         soup = BeautifulSoup(res.text, "html.parser")
         internal_urls = [domain + a["href"] for a in soup.select("* a[href^='/']")]

@@ -41,8 +41,8 @@ allinurl:control/multiview
 intitle:”supervisioncam protocol”
 allinurl:"view/index" filetype:shtml
 
-== Axis ==
 
+== Axis ==
 inurl:"view/indexFrame.shtml"
 inurl:"view/index.shtml"
 intitle:"Live View / - AXIS"
@@ -68,12 +68,15 @@ intitle:"my webcamXP server!"
 == MOBOTIX ==
 
 inurl:/control/userimage.html
-
 == Panasonic ==
 
 inurl:/ViewerFrame?Mode=Motion
 
 == FlexWatch ==
+
+inurl:/video.mjpg
+inurl:/video.mjpeg
+inurl:/www.opentopia.com/webcam/
 
 inurl:toolam.html
 inurl:viewash.html

@@ -7,7 +7,7 @@ from sqlalchemy import text
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy import Table
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 class Sql:
