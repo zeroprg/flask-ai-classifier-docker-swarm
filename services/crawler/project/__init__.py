@@ -125,12 +125,12 @@ def populate_lat_long(params):
         
         # Different https://get.geojs.io  API
         print("Geolocation data: {}".format(data))
-        params['lat'] = data['latitude']
-        params['lng'] = data['longitude']
+        params['lat'] = data.get('latitude', None)
+        params['lng'] = data.get('longitude', None)
         params['city'] = data.get('city', None)
-        #params['postalcode'] = data['postalCode']
-        params['region']  = data.get('region', None)
-        params['country'] =  data['country_code']    
+        params['postalcode'] = data.get('postalCode', None)
+        params['region']  = data.get('region', None)   
+        params['country'] = data.get('country_code', 'Unknown')
 
 ip_geolocation_key = None
 def get_geolocation_by_ip(ip): 
