@@ -6,8 +6,8 @@
  # used to delete all images  --> sudo docker image prune -a
  sudo docker rmi $(sudo docker images -a --filter=dangling=true -q)
  
-# cd services/cam && sh build.sh
-# cd - 
+cd services/cam && sh build.sh
+cd - 
 sudo docker pull zeroprg/flask-docker-swarm_cam:latest
 
  #cd services/web && sh build.sh 
