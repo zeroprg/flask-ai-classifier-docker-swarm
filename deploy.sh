@@ -4,11 +4,11 @@
  
  #sudo docker network rm flask
  # used to delete all images  --> sudo docker image prune -a
-sudo docker rmi $(sudo docker images -a --filter=dangling=true -q)
+docker rmi $(sudo docker images -a --filter=dangling=true -q)
  
 #cd services/cam && sh build.sh
 #cd - 
-sudo docker pull zeroprg/flask-docker-swarm_cam:latest
+docker pull zeroprg/flask-docker-swarm_cam:latest
 
  #cd services/web && sh build.sh 
  #cd - 
@@ -16,7 +16,7 @@ sudo docker pull zeroprg/flask-docker-swarm_cam:latest
 # always build ui on loptop
  #cd services/ui  && sh build.sh 
  #cd -
- sudo docker pull zeroprg/flask-docker-swarm_ui:latest
+ docker pull zeroprg/flask-docker-swarm_ui:latest
 
  #cd services/crawler  && sh build.sh && 
  #cd -

@@ -4,7 +4,7 @@ services:
 
   cam_stream:
     image: zeroprg/flask-docker-swarm_cam:latest 
-    command: python video_streams.py   
+#    command: python video_streams.py   
     deploy:
       replicas: 2
 #      max_replicas_per_node: 2 # doesn't work

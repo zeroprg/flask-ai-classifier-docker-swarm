@@ -1,4 +1,5 @@
-FROM arm32v7/python:3.11-slim-bookworm
+# Base Image
+FROM zeroprg/flask-docker-swarm_cv2:latest
 
 
 # Install curl
