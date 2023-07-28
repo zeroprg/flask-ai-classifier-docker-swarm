@@ -202,5 +202,10 @@ create or replace view obj_stat AS
 
 
 COMMIT;
+delete from statistic;
+delete from objects;
+select count(*) from objects;
 SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
 SELECT count(*) FROM pg_stat_activity;
+select count(*) from objects WHERE currentime < (EXTRACT(EPOCH FROM NOW()) * 1000) - (14 * 24 * 60 * 60 * 1000);
+delete  from objects WHERE currentime < (EXTRACT(EPOCH FROM NOW()) * 1000) - (14 * 24 * 60 * 60 * 1000);
