@@ -41,9 +41,18 @@ sudo ./topic_create.sh ${host_ip}
 #       --create --topic preprocessed --partitions 1 --replication-factor 1 \
 #        --config cleanup.policy=delete
 
-echo  "Running web_ultralitics ..."
 #!/bin/bash
+# Check if kafka/zookeeper IP is provided
+if [ -z "$1" ]
+  then
+    echo "Error: No zookeeper IP provided. Exiting."
+    exit 1
+fi
 
+host_ip="$1"
+
+
+echo  "Running web_ultralitics ..."
 # Detect the system architecture
 ARCH=$(uname -m)
 
