@@ -1,6 +1,4 @@
-ARG PYTHON_VERSION_SHORT=3.7
-
-FROM arm32v7/python:${PYTHON_VERSION_SHORT}-buster
+FROM arm32v7/python:3.12-rc-bookworm
 
 
 # Install curl
