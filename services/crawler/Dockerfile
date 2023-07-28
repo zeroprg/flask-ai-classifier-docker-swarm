@@ -1,4 +1,4 @@
-FROM arm32v7/python:3.11-slim-bookworm
+FROM python:3.10-slim
 
 
 # Install curl
