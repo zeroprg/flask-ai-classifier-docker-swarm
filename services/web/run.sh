@@ -35,7 +35,7 @@ sleep 15
 
 echo "Running topic 'preprocessed' creation ..."
 
-sudo ./topic_create.sh ${host_ip}
+./topic_create.sh ${host_ip}
 
 #sudo docker exec -it kafka kafka-topics.sh --zookeeper  ${host_ip}:2181 \
 #       --create --topic preprocessed --partitions 1 --replication-factor 1 \
