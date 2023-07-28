@@ -60,7 +60,7 @@ ARCH=$(uname -m)
 if [ "$ARCH" = "x86_64" ]; then
     # AMD64 architecture
     sudo docker run --name web_ultralitics -e KAFKA_SERVER=${host_ip}:9092 -e PROCCESS_BATCH_SIZE=170 --gpus all -d zeroprg/flask-docker-swarm_web:amd64
-elif [ "$ARCH" = "arm" ]; then
+elif [ "$ARCH" = "aarch64" ]; then
     # ARM architecture
     sudo docker run --name web_ultralitics -e KAFKA_SERVER=${host_ip}:9092 -e PROCCESS_BATCH_SIZE=15 -d zeroprg/flask-docker-swarm_web:latest
 else
