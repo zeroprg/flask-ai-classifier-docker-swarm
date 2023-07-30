@@ -27,5 +27,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 
 # run server and bounded programs
-CMD ["run.sh"]
- 
+CMD ["python3", "crawler.py"]
