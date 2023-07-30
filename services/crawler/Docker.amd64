@@ -1,6 +1,5 @@
 # Base Image
-FROM zeroprg/flask-docker-swarm_cv2:latest
-
+FROM python:3.10-slim
 
 # Install curl
 RUN apt-get update && apt-get install -y curl
