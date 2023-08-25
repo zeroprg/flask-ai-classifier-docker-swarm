@@ -6,13 +6,13 @@ services:
     image: zeroprg/flask-docker-swarm_cam:latest 
 #    command: python video_streams.py   
     deploy:
-      replicas: 2
+      replicas: 3
 #      max_replicas_per_node: 2 # doesn't work
       restart_policy:
         condition: on-failure
-#      placement:
-#        constraints:
-#          - node.role==worker
+      placement:
+        constraints:
+          - node.role==worker
     environment:
       - CLASSIFIER_SERVER=http://192.168.0.100:4000/classify
       - CONFIDENCE=0.419967
@@ -33,7 +33,7 @@ services:
     image: zeroprg/flask-docker-swarm_cam:latest
     command: gunicorn --env TMPDIR=./ -w 4 -b 0.0.0.0:3020 manage:app
     deploy:
-      replicas: 2
+      replicas: 1
 #      max_replicas_per_node: 2 # doesn't work
       restart_policy:
         condition: on-failure
