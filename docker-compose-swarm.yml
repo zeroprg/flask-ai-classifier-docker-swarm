@@ -52,15 +52,15 @@ services:
     ports:
       - 3020:3020
 
-#  crawler:
-#    image: zeroprg/flask-docker-swarm_crawler:latest
-#    deploy:
-#      replicas: 1
-#      restart_policy:
-#        condition: on-failure
-#      placement:
-#        constraints:
-#          - node.role==worker
+  crawler:
+    image: zeroprg/flask-docker-swarm_crawler:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role==worker
 
   #web:
   #  image: zeroprg/flask-docker-swarm_web:latest

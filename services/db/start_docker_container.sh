@@ -1,1 +1,1 @@
- sudo docker run --name postgres_arm64 -e POSTGRES_USER=odroid -e POSTGRES_DB streamer -e POSTGRES_PASSWORD=passw0rd -d arm64v8/postgres
+docker run --name postgres_arm64 -e POSTGRES_USER=odroid -e POSTGRES_DB=streamer -e POSTGRES_PASSWORD=passw0rd -d -p 5432:5432 -v postgres_volume:/var/lib/docker/volumes/postgres_volume/  arm64v8/postgres
