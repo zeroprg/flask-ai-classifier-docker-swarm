@@ -6,7 +6,7 @@ services:
     image: zeroprg/flask-docker-swarm_cam:latest 
 #    command: python video_streams.py   
     deploy:
-      replicas: 3
+      replicas: 5
 #      max_replicas_per_node: 2 # doesn't work
       restart_policy:
         condition: on-failure
@@ -37,9 +37,9 @@ services:
 #      max_replicas_per_node: 2 # doesn't work
       restart_policy:
         condition: on-failure
-      placement:
-        constraints:
-          - node.role==worker
+#      placement:
+#        constraints:
+#          - node.role==worker
     environment:
       - FLASK_ENV=production
       - APP_SETTINGS=/home/app/config.txt
