@@ -1,54 +1,33 @@
-import time
 import os
-import cv2
+import time
 import json
 import logging
-
-from project.config import  ProductionConfig as prod
-from project import db, populate_lat_long, comp_node, ping_video_url, videos
-
-
 from flask import Blueprint, Response, request, send_from_directory
 from flask_cors import cross_origin, CORS
 
+from project import db, populate_lat_long, comp_node, ping_video_url
+from project.config import ProductionConfig as Prod
+
 logging.basicConfig(level=logging.INFO)
 
-
 ENCODING = "utf-8"
-
-#  --------------------  constanst and definitions -------------------------
 IMG_PAGINATOR = 40
-
-port =  prod.PORT
-IP_ADDRESS = prod.DB_IP_ADDRESS
-
+PORT = Prod.PORT
+IP_ADDRESS = Prod.DB_IP_ADDRESS
 
 main_blueprint = Blueprint("main", __name__)
-
-
-def change_res(camera, width, height):
-    camera.set(3, width)
-    camera.set(4, height)
-
-
-
-###################### Flask API #########################
-
-#main_blueprint.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy   dog'
-#main_blueprint.config['CORS_HEADERS'] = 'Content-Type'
-
 cors = CORS(main_blueprint)
 
 
-
-# api = Api(main_blueprint)
-# api.decorators=[cors.crossdomain(origin='*')]
-
 @main_blueprint.route("/ping", methods=["GET"])
-def ping_pong():    
+def ping_pong():
     logging.info('Hitting the "/ping" route')
-    return Response(json.dumps({"status": "success", "message": "ping-pong!", "container_id": comp_node()},
-                               default=str, indent = 4), mimetype='text/plain', status=200)
+    return Response(json.dumps({
+        "status": "success",
+        "message": "ping-pong!",
+        "container_id": comp_node()
+    }, default=str, indent=4), mimetype='text/plain', status=200)
+
 
 @main_blueprint.route('/static/<path:filename>')
 @cross_origin(origin='*')
@@ -56,24 +35,34 @@ def serve_static(filename):
     root_dir = os.path.dirname(os.getcwd())
     return send_from_directory(os.path.join(root_dir, 'static', 'js'), filename)
 
+
 @main_blueprint.route('/health')
 def health():
-    
     with db.engine.connect() as conn:
-        objects_rows = conn.execute("SELECT count(*) FROM OBJECTS" ).fetchall()
-        urls_rows = conn.execute("SELECT count(*) FROM URLS" ).fetchall()
-        print("Total objects : {}".format(objects_rows[0][0]))
-        last_hour = conn.execute("SELECT 'type', SUM(lasthour) FROM latesthour GROUP BY type" ).fetchall()
-        print("Total {} for last hour : {}".format(last_hour[0][0], last_hour[0][1]))         
-        time_in200_secs_back =  int(time.time() - 200 )* 1000;
-        processes = conn.execute('SELECT count(os) FROM URLS WHERE os is not NULL and last_time_updated > {}'.format(time_in200_secs_back)).fetchall()
-        print("Total processes: {}".format(processes))
-        nodes = conn.execute('SELECT count(os) from (SELECT distinct os FROM URLS WHERE os is not NULL and last_time_updated > {}) as dist_os'.format(time_in200_secs_back)).fetchall()
-        print("Total nodes involved in processesing: {}".format(processes))
-        print("Database connection health was fine !!!") 
-    ret = {'os': comp_node(), "objects": objects_rows[0][0], "cams": urls_rows[0][0], "last_hour_persons": last_hour[0][1], "nodes":nodes[0][0], "videostreams":processes[0][0]}
-    logging.info(ret)
-    return Response(json.dumps(ret,default=str, indent = 4), mimetype='text/plain', status=200)
+        objects_count = conn.execute("SELECT count(*) FROM OBJECTS").scalar()
+        urls_count = conn.execute("SELECT count(*) FROM URLS").scalar()
+        last_hour_data = conn.execute("SELECT 'type', SUM(lasthour) FROM latesthour GROUP BY type").fetchone()
+
+        time_200_secs_back = int(time.time() - 200) * 1000
+        processes_count = conn.execute('SELECT count(os) FROM URLS WHERE os is not NULL and last_time_updated > ?', time_200_secs_back).scalar()
+        nodes_count = conn.execute('SELECT count(os) from (SELECT distinct os FROM URLS WHERE os is not NULL and last_time_updated > ?) as dist_os', time_200_secs_back).scalar()
+
+        logging.info({
+            'os': comp_node(),
+            "objects": objects_count,
+            "cams": urls_count,
+            "last_hour_persons": last_hour_data[1],
+            "nodes": nodes_count,
+            "videostreams": processes_count
+        })
+        return Response(json.dumps({
+            'os': comp_node(),
+            "objects": objects_count,
+            "cams": urls_count,
+            "last_hour_persons": last_hour_data[1],
+            "nodes": nodes_count,
+            "videostreams": processes_count
+        }, default=str, indent=4), mimetype='text/plain', status=200)
 
 
 
@@ -217,8 +206,6 @@ def urls():
                     return Response('{"message":"URL deleted successfully"}', mimetype='text/plain')
                 except:
                     return None, 500
-
-
 
 
 @main_blueprint.route('/params_feed')
