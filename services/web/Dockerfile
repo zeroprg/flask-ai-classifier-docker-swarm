@@ -19,7 +19,7 @@ COPY . .
 RUN apt-get update && apt-get install -y wget
 # Download yolov5s.pt
 RUN wget  --show-progress -P .  https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt
-
+RUN apt-get install -y libpq-dev
 # Install requirements and download mode
 RUN pip install -r ./requirements.txt
 
