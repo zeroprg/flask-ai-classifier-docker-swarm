@@ -8,7 +8,6 @@ case "$platform" in
         tag_suffix="amd64"
         ;;
     armv7l)
-        docker_platform="linux/arm/v7"
         tag_suffix="arm32v7"
         ;;
     *)
@@ -24,7 +23,11 @@ if ! docker info | grep -q Username; then
 fi
 
 # Build Docker image
-docker build --platform "${docker_platform}" -t "zeroprg/ultralitics:${tag_suffix}" .
+if [ "$platform" = "x86_64" ]; then
+    docker build --platform "${docker_platform}" -t "zeroprg/ultralitics:${tag_suffix}" .
+else
+    docker build -t "zeroprg/ultralitics:${tag_suffix}" .
+fi
 
 # Push the image to DockerHub
 docker push "zeroprg/ultralitics:${tag_suffix}"
