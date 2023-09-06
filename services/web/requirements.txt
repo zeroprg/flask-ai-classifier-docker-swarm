@@ -4,3 +4,5 @@ psutil==5.9.5
 yml
 zipp
 pykafka
+requests
+spacy
