@@ -1,4 +1,4 @@
-FROM python:3.9-slim-buster
+FROM zeroprg/flask-docker-swarm_cv2:latest
 
 RUN apt-get update && apt-get install -y \
     git \
@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y \
     gfortran \
     python3-scipy \
     python3-matplotlib \
-    python3-pil \
     python3-yaml \
     libjpeg62-turbo-dev \
     zlib1g-dev \
