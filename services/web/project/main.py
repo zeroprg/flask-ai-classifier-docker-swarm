@@ -4,7 +4,6 @@ import zlib
 import logging
 import json
 import numpy as np
-import cv2
 import base64
 from PIL import Image
 
@@ -48,9 +47,13 @@ def stringToImage(base64_string):
     imgdata = base64.b64decode(base64_string)
     return Image.open(io.BytesIO(imgdata))
 
+#def from_base64(base64_data):
+#    nparr = np.fromstring(base64.b64decode(base64_data), np.uint8)
+#    return cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
 def from_base64(base64_data):
-    nparr = np.fromstring(base64.b64decode(base64_data), np.uint8)
-    return cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    image_data = io.BytesIO(base64.b64decode(base64_data))
+    return Image.open(image_data)
 
 @main_blueprint.route('/classify', methods=['POST'])
 @cross_origin(origin='*')
