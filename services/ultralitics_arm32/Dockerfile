@@ -17,10 +17,10 @@ RUN apt-get update && apt-get install -y \
     libwebp-dev \
     libopenjp2-7-dev \
     libimagequant-dev \
-    libatlas-base-dev \
-
+    libatlas-base-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
 
 COPY requirements.txt .
 
