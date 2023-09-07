@@ -1,3 +1,4 @@
+ultralytics
 SQLAlchemy==1.4.6
 psycopg2-binary==2.9.6
 psutil==5.9.5
