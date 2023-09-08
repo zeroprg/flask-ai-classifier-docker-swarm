@@ -39,6 +39,14 @@ RUN pip install --upgrade pip setuptools wheel
 
 RUN apt-get update && apt-get install -y python3-pip python3-setuptools && \
     pip3 install meson
+# Install pybind11 and set the CMAKE_PREFIX_PATH
+RUN pip install pybind11 && \
+    export PY_VER=$(python3 -c "import sys; print(f'python{sys.version_info.major}.{sys.version_info.minor}')") && \
+    export CMAKE_PATH="/usr/local/lib/$PY_VER/site-packages/pybind11/share/cmake/pybind11" && \
+    echo "export CMAKE_PREFIX_PATH=$CMAKE_PATH:\$CMAKE_PREFIX_PATH" >> ~/.bashrc
+
+# Make sure ENV retains this change across layers
+ENV CMAKE_PREFIX_PATH /usr/local/lib/python3.9/site-packages/pybind11/share/cmake/pybind11:$CMAKE_PREFIX_PATH
 
 # Clone and build contourpy
 RUN git clone https://github.com/contourpy/contourpy.git
