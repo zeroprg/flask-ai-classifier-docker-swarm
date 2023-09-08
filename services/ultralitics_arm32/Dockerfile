@@ -38,7 +38,7 @@ RUN git clone https://github.com/ultralytics/yolov5.git /yolov5
 RUN pip install --upgrade pip setuptools wheel
 
 RUN apt-get update && apt-get install -y python3-pip python3-setuptools && \
-    pip install meson mesonpy
+    pip install meson
 
 
 # Install pybind11 and set the CMAKE_PREFIX_PATH
