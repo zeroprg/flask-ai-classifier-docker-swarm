@@ -29,6 +29,8 @@ COPY requirements.txt .
 
 RUN pip install --upgrade pip 
 RUN pip install -r requirements.txt
+RUN pip install --no-deps ultralytics
+
 
 RUN python3 -m pip install https://github.com/maxisoft/pytorch-arm/releases/download/v1.0.0/torch-1.13.0a0+git7c98e70-cp39-cp39-linux_armv7l.whl # change the url if needed
 
