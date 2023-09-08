@@ -40,10 +40,11 @@ RUN pip install --upgrade pip setuptools wheel
 # Clone and build contourpy
 RUN git clone https://github.com/contourpy/contourpy.git
 WORKDIR /contourpy
-RUN pip install meson ninja pybind11
-RUN python3 setup.py bdist_wheel
-RUN pip install dist/*.whl
+RUN meson setup --prefix=/usr builddir
+RUN ninja -C builddir
+RUN ninja -C builddir install
 WORKDIR /
+
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 # Install PyTorch
