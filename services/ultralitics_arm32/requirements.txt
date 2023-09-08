@@ -1,2 +1,5 @@
+opencv-python<=4.8.0
 pandas==2.0.2
 tqdm
+requests
+ultralytics
