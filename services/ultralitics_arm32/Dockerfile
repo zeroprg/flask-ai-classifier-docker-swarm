@@ -1,5 +1,7 @@
+# Start with the base image
 FROM zeroprg/flask-docker-swarm_cv2:latest
 
+# Update and install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -25,12 +27,20 @@ RUN apt-get update && apt-get install -y \
 
 # Clone the YOLOv5 repository
 RUN git clone https://github.com/ultralytics/yolov5.git /yolov5
+
+# Install Python dependencies and upgrades
+RUN pip install --upgrade pip setuptools wheel
+
+# Clone and build contourpy
+RUN git clone https://github.com/contourpy/contourpy.git
+WORKDIR /contourpy
+RUN pip install meson ninja pybind11
+RUN python3 setup.py bdist_wheel
+RUN pip install dist/*.whl
+WORKDIR /
 COPY requirements.txt .
-
-
-RUN pip install --upgrade pip 
 RUN pip install -r requirements.txt
-
-RUN python3 -m pip install https://github.com/maxisoft/pytorch-arm/releases/download/v1.0.0/torch-1.13.0a0+git7c98e70-cp39-cp39-linux_armv7l.whl # change the url if needed
+# Install PyTorch
+RUN python3 -m pip install https://github.com/maxisoft/pytorch-arm/releases/download/v1.0.0/torch-1.13.0a0+git7c98e70-cp39-cp39-linux_armv7l.whl
 
 CMD ["bash"]
