@@ -7,7 +7,7 @@ import pandas as pd
 label_tuple = ('person', 'dog', 'cow')
 
 # Model
-model = torch.hub.load('ultralytics/yolov5', 'yolov5s') 
+model = torch.hub.load('ultralytics/yolov5', 'yolov5s', source='local') 
 
     
 # Set the device and torch data type
