@@ -47,14 +47,12 @@ RUN pip install pybind11 && \
 
 # Make sure ENV retains this change across layers
 ENV CMAKE_PREFIX_PATH /usr/local/lib/python3.9/site-packages/pybind11/share/cmake/pybind11:$CMAKE_PREFIX_PATH
-
 # Clone and build contourpy
-RUN git clone https://github.com/contourpy/contourpy.git
-WORKDIR /contourpy
-RUN meson setup --prefix=/usr builddir
-RUN ninja -C builddir
-RUN ninja -C builddir install
-WORKDIR /
+RUN git clone https://github.com/contourpy/contourpy.git /contourpy && \
+    cd /contourpy && \
+    meson setup builddir --prefix=/contourpy/install && \
+    meson compile -C builddir && \
+    meson install -C builddir
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
