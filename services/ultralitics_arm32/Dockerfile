@@ -38,7 +38,9 @@ RUN git clone https://github.com/ultralytics/yolov5.git /yolov5
 RUN pip install --upgrade pip setuptools wheel
 
 RUN apt-get update && apt-get install -y python3-pip python3-setuptools && \
-    pip3 install meson
+    pip install meson mesonpy
+
+
 # Install pybind11 and set the CMAKE_PREFIX_PATH
 RUN pip install pybind11 && \
     export PY_VER=$(python3 -c "import sys; print(f'python{sys.version_info.major}.{sys.version_info.minor}')") && \
