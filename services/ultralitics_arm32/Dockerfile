@@ -50,11 +50,11 @@ ENV CMAKE_PREFIX_PATH /usr/local/lib/python3.9/site-packages/pybind11/share/cmak
 # Clone and build contourpy
 
 RUN git clone https://github.com/contourpy/contourpy.git /contourpy && \
-    meson setup builddir --prefix=/contourpy/install -Dpython=/usr/local/bin/python3 && \
     cd /contourpy && \
-    meson setup builddir --prefix=/contourpy/install && \
+    meson setup builddir --prefix=/contourpy/install -Dpython=/usr/local/bin/python3 && \
     meson compile -C builddir && \
     meson install -C builddir
+
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
