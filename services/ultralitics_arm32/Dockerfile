@@ -37,6 +37,9 @@ RUN git clone https://github.com/ultralytics/yolov5.git /yolov5
 # Install Python dependencies and upgrades
 RUN pip install --upgrade pip setuptools wheel
 
+RUN apt-get update && apt-get install -y python3-pip python3-setuptools && \
+    pip3 install meson
+
 # Clone and build contourpy
 RUN git clone https://github.com/contourpy/contourpy.git
 WORKDIR /contourpy
