@@ -4,8 +4,9 @@ FROM zeroprg/flask-docker-swarm_cv2:latest
 # Update and install system dependencies
 RUN apt-get update && \
     apt-get purge -y cmake && \
-    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null && \
-    apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main' && \
+    wget https://apt.kitware.com/keys/kitware-archive-latest.asc && \
+    apt-key add kitware-archive-latest.asc && \
+    echo 'deb https://apt.kitware.com/ubuntu/ bionic main' >> /etc/apt/sources.list && \
     apt-get update && \
     apt-get install -y cmake \
     git \
