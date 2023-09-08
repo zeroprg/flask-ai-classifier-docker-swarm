@@ -23,14 +23,13 @@ RUN apt-get update && apt-get install -y \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-
+# Clone the YOLOv5 repository
+RUN git clone https://github.com/ultralytics/yolov5.git /yolov5
 COPY requirements.txt .
 
 
 RUN pip install --upgrade pip 
 RUN pip install -r requirements.txt
-RUN pip install --no-deps ultralytics
-
 
 RUN python3 -m pip install https://github.com/maxisoft/pytorch-arm/releases/download/v1.0.0/torch-1.13.0a0+git7c98e70-cp39-cp39-linux_armv7l.whl # change the url if needed
 
