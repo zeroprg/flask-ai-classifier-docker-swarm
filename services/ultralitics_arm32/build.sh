@@ -24,7 +24,8 @@ fi
 
 # Build Docker image
 if [ "$platform" = "x86_64" ]; then
-    docker build --platform "${docker_platform}" -t "zeroprg/ultralitics:${tag_suffix}" .
+    docker build --platform linux/arm/v7 -t zeroprg/ultralitics:arm32v7 .
+    docker build --push -t zeroprg/ultralitics:amd64 -f Docker.amd64 .
 else
     docker build -t "zeroprg/ultralitics:${tag_suffix}" .
 fi
