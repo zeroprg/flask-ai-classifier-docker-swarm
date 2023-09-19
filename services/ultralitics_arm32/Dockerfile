@@ -57,10 +57,11 @@ RUN git clone https://github.com/contourpy/contourpy.git /contourpy && \
     meson compile -C builddir && \
     meson install -C builddir
 
+# Install PyTorch
+RUN python3 -m pip install https://github.com/maxisoft/pytorch-arm/releases/download/v1.0.0/torch-1.13.0a0+git7c98e70-cp39-cp39-linux_armv7l.whl
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-# Install PyTorch
-RUN python3 -m pip install https://github.com/maxisoft/pytorch-arm/releases/download/v1.0.0/torch-1.13.0a0+git7c98e70-cp39-cp39-linux_armv7l.whl
+RUN pip install --no-dependencies ultralytics 
 
 CMD ["bash"]
