@@ -1,67 +1,47 @@
-# Start with the base image
-FROM zeroprg/flask-docker-swarm_cv2:latest
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+# Builds ultralytics/ultralytics:latest-arm32v7 image on DockerHub https://hub.docker.com/r/ultralytics/ultralytics
+# Image is arm32v7-compatible for Raspberry Pi and other 32-bit ARM architectures
 
-# Update and install system dependencies
-RUN apt-get update && \
-    apt-get purge -y cmake && \
-    wget https://apt.kitware.com/keys/kitware-archive-latest.asc && \
-    apt-key add kitware-archive-latest.asc && \
-    echo 'deb https://apt.kitware.com/ubuntu/ bionic main' >> /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -y cmake \
-    git \
-    curl \
-    libopenblas-dev \
-    ninja-build \
-    gfortran \
-    python3-scipy \
-    python3-matplotlib \
-    python3-yaml \
-    libjpeg62-turbo-dev \
-    zlib1g-dev \
-    libtiff-dev \
-    libfreetype6 \
-    libfreetype6-dev \
-    libwebp-dev \
-    libopenjp2-7-dev \
-    libimagequant-dev \
-    libatlas-base-dev \
-    build-essential \
-    cmake  && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Start FROM Ubuntu image https://hub.docker.com/_/ubuntu
+FROM arm32v7/ubuntu:22.04
 
-# Clone the YOLOv5 repository
-RUN git clone https://github.com/ultralytics/yolov5.git /yolov5
+# Downloads to user config dir
+ADD https://ultralytics.com/assets/Arial.ttf https://ultralytics.com/assets/Arial.Unicode.ttf /root/.config/Ultralytics/
 
-# Install Python dependencies and upgrades
-RUN pip install --upgrade pip setuptools wheel
+# Install linux packages
+# g++ required to build 'tflite_support' and 'lap' packages, libusb-1.0-0 required for 'tflite_support' package
+RUN apt update \
+    && apt install --no-install-recommends -y python3-pip git zip curl htop gcc libgl1-mesa-glx libglib2.0-0 libpython3-dev gnupg g++ libusb-1.0-0
+# RUN alias python=python3
 
-RUN apt-get update && apt-get install -y python3-pip python3-setuptools && \
-    pip install meson-python
+# Create working directory
+WORKDIR /usr/src/ultralytics
+
+# Copy contents
+# COPY . /usr/src/ultralytics  # git permission issues inside container
+RUN git clone https://github.com/ultralytics/ultralytics -b main /usr/src/ultralytics
+ADD https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.pt /usr/src/ultralytics/
+
+# Install pip packages
+# Install thop and other required packages
+#used only for FLOP calculations
+#RUN python3 -m pip install --upgrade pip wheel thop
 
 
-# Install pybind11 and set the CMAKE_PREFIX_PATH
-RUN pip install pybind11 && \
-    export PY_VER=$(python3 -c "import sys; print(f'python{sys.version_info.major}.{sys.version_info.minor}')") && \
-    export CMAKE_PATH="/usr/local/lib/$PY_VER/site-packages/pybind11/share/cmake/pybind11" && \
-    echo "export CMAKE_PREFIX_PATH=$CMAKE_PATH:\$CMAKE_PREFIX_PATH" >> ~/.bashrc
+# Creates a symbolic link to make 'python' point to 'python3'
+RUN ln -sf /usr/bin/python3 /usr/bin/python
 
-# Make sure ENV retains this change across layers
-ENV CMAKE_PREFIX_PATH /usr/local/lib/python3.9/site-packages/pybind11/share/cmake/pybind11:$CMAKE_PREFIX_PATH
-# Clone and build contourpy
 
-RUN git clone https://github.com/contourpy/contourpy.git /contourpy && \
-    cd /contourpy && \
-    meson setup builddir --prefix=/contourpy/install && \
-    meson compile -C builddir && \
-    meson install -C builddir
+# Usage Examples -------------------------------------------------------------------------------------------------------
 
-# Install PyTorch
-RUN python3 -m pip install https://github.com/maxisoft/pytorch-arm/releases/download/v1.0.0/torch-1.13.0a0+git7c98e70-cp39-cp39-linux_armv7l.whl
+# Build and Push
+# t=ultralytics/ultralytics:latest-arm32v7 && sudo docker build --platform linux/arm/v7 -f docker/Dockerfile-arm32v7 -t $t . && sudo docker push $t
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-RUN pip install --no-dependencies ultralytics 
+# Run
+# t=ultralytics/ultralytics:latest-arm32v7 && sudo docker run -it --ipc=host $t
 
-CMD ["bash"]
+# Pull and Run
+# t=ultralytics/ultralytics:latest-arm32v7 && sudo docker pull $t && sudo docker run -it --ipc=host $t
+
+# Pull and Run with local volume mounted
+# t=ultralytics/ultralytics:latest-arm32v7 && sudo docker pull $t && sudo docker run -it --ipc=host -v "$(pwd)"/datasets:/usr/src/datasets $t
