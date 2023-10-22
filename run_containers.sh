@@ -1,7 +1,9 @@
 #!/bin/bash
 UI_MACHINE_IP="odroid@odr4" # Replace with your details
+STREAM_MACHINE_IP="opi2"
+CRAWLER_MACHINE_IP = "odroid@tinker1"
 # cam_stream.sh
-ssh odroid@192.168.0.100 <<EOF
+ssh -tt $STREAM_MACHINE_IP <<EOF
     # Pull the necessary Docker image
     docker pull zeroprg/flask-docker-swarm_cam:latest
     
@@ -24,7 +26,7 @@ ssh odroid@192.168.0.100 <<EOF
     zeroprg/flask-docker-swarm_cam:latest
 EOF
 
-ssh $UI_MACHINE_IP <<EOF
+ssh -tt $UI_MACHINE_IP <<EOF
     # Pull the necessary Docker image
     docker pull zeroprg/flask-docker-swarm_cam:latest
     
@@ -48,7 +50,7 @@ EOF
 REMOTE_MACHINE_IP="your_remote_machine_ip_here"
 
 # Use SSH to run the Docker commands on the remote machine
-ssh "$REMOTE_MACHINE_IP" <<EOF
+ssh -tt $REMOTE_MACHINE_IP <<EOF
     # Pull the necessary Docker image
     docker pull zeroprg/flask-docker-swarm_cam:latest
     
@@ -71,3 +73,11 @@ ssh "$REMOTE_MACHINE_IP" <<EOF
         gunicorn --env TMPDIR=./ -w 4 -b 0.0.0.0:3020 manage:app
 EOF
 
+
+
+#!/bin/bash
+
+# Set REMOTE_MACHINE_IP to the IP address of the remote machine
+ssh -tt $CRAWLER_MACHINE_IP <<EOF
+    docker run -d --restart unless-stopped zeroprg/flask-docker-swarm_crawler:latest 
+EOF
